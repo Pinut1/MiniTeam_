@@ -262,10 +262,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3624291313517375209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9708000b12c17f24bb57f3e699dd695e, type: 3}
+  m_Script: {fileID: 11500000, guid: 16256b112760ab5408c1dee1ed02296d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHit
-  invincibleTime: 2
+  moveSpeed: 5
+  bulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
+  firePoint: {fileID: 2659021776226008480}
+  fireRate: 0.15
 --- !u!114 &3782055564796801268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,12 +278,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3624291313517375209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4052d2bc1d1ef8489bbe44c6b9f5a2a, type: 3}
+  m_Script: {fileID: 11500000, guid: 649d1391691106f4db6eb3e7cc49b083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FormationManager
-  buttercup: {fileID: 1317998263374270997}
-  bubbles: {fileID: 1090285449654687728}
-  blossom: {fileID: 4797703102538229429}
+  invincibleTime: 2
 --- !u!114 &9171841088899418321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -290,13 +291,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3624291313517375209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13bc17fb9ec2d604ab54b985411570f4, type: 3}
+  m_Script: {fileID: 11500000, guid: 3241d37df4299c54792f1f4b4697ee82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
-  bulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
-  firePoint: {fileID: 2659021776226008480}
-  fireRate: 0.15
+  buttercup: {fileID: 1317998263374270997}
+  bubbles: {fileID: 1090285449654687728}
+  blossom: {fileID: 4797703102538229429}
 --- !u!54 &7528329572770112823
 Rigidbody:
   m_ObjectHideFlags: 0
