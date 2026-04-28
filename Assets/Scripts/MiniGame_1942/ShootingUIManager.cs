@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace MiniTeam.Shooting1942
 {
@@ -17,7 +18,7 @@ namespace MiniTeam.Shooting1942
 
         [Header("웨이브 안내 텍스트")]
         public GameObject wavePanel;
-        public Text waveText;
+        public TextMeshProUGUI waveText;
 
         void Awake()
         {
