@@ -4,10 +4,7 @@ using MiniTeam.Core;
 namespace MiniTeam.Shooting1942
 {
     // 역할: 편대원 상태 / HP 관리
-<<<<<<< Updated upstream
     // 피격 이벤트는 PlayerHit.cs에서 호출
-=======
->>>>>>> Stashed changes
     public class FormationManager : MonoBehaviour
     {
         [Header("편대원 오브젝트 (Inspector에서 연결)")]
@@ -23,10 +20,7 @@ namespace MiniTeam.Shooting1942
             SetActive(bubbles,   true);
             SetActive(blossom,   true);
             CurrentHP = 3;
-<<<<<<< Updated upstream
-=======
             ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
->>>>>>> Stashed changes
         }
 
         public void TakeHit()
@@ -40,16 +34,6 @@ namespace MiniTeam.Shooting1942
                 case 0: SetActive(blossom,   false); GameOver(); break;
             }
 
-<<<<<<< Updated upstream
-            Debug.Log($"[Formation] 피격 - 남은 HP: {CurrentHP}");
-        }
-
-        // P아이템 먹으면 편대원 복귀
-        public void Recover()
-        {
-            if (CurrentHP >= 3) return;
-
-=======
             ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
             Debug.Log($"[Formation] 피격 - 남은 HP: {CurrentHP}");
         }
@@ -57,7 +41,6 @@ namespace MiniTeam.Shooting1942
         public void Recover()
         {
             if (CurrentHP >= 3) return;
->>>>>>> Stashed changes
             CurrentHP++;
 
             switch (CurrentHP)
@@ -66,10 +49,7 @@ namespace MiniTeam.Shooting1942
                 case 3: SetActive(buttercup, true); break;
             }
 
-<<<<<<< Updated upstream
-=======
             ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
->>>>>>> Stashed changes
             Debug.Log($"[Formation] 복귀 - 현재 HP: {CurrentHP}");
         }
 

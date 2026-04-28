@@ -8,19 +8,6 @@ namespace MiniTeam.Shooting1942
         [Header("적 프리팹")]
         public GameObject[] enemyPrefabs;
 
-<<<<<<< Updated upstream
-        [Header("소환 설정")]
-        public float spawnInterval = 1.5f;
-        public float spawnYOffset  = 1f;
-
-        [Header("난이도 (시간 경과 자동 증가)")]
-        public float difficultyInterval = 15f;
-        public float minInterval        = 0.5f;
-
-        private float spawnTopY;
-        private float spawnMinX;
-        private float spawnMaxX;
-=======
         [Header("Wave 1 설정 (직선만, 느림)")]
         public float wave1Interval = 2.5f;
         public float wave1Speed    = 1.2f;
@@ -37,15 +24,10 @@ namespace MiniTeam.Shooting1942
         private int   currentWave = 0;
         private bool  spawning    = false;
         private Coroutine spawnCoroutine;
->>>>>>> Stashed changes
 
         void Start()
         {
             CalculateSpawnBounds();
-<<<<<<< Updated upstream
-            StartCoroutine(SpawnLoop());
-            StartCoroutine(DifficultyLoop());
-=======
         }
 
         public void SetWave(int wave)
@@ -71,50 +53,24 @@ namespace MiniTeam.Shooting1942
         {
             spawning = false;
             if (spawnCoroutine != null) StopCoroutine(spawnCoroutine);
->>>>>>> Stashed changes
         }
 
         IEnumerator SpawnLoop()
         {
-<<<<<<< Updated upstream
-            while (true)
-            {
-                SpawnEnemy();
-                yield return new WaitForSeconds(spawnInterval);
-            }
-        }
-
-        IEnumerator DifficultyLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(difficultyInterval);
-                spawnInterval = Mathf.Max(minInterval, spawnInterval - 0.2f);
-                Debug.Log($"[Spawner] 난이도 증가 - 소환 간격: {spawnInterval:F1}s");
-=======
             while (spawning)
             {
                 SpawnEnemy();
                 yield return new WaitForSeconds(currentInterval);
->>>>>>> Stashed changes
             }
         }
 
         void SpawnEnemy()
         {
-<<<<<<< Updated upstream
-            float randomX = Random.Range(spawnMinX, spawnMaxX);
-            Vector3 spawnPos = new Vector3(randomX, spawnTopY, 0f);
-
-            int idx = Random.Range(0, enemyPrefabs.Length);
-            Instantiate(enemyPrefabs[idx], spawnPos, Quaternion.identity);
-=======
             if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
 
             float randomX = Random.Range(spawnMinX, spawnMaxX);
             Vector3 spawnPos = new Vector3(randomX, spawnTopY, 0f);
 
-            // Wave 2에서는 절반 확률로 사인 패턴
             int idx = Random.Range(0, enemyPrefabs.Length);
             GameObject obj = Instantiate(enemyPrefabs[idx], spawnPos, Quaternion.identity);
 
@@ -128,14 +84,12 @@ namespace MiniTeam.Shooting1942
 
         void SetEnemySpeed(float speed)
         {
-            // 이후 소환될 프리팹 기본값 변경 (Inspector 기준)
             foreach (var prefab in enemyPrefabs)
             {
                 if (prefab == null) continue;
                 Enemy e = prefab.GetComponent<Enemy>();
                 if (e != null) e.moveSpeed = speed;
             }
->>>>>>> Stashed changes
         }
 
         void CalculateSpawnBounds()

@@ -2,11 +2,7 @@ using UnityEngine;
 
 namespace MiniTeam.Shooting1942
 {
-<<<<<<< Updated upstream
-    // 역할: 이동 / 적 충돌 시 삭제
-=======
     // 역할: 이동 / 적 및 보스 충돌 처리
->>>>>>> Stashed changes
     public class Bullet : MonoBehaviour
     {
         public float speed = 10f;
@@ -35,14 +31,11 @@ namespace MiniTeam.Shooting1942
                 other.GetComponent<Enemy>()?.TakeHit();
                 Destroy(gameObject);
             }
-<<<<<<< Updated upstream
-=======
             else if (other.CompareTag("Boss"))
             {
                 other.GetComponent<BossController>()?.TakeHit();
                 Destroy(gameObject);
             }
->>>>>>> Stashed changes
         }
     }
 }
