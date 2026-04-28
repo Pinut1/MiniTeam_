@@ -24,7 +24,7 @@ namespace MiniTeam.Shooting1942
         {
             gameController = GetComponent<ShootingGameController>();
             if (gameController == null)
-                gameController = FindObjectOfType<ShootingGameController>();
+                gameController = FindAnyObjectByType<ShootingGameController>();
 
             StartCoroutine(RunWaves());
         }
