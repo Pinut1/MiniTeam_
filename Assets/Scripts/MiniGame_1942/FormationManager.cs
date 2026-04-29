@@ -20,6 +20,7 @@ namespace MiniTeam.Shooting1942
             SetActive(bubbles,   true);
             SetActive(blossom,   true);
             CurrentHP = 3;
+            ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
         }
 
         public void TakeHit()
@@ -33,14 +34,13 @@ namespace MiniTeam.Shooting1942
                 case 0: SetActive(blossom,   false); GameOver(); break;
             }
 
+            ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
             Debug.Log($"[Formation] 피격 - 남은 HP: {CurrentHP}");
         }
 
-        // P아이템 먹으면 편대원 복귀
         public void Recover()
         {
             if (CurrentHP >= 3) return;
-
             CurrentHP++;
 
             switch (CurrentHP)
@@ -49,6 +49,7 @@ namespace MiniTeam.Shooting1942
                 case 3: SetActive(buttercup, true); break;
             }
 
+            ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
             Debug.Log($"[Formation] 복귀 - 현재 HP: {CurrentHP}");
         }
 
