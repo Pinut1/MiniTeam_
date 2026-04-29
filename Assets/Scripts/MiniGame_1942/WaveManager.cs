@@ -9,15 +9,19 @@ namespace MiniTeam.Shooting1942
         [Header("적 프리팹")]
         public GameObject[] enemyPrefabs;
 
-        [Header("Wave 1 (직선만, 느림)")]
-        public float wave1Duration = 60f;
-        public float wave1Interval = 2.5f;
-        public float wave1Speed    = 1.2f;
+        [Header("Wave 1")]
+        public float wave1Duration   = 60f;
+        public float wave1Interval   = 2.5f;
+        public float wave1Speed      = 1.2f;
+        [Range(0f, 1f)]
+        public float wave1ShootRatio = 0.3f;
 
-        [Header("Wave 2 (직선+사인 혼합)")]
-        public float wave2Duration = 60f;
-        public float wave2Interval = 1.8f;
-        public float wave2Speed    = 1.8f;
+        [Header("Wave 2")]
+        public float wave2Duration   = 60f;
+        public float wave2Interval   = 1.8f;
+        public float wave2Speed      = 1.8f;
+        [Range(0f, 1f)]
+        public float wave2ShootRatio = 0.5f;
 
         [Header("보스")]
         public GameObject bossPrefab;
@@ -106,12 +110,14 @@ namespace MiniTeam.Shooting1942
             int idx        = Random.Range(0, enemyPrefabs.Length);
             GameObject obj = Instantiate(enemyPrefabs[idx], spawnPos, Quaternion.identity);
 
-            if (currentWave == 2)
-            {
-                Enemy enemy = obj.GetComponent<Enemy>();
-                if (enemy != null && Random.value > 0.5f)
-                    enemy.movementType = Enemy.MovementType.Sine;
-            }
+            Enemy enemy = obj.GetComponent<Enemy>();
+            if (enemy == null) return;
+
+            float shootRatio = currentWave == 1 ? wave1ShootRatio : wave2ShootRatio;
+            enemy.canShoot = Random.value < shootRatio;
+
+            if (currentWave == 2 && Random.value > 0.5f)
+                enemy.movementType = Enemy.MovementType.Sine;
         }
 
         void SetEnemySpeed(float speed)

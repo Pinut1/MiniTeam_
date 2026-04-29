@@ -19,6 +19,7 @@ namespace MiniTeam.Shooting1942
         public float pattern1Interval = 2f;
 
         [Header("패턴 2 - 3방향 산탄")]
+        public GameObject bossBulletPrefab;  // BossBullet 컴포넌트 붙은 프리팹
         public float pattern2Interval = 4f;
         public float spreadAngle = 25f;
 
@@ -79,12 +80,13 @@ namespace MiniTeam.Shooting1942
 
         void FireSpread()
         {
-            if (bulletPrefab == null) return;
+            if (bossBulletPrefab == null) return;
             float[] angles = { -spreadAngle, 0f, spreadAngle };
             foreach (float angle in angles)
             {
-                Quaternion rot = Quaternion.Euler(0f, 0f, angle);
-                Instantiate(bulletPrefab, transform.position, rot);
+                Vector3 dir = Quaternion.Euler(0f, 0f, angle) * Vector3.down;
+                GameObject b = Instantiate(bossBulletPrefab, transform.position, Quaternion.identity);
+                b.GetComponent<BossBullet>()?.SetDirection(dir);
             }
         }
 
