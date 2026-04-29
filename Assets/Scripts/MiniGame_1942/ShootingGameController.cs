@@ -3,17 +3,26 @@ using MiniTeam.Core;
 
 namespace MiniTeam.Shooting1942
 {
-    // 담당: 김영욱
+    // 1942 게임 전체 흐름 관리
+    // 같은 GameObject에 WaveManager 컴포넌트도 추가할 것
     public class ShootingGameController : MonoBehaviour, IMiniGame
     {
-        void Start()
+        private WaveManager waveManager;
+
+        void Awake()
         {
-            // TODO: 1942 슈팅 게임 초기화
+            waveManager = GetComponent<WaveManager>();
         }
 
-        void Update()
+        void Start()
         {
-            // TODO: 플레이어 이동, 총알 발사, 적 스폰
+            waveManager.StartWaves();
+        }
+
+        // WaveManager → Boss 격파 시 호출
+        public void OnBossDefeated()
+        {
+            OnGameClear();
         }
 
         public void OnGameClear()
