@@ -4,28 +4,49 @@ using MiniTeam.Core;
 namespace MiniTeam.Shooting1942
 {
     // 담당: 김영욱
+    // 전체 게임 흐름 총괄 (웨이브 → 보스 → 클리어/실패)
     public class ShootingGameController : MonoBehaviour, IMiniGame
     {
+        [Header("연출")]
+        public GameObject spaceshipRewardObj;  // 클리어 시 등장할 우주선 오브젝트
+
+        private bool isGameOver = false;
+
         void Start()
         {
-            // TODO: 1942 슈팅 게임 초기화
+            if (spaceshipRewardObj != null)
+                spaceshipRewardObj.SetActive(false);
         }
 
-        void Update()
-        {
-            // TODO: 플레이어 이동, 총알 발사, 적 스폰
-        }
+        void Update() { }
 
         public void OnGameClear()
         {
-            Debug.Log("[1942] Game Clear!");
-            MiniGameManager.Instance.OnMiniGameClear();
+            if (isGameOver) return;
+            isGameOver = true;
+
+            Debug.Log("[1942] Game Clear! 우주선 획득");
+
+            // 우주선 오브제 등장 연출
+            if (spaceshipRewardObj != null)
+                spaceshipRewardObj.SetActive(true);
+
+            // 2초 후 허브로 복귀
+            Invoke(nameof(ExitToHub), 2f);
         }
 
         public void OnGameFail()
         {
+            if (isGameOver) return;
+            isGameOver = true;
+
             Debug.Log("[1942] Game Fail!");
-            MiniGameManager.Instance.OnMiniGameFail();
+            Invoke(nameof(ExitToHub), 1.5f);
+        }
+
+        void ExitToHub()
+        {
+            MiniGameManager.Instance.OnMiniGameClear();
         }
     }
 }

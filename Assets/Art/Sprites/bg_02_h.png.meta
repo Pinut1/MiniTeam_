@@ -1,10 +1,7 @@
 fileFormatVersion: 2
-guid: bf4b6fda11b2c7d45b7753402a5f5651
+guid: 0ef9e1b30c88d9c4faf55cece61257ae
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -4423739779879752017
-    second: vehlnjfl7vmc1_0
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -42,7 +39,7 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -124,29 +121,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: vehlnjfl7vmc1_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 225
-        height: 225
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: faea081bb18bb92c0800000000000000
-      internalID: -4423739779879752017
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     customData: 
     physicsShape: []
@@ -160,8 +135,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      vehlnjfl7vmc1_0: -4423739779879752017
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
