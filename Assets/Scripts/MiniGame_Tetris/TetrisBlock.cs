@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TetrisBlock : MonoBehaviour
@@ -7,6 +8,8 @@ public class TetrisBlock : MonoBehaviour
     public float fallTime = 0.8f;
     public static int height = 20;
     public static int width = 10;
+    private static Transform[,] grid = new Transform[width, height];
+   
    
     void Start()
     {
@@ -23,6 +26,10 @@ public class TetrisBlock : MonoBehaviour
             if (!ValidMove())
             {
                 transform.position += new Vector3(0, 1, 0);
+                AddToGrid();
+                CheckForLines();
+                this.enabled = false;
+                SpawnTetromino.Instance.NewTetromino();
             }
             previousTime = Time.time;
         }
@@ -58,6 +65,68 @@ public class TetrisBlock : MonoBehaviour
         }
     }
 
+    private void CheckForLines()
+    {
+        for (int i = height-1; i >= 0; i--)
+        {
+            if (HasLine(i))
+            {
+                DeleteLine(i);
+                RowDown(i);
+
+                i++;
+            }
+        }
+    }
+
+
+    bool HasLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (grid[j,i] == null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void DeleteLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            Destroy(grid[j, i].gameObject);
+            grid[j, i] = null;
+        }
+    }
+    private void RowDown(int i)
+    {
+        for (int y = i; y < height; y++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (grid[j,y] != null)
+                {
+                    grid[j, y - 1] = grid[j, y];
+                    grid[j, y] = null;
+                    grid[j, y - 1].transform.position -= new Vector3(0, 1, 0);
+                }
+            }
+        }
+    }
+
+    void AddToGrid()
+    {
+        foreach (Transform children in transform)
+        {
+            int roundedX = Mathf.RoundToInt(children.transform.position.x);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+
+            grid[roundedX, roundedY] = children;
+
+        }
+    }
 
     //배경을 벗어나지 않도록 체크하는 메서드
     bool ValidMove()
@@ -68,6 +137,11 @@ public class TetrisBlock : MonoBehaviour
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
             if (roundedX < 0 || roundedX >= width || roundedY < 0 || roundedY >= height)
+            {
+                return false;
+            }
+
+            if (grid[roundedX, roundedY] != null)
             {
                 return false;
             }
