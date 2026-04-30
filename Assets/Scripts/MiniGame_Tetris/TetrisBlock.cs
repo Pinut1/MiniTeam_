@@ -3,18 +3,37 @@ using UnityEngine;
 
 public class TetrisBlock : MonoBehaviour
 {
+    public enum BlockType { Normal, I, O }
+    public BlockType type = BlockType.Normal;
+
     public Vector3 rotationPoint;
     private float previousTime;
     public float fallTime = 0.8f;
     public static int height = 20;
     public static int width = 10;
     private static Transform[,] grid = new Transform[width, height];
-   
-   
-    void Start()
-    {
-        
-    }
+ 
+
+
+    private int rotationState = 0;
+
+    // ---  [SRS 하드코딩 데이터] ---
+    // [JLSTZ = Normal 블록] 시계 방향 회전 시 벽차기 오프셋 (Test 2 ~ 5)
+    private readonly Vector2[,] normalKickData = new Vector2[,] {
+        { new Vector2(-1, 0), new Vector2(-1, 1), new Vector2(0, -2), new Vector2(-1, -2) }, // State 0 -> 1
+        { new Vector2(1, 0),  new Vector2(1, -1), new Vector2(0, 2),  new Vector2(1, 2) },   // State 1 -> 2
+        { new Vector2(1, 0),  new Vector2(1, 1),  new Vector2(0, -2), new Vector2(1, -2) },  // State 2 -> 3
+        { new Vector2(-1, 0), new Vector2(-1, -1),new Vector2(0, 2),  new Vector2(-1, 2) }   // State 3 -> 0
+    };
+
+    // [I 블록] 긴 막대기 전용 시계 방향 벽차기 오프셋
+    private readonly Vector2[,] iKickData = new Vector2[,] {
+        { new Vector2(-2, 0), new Vector2(1, 0),  new Vector2(-2, -1), new Vector2(1, 2) },
+        { new Vector2(-1, 0), new Vector2(2, 0),  new Vector2(-1, 2),  new Vector2(2, -1) },
+        { new Vector2(2, 0),  new Vector2(-1, 0), new Vector2(2, 1),   new Vector2(-1, -2) },
+        { new Vector2(1, 0),  new Vector2(-2, 0), new Vector2(1, -2),  new Vector2(-2, 1) }
+    };
+
 
     void Update()
     {
@@ -26,6 +45,7 @@ public class TetrisBlock : MonoBehaviour
             if (!ValidMove())
             {
                 transform.position += new Vector3(0, 1, 0);
+             
                 AddToGrid();
                 CheckForLines();
                 this.enabled = false;
@@ -57,12 +77,44 @@ public class TetrisBlock : MonoBehaviour
         //블록 회전
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0,0,1), 90);
+            if (type == BlockType.O) return;
+            
+            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0,0,1), -90);
+
+            // 회전하는데 벽에 걸린 경우
             if (!ValidMove())
             {
-                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+
+                if(!PerformWallKick(rotationState))
+                {
+                    transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                    return;
+                }
+
             }
+
+            rotationState = (rotationState + 1) % 4;
         }
+    }
+
+    bool PerformWallKick(int currentState)
+    {
+        Vector2[,] kickTable = (type == BlockType.I) ? iKickData : normalKickData;
+
+        for (int testIndex = 0; testIndex < 4; testIndex++)
+        {
+            Vector2 translation = kickTable[currentState, testIndex];
+
+            transform.position += new Vector3(translation.x, translation.y, 0);
+
+            if (ValidMove())
+            {
+                return true;
+            }
+
+            transform.position -= new Vector3(translation.x, translation.y, 0);
+        }
+        return false;
     }
 
     private void CheckForLines()
