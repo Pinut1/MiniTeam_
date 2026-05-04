@@ -36,16 +36,16 @@ public class TetrisBlock : MonoBehaviour
 
     private void Start()
     {
-        //spawn 하자마자 정상적인 위치인지 검사
+        //spawn    美               치      講 
         if (!ValidMove())
         {
-            Debug.Log("스폰 위치에 이미 블록이 있습니다! 깔끔하게 GAME OVER!");
+            Debug.Log("       치    譴         笭  求 !     構  GAME OVER!");
 
             SpawnTetromino.Instance.TogglespawnTrigger();
 
             this.enabled = false;
 
-            //TODO : 게임 오버 처리
+            //TODO :           처  
 
         }
 
