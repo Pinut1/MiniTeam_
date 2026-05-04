@@ -34,6 +34,23 @@ public class TetrisBlock : MonoBehaviour
         { new Vector2(1, 0),  new Vector2(-2, 0), new Vector2(1, -2),  new Vector2(-2, 1) }
     };
 
+    private void Start()
+    {
+        //spawn 하자마자 정상적인 위치인지 검사
+        if (!ValidMove())
+        {
+            Debug.Log("스폰 위치에 이미 블록이 있습니다! 깔끔하게 GAME OVER!");
+
+            SpawnTetromino.Instance.TogglespawnTrigger();
+
+            this.enabled = false;
+
+            //TODO : 게임 오버 처리
+
+        }
+
+    }
+
 
     void Update()
     {
@@ -52,6 +69,7 @@ public class TetrisBlock : MonoBehaviour
                 this.enabled = false;
 
                 SpawnTetromino.Instance.NewTetromino();
+                return;
             }
             previousTime = Time.time;
         }

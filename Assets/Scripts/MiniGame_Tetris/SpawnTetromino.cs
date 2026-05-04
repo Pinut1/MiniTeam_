@@ -101,7 +101,7 @@ public class SpawnTetromino : MonoBehaviour
             Instantiate(Tetrominoes[currentBlockIndex], transform.position, Quaternion.identity);
             canHold = false;
         }
-        
+
     }
 
     // 주머니를 채우고 섞는 메서드
@@ -122,5 +122,15 @@ public class SpawnTetromino : MonoBehaviour
             bag[i] = bag[randomIndex];
             bag[randomIndex] = temp;
         }
+    }
+
+    private Vector3 GetCenter(GameObject block)
+    {
+        Vector3 CenterPos = Vector3.zero;
+        foreach (Transform item in block.transform)
+        {
+            CenterPos += item.position;
+        }
+        return CenterPos / block.transform.childCount;
     }
 }
