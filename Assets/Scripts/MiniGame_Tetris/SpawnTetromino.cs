@@ -17,6 +17,11 @@ public class SpawnTetromino : MonoBehaviour
     private GameObject holdDummy;     // 홀드 구역(허공)에 보여줄 가짜 블록
     public Transform holdPos;
 
+    [Header("Next 블록 세팅")]
+    public Transform[] nextAnchors;
+    private GameObject[] nextDumies;
+
+
     /// <summary>
     /// Initializes the class-level singleton Instance; if another instance already exists, destroys this component.
     /// </summary>
@@ -38,7 +43,9 @@ public class SpawnTetromino : MonoBehaviour
     void Start()
     {
         spawnTrigger = true;
+        nextDumies = new GameObject[nextAnchors.Length];
         NewTetromino();
+
     }
     void Update()
     {
@@ -67,7 +74,7 @@ public class SpawnTetromino : MonoBehaviour
         if(!spawnTrigger)
             return;
 
-        if (bag.Count == 0)
+        if (bag.Count <= nextAnchors.Length)
         {
             FillAndShuffleBag();
         }
@@ -81,6 +88,9 @@ public class SpawnTetromino : MonoBehaviour
         canHold = true;
 
         Instantiate(Tetrominoes[index], transform.position, Quaternion.identity);
+
+        
+        UpdateNextBlocks();
     }
 
     /// <summary>
@@ -102,6 +112,13 @@ public class SpawnTetromino : MonoBehaviour
         if (holdDummy != null) Destroy(holdDummy); //기존 HOLD칸의 더미 블록 삭제.
 
         holdDummy = Instantiate(Tetrominoes[currentBlockIndex], holdPos.position, Quaternion.identity);
+
+        holdDummy.transform.localScale = Vector3.one * 0.65f;
+
+        Vector3 realCenter = GetCenter(holdDummy);
+        Vector3 offset = holdPos.position - realCenter;
+        holdDummy.transform.position += offset;
+
         holdDummy.GetComponent<TetrisBlock>().enabled = false; // 움직이지 않게 
 
         //3. 블록 Swap 로직. 비어있었던 경우와, 이미 홀드된 블록이 있는 경우 두가지로 나뉜다.
@@ -128,6 +145,39 @@ public class SpawnTetromino : MonoBehaviour
 
     }
 
+    public void UpdateNextBlocks()
+    {
+        // 기존에 떠 있던 Next 더미 블록을 전부 파괴해서 초기화
+        for (int i = 0; i < nextDumies.Length; i++)
+        {
+            if (nextDumies[i] != null) Destroy(nextDumies[i]);
+        }
+
+
+        // 보여줄 개수(Anchor)만큼 반복하며 렌더링
+        for (int i = 0; i < nextDumies.Length; i++)
+        {
+            //주머니 부족 버그 방어용 조건문
+            if (i < bag.Count)
+            {
+                int blockIndex = bag[i];
+                GameObject dummy = Instantiate(Tetrominoes[blockIndex], nextAnchors[i].position, Quaternion.identity);
+
+                
+                dummy.GetComponent<TetrisBlock>().enabled = false;
+
+                dummy.transform.localScale = Vector3.one * 0.65f;
+
+                // 블록의 무게중심 보정
+                Vector3 realCenter = GetCenter(dummy);
+                Vector3 offset = nextAnchors[i].position - realCenter;
+                dummy.transform.position += offset;
+
+                // 다음 턴에 지울 수 있게 배열에 기억해둠
+                nextDumies[i] = dummy;
+            }
+        }
+    }
     /// <summary>
     /// Refills the internal bag with one copy of each tetromino index (0–6) and randomizes their order.
     /// </summary>

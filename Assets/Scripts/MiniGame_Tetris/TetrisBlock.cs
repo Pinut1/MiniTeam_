@@ -39,7 +39,7 @@ public class TetrisBlock : MonoBehaviour
         //spawn    ڸ               ġ      ˻ 
         if (!ValidMove())
         {
-            Debug.Log("       ġ    ̹         ֽ  ϴ !     ϰ  GAME OVER!");
+            Debug.Log(" GAME OVER!");
 
             SpawnTetromino.Instance.TogglespawnTrigger();
 
