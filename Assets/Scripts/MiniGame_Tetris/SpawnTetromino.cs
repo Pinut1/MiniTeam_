@@ -21,6 +21,7 @@ public class SpawnTetromino : MonoBehaviour
     public Transform[] nextAnchors;
     private GameObject[] nextDumies;
 
+   
 
     /// <summary>
     /// Initializes the class-level singleton Instance; if another instance already exists, destroys this component.
@@ -209,4 +210,6 @@ public class SpawnTetromino : MonoBehaviour
         }
         return CenterPos / block.transform.childCount;
     }
+
+  
 }

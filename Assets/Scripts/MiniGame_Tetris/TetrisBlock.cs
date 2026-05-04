@@ -12,8 +12,11 @@ public class TetrisBlock : MonoBehaviour
     public static int height = 20;
     public static int width = 10;
     private static Transform[,] grid = new Transform[width, height];
- 
 
+    [Header("조작감 세팅 (DAS & ARR)")]
+    public float das = 0.17f;
+    public float arr = 0.05f;
+    private float horizontalTimer = 0f;
 
     private int rotationState = 0;
 
@@ -36,7 +39,7 @@ public class TetrisBlock : MonoBehaviour
 
     private void Start()
     {
-        //spawn    ڸ               ġ      ˻ 
+        //spawn
         if (!ValidMove())
         {
             Debug.Log(" GAME OVER!");
@@ -45,7 +48,7 @@ public class TetrisBlock : MonoBehaviour
 
             this.enabled = false;
 
-            //TODO :           ó  
+            //TODO : 
 
         }
 
@@ -88,19 +91,33 @@ public class TetrisBlock : MonoBehaviour
         //블록 좌우
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            transform.position += new Vector3(-1, 0, 0);
-            if (!ValidMove())
-            {
-                transform.position += new Vector3(1, 0, 0);
-            }
+            MoveHorizontal(-1);
+            horizontalTimer = Time.time + das;
         }
 
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            transform.position += new Vector3(1, 0, 0);
-            if (!ValidMove())
+            MoveHorizontal(1);
+            horizontalTimer = Time.time + das;
+        }
+
+        // 키를 '꾹' 누르고 있을때
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            if(Time.time > horizontalTimer)
             {
-                transform.position += new Vector3(-1, 0, 0);
+                MoveHorizontal(-1);
+                horizontalTimer = Time.time + arr;
+
+            }
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            if(Time.time > horizontalTimer)
+            {
+                MoveHorizontal(1);
+                horizontalTimer = Time.time + arr;
+
             }
         }
 
@@ -108,14 +125,14 @@ public class TetrisBlock : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (type == BlockType.O) return;
-            
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0,0,1), -90);
+
+            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
 
             // 회전하는데 벽에 걸린 경우
             if (!ValidMove())
             {
 
-                if(!PerformWallKick(rotationState))
+                if (!PerformWallKick(rotationState))
                 {
                     transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
                     return;
@@ -311,5 +328,13 @@ public class TetrisBlock : MonoBehaviour
         }
         return true;
     }
+    private void MoveHorizontal(int direction)
+    {
+        transform.position += new Vector3(direction, 0, 0);
 
+        if (!ValidMove())
+        {
+            transform.position -= new Vector3(direction, 0, 0);
+        }
+    }
 }
