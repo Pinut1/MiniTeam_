@@ -68,60 +68,16 @@ public class TetrisBlock : MonoBehaviour
     void Update()
     {
 
-        //블록 하강
-        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        //1 순위 입력. HOLD 입력
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            transform.position += new Vector3(0, -1, 0);
-            if (!ValidMove())
-            {
-                transform.position += new Vector3(0, 1, 0);
-             
-                AddToGrid();
-                CheckForLines();
-
-                this.enabled = false;
-
-                SpawnTetromino.Instance.NewTetromino();
-                return;
-            }
-            previousTime = Time.time;
+            //SpawnTetromino 한테 자신을 넘기며 홀드 요청
+            SpawnTetromino.Instance.HoldBlock(this.gameObject);
+            return;
         }
 
 
-        //블록 좌우
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            MoveHorizontal(-1);
-            horizontalTimer = Time.time + das;
-        }
-
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            MoveHorizontal(1);
-            horizontalTimer = Time.time + das;
-        }
-
-        // 키를 '꾹' 누르고 있을때
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            if(Time.time > horizontalTimer)
-            {
-                MoveHorizontal(-1);
-                horizontalTimer = Time.time + arr;
-
-            }
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            if(Time.time > horizontalTimer)
-            {
-                MoveHorizontal(1);
-                horizontalTimer = Time.time + arr;
-
-            }
-        }
-
-        //블록 회전
+        //2 순위 입력. 블록 회전
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (type == BlockType.O) return;
@@ -143,12 +99,65 @@ public class TetrisBlock : MonoBehaviour
             rotationState = (rotationState + 1) % 4;
         }
 
-        //HOLD 입력
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        
+        //3 순위 입력. 블록 좌우
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            //SpawnTetromino 한테 자신을 넘기며 홀드 요청
-            SpawnTetromino.Instance.HoldBlock(this.gameObject);
+            MoveHorizontal(-1);
+            horizontalTimer = Time.time + das;
         }
+
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveHorizontal(1);
+            horizontalTimer = Time.time + das;
+        }
+
+        // 키를 '꾹' 누르고 있을때
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            if (Time.time > horizontalTimer)
+            {
+                MoveHorizontal(-1);
+                horizontalTimer = Time.time + arr;
+
+            }
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            if (Time.time > horizontalTimer)
+            {
+                MoveHorizontal(1);
+                horizontalTimer = Time.time + arr;
+
+            }
+        }
+
+        //4 순위 입력. 블록 하강
+        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        {
+            transform.position += new Vector3(0, -1, 0);
+            if (!ValidMove())
+            {
+                transform.position += new Vector3(0, 1, 0);
+             
+                AddToGrid();
+                CheckForLines();
+
+                this.enabled = false;
+
+                SpawnTetromino.Instance.NewTetromino();
+                return;
+            }
+            previousTime = Time.time;
+        }
+
+
+        
+
+        
+
+       
     }
 
     /// <summary>
