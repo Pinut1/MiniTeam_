@@ -260,9 +260,10 @@ public class TetrisBlock : MonoBehaviour
                         }
                     }
                 }
+                Destroy(cell.gameObject);
+                grid[j, i] = null;
             }
-            Destroy(cell.gameObject);
-            grid[j, i] = null;
+           
         }
     }
     /// <summary>
