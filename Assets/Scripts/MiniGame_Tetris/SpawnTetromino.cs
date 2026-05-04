@@ -183,21 +183,21 @@ public class SpawnTetromino : MonoBehaviour
     /// </summary>
     private void FillAndShuffleBag()
     {
-        // 1. 주머니에 0번부터 6번까지 총 7개의 인덱스를 채워 넣음
-        for (int i = 0; i < 7; i++)
-        {
-            bag.Add(i);
-        }
+        List<int> newBag = new List<int>();
+        for (int i = 0; i < 7; i++) newBag.Add(i);
+        
 
 
         // 2. Fisher - Yates 알고리즘으로 리스트를 무작위로 섞음
-        for (int i = 0; i < bag.Count; i++)
+        for (int i = 0; i < newBag.Count; i++)
         {
-            int randomIndex = Random.Range(i, bag.Count);
-            int temp = bag[i];
-            bag[i] = bag[randomIndex];
-            bag[randomIndex] = temp;
+            int randomIndex = Random.Range(i, newBag.Count);
+            int temp = newBag[i];
+            newBag[i] = newBag[randomIndex];
+            newBag[randomIndex] = temp;
         }
+
+        bag.AddRange(newBag);
     }
 
     private Vector3 GetCenter(GameObject block)
