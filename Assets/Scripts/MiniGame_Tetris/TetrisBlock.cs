@@ -17,8 +17,8 @@ public class TetrisBlock : MonoBehaviour
 
     private int rotationState = 0;
 
-    // ---  [SRS ÇÏµåÄÚµù µ¥ÀÌÅÍ] ---
-    // [JLSTZ = Normal ºí·Ï] ½Ã°è ¹æÇâ È¸Àü ½Ã º®Â÷±â ¿ÀÇÁ¼Â (Test 2 ~ 5)
+    // ---  [SRS í•˜ë“œì½”ë”© ë°ì´í„°] ---
+    // [JLSTZ = Normal ë¸”ë¡] ì‹œê³„ ë°©í–¥ íšŒì „ ì‹œ ë²½ì°¨ê¸° ì˜¤í”„ì…‹ (Test 2 ~ 5)
     private readonly Vector2[,] normalKickData = new Vector2[,] {
         { new Vector2(-1, 0), new Vector2(-1, 1), new Vector2(0, -2), new Vector2(-1, -2) }, // State 0 -> 1
         { new Vector2(1, 0),  new Vector2(1, -1), new Vector2(0, 2),  new Vector2(1, 2) },   // State 1 -> 2
@@ -26,7 +26,7 @@ public class TetrisBlock : MonoBehaviour
         { new Vector2(-1, 0), new Vector2(-1, -1),new Vector2(0, 2),  new Vector2(-1, 2) }   // State 3 -> 0
     };
 
-    // [I ºí·Ï] ±ä ¸·´ë±â Àü¿ë ½Ã°è ¹æÇâ º®Â÷±â ¿ÀÇÁ¼Â
+    // [I ë¸”ë¡] ê¸´ ë§‰ëŒ€ê¸° ì „ìš© ì‹œê³„ ë°©í–¥ ë²½ì°¨ê¸° ì˜¤í”„ì…‹
     private readonly Vector2[,] iKickData = new Vector2[,] {
         { new Vector2(-2, 0), new Vector2(1, 0),  new Vector2(-2, -1), new Vector2(1, 2) },
         { new Vector2(-1, 0), new Vector2(2, 0),  new Vector2(-1, 2),  new Vector2(2, -1) },
@@ -52,10 +52,20 @@ public class TetrisBlock : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Processes player input and timed gravity for the active tetromino.
+    /// </summary>
+    /// <remarks>
+    /// - Advances the piece downward on a timed interval (accelerated while DownArrow is held). 
+    /// - Moves the piece left/right on LeftArrow/RightArrow presses.
+    /// - Rotates the piece on UpArrow (no rotation for O blocks); if rotation collides, attempts wall-kick adjustments.
+    /// - When the piece can no longer descend, locks it into the playfield, clears completed lines, disables this component, and requests a new tetromino spawn.
+    /// - Sends a hold request to the spawn manager when LeftShift is pressed.
+    /// </remarks>
     void Update()
     {
 
-        //ºí·Ï ÇÏ°­
+        //ë¸”ë¡ í•˜ê°•
         if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
         {
             transform.position += new Vector3(0, -1, 0);
@@ -75,7 +85,7 @@ public class TetrisBlock : MonoBehaviour
         }
 
 
-        //ºí·Ï ÁÂ¿ì
+        //ë¸”ë¡ ì¢Œìš°
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             transform.position += new Vector3(-1, 0, 0);
@@ -94,14 +104,14 @@ public class TetrisBlock : MonoBehaviour
             }
         }
 
-        //ºí·Ï È¸Àü
+        //ë¸”ë¡ íšŒì „
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (type == BlockType.O) return;
             
             transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0,0,1), -90);
 
-            // È¸ÀüÇÏ´Âµ¥ º®¿¡ °É¸° °æ¿ì
+            // íšŒì „í•˜ëŠ”ë° ë²½ì— ê±¸ë¦° ê²½ìš°
             if (!ValidMove())
             {
 
@@ -116,14 +126,19 @@ public class TetrisBlock : MonoBehaviour
             rotationState = (rotationState + 1) % 4;
         }
 
-        //HOLD ÀÔ·Â
+        //HOLD ì…ë ¥
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            //SpawnTetromino ÇÑÅ× ÀÚ½ÅÀ» ³Ñ±â¸ç È¦µå ¿äÃ»
+            //SpawnTetromino í•œí…Œ ìì‹ ì„ ë„˜ê¸°ë©° í™€ë“œ ìš”ì²­
             SpawnTetromino.Instance.HoldBlock(this.gameObject);
         }
     }
 
+    /// <summary>
+    /// Attempts positional adjustments (wall kicks) using the appropriate kick table to find a valid placement after a rotation.
+    /// </summary>
+    /// <param name="currentState">Current rotation state index (0â€“3) used to select the kick offsets.</param>
+    /// <returns>`true` if applying any kick offset produces a valid placement, `false` otherwise.</returns>
     bool PerformWallKick(int currentState)
     {
         Vector2[,] kickTable = (type == BlockType.I_enable) ? iKickData : normalKickData;
@@ -144,6 +159,12 @@ public class TetrisBlock : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Scans the board for completed horizontal lines, removes each full line, and drops the rows above down to fill the gap.
+    /// </summary>
+    /// <remarks>
+    /// The method iterates rows from the top of the playfield to the bottom. After deleting a line and shifting rows down, it rechecks the same row index to detect consecutive cleared lines that moved into this row.
+    /// </remarks>
     private void CheckForLines()
     {
         for (int i = height-1; i >= 0; i--)
@@ -159,6 +180,11 @@ public class TetrisBlock : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Determines whether the specified row is completely filled with blocks.
+    /// </summary>
+    /// <param name="i">The zero-based row index to check (0 = bottom row).</param>
+    /// <returns>`true` if every column in row <paramref name="i"/> contains a block, `false` otherwise.</returns>
     bool HasLine(int i)
     {
         for (int j = 0; j < width; j++)
@@ -171,12 +197,16 @@ public class TetrisBlock : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Removes all occupied cells in the specified row, clears their grid entries, and applies special handling for fragments of `I_enable` blocks.
+    /// </summary>
+    /// <param name="i">Index of the row to delete (0-based, 0 is the bottom row).</param>
     private void DeleteLine(int i)
     {
         for (int j = 0; j < width; j++)
         {
             Transform cell = grid[j, i];
-            if (cell != null) // ¾ÈÀüÀåÄ¡
+            if (cell != null) // ì•ˆì „ì¥ì¹˜
             {
                 Transform parentTransform = cell.parent;
 
@@ -186,18 +216,18 @@ public class TetrisBlock : MonoBehaviour
                     {
                         if (parentBlock.type == BlockType.I_enable)
                         {
-                            Debug.Log("I_enable ºí·ÏÀÇ ÆÄÆíÀ» Ã£¾Ò½À´Ï´Ù");
+                            Debug.Log("I_enable ë¸”ë¡ì˜ íŒŒí¸ì„ ì°¾ì•˜ìŠµë‹ˆë‹¤");
                             parentBlock.type = BlockType.I_disable;
-                            //TODO Å¸¸¶¸¶ ÀÓÆåÆ® Ã³¸®
+                            //TODO íƒ€ë§ˆë§ˆ ì„í™íŠ¸ ì²˜ë¦¬
 
                             foreach (Transform sibling in parentTransform)
                             {
-                                // ÀÌ¹ø¿¡ Áö¿öÁú ÀÚ±â ÀÚ½ÅÀº ¾îÂ÷ÇÇ °ğ ÆÄ±«µÇ´Ï »öÄ¥ÇÒ ÇÊ¿ä ¾øÀ½
+                                // ì´ë²ˆì— ì§€ì›Œì§ˆ ìê¸° ìì‹ ì€ ì–´ì°¨í”¼ ê³§ íŒŒê´´ë˜ë‹ˆ ìƒ‰ì¹ í•  í•„ìš” ì—†ìŒ
                                 if (sibling != cell)
                                 {
                                     if (sibling.TryGetComponent(out SpriteRenderer sr))
                                     {
-                                        sr.color = Color.gray; // »ì¾Æ³²Àº ÆÄÆíµéÀº È¸»öÀ¸·Î ±»¾î¹ö¸²!
+                                        sr.color = Color.gray; // ì‚´ì•„ë‚¨ì€ íŒŒí¸ë“¤ì€ íšŒìƒ‰ìœ¼ë¡œ êµ³ì–´ë²„ë¦¼!
                                     }
                                 }
                             }
@@ -209,6 +239,10 @@ public class TetrisBlock : MonoBehaviour
             grid[j, i] = null;
         }
     }
+    /// <summary>
+    /// Moves every occupied cell at or above the specified row down by one row in the grid.
+    /// </summary>
+    /// <param name="i">The starting row index (inclusive); all occupied cells in row <c>i</c> and above are shifted down one row. This updates both the static grid references and each moved transform's world position.</param>
     private void RowDown(int i)
     {
         for (int y = i; y < height; y++)
@@ -225,6 +259,13 @@ public class TetrisBlock : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Stores each child square of this tetromino into the static playfield grid at its rounded world coordinates.
+    /// </summary>
+    /// <remarks>
+    /// Rounds each child's world X/Y to integer grid coordinates before placement. If a child's rounded Y is equal to or above the grid height, the method triggers the spawn/game-over handler and skips placing that cell.
+    /// </remarks>
+    /// <seealso cref="SpawnTetromino.Instance.TogglespawnTrigger"/>
     void AddToGrid()
     {
         foreach (Transform children in transform)
@@ -234,9 +275,9 @@ public class TetrisBlock : MonoBehaviour
 
             if (roundedY >= height)
             {
-                Debug.LogWarning("ºí·ÏÀÌ ÃµÀåÀ» ¶Õ¾ú½À´Ï´Ù. GAME OVER");
+                Debug.LogWarning("ë¸”ë¡ì´ ì²œì¥ì„ ëš«ì—ˆìŠµë‹ˆë‹¤. GAME OVER");
                 // TODO
-                // °ÔÀÓ ¿À¹ö½Ã Ã³¸®
+                // ê²Œì„ ì˜¤ë²„ì‹œ ì²˜ë¦¬
                 SpawnTetromino.Instance.TogglespawnTrigger();
 
                 continue;
@@ -247,7 +288,10 @@ public class TetrisBlock : MonoBehaviour
         }
     }
 
-    //¹è°æÀ» ¹ş¾î³ªÁö ¾Êµµ·Ï Ã¼Å©ÇÏ´Â ¸Ş¼­µå
+    /// <summary>
+    /// Determines whether all child blocks of this tetromino are inside the playfield bounds and not colliding with occupied grid cells.
+    /// </summary>
+    /// <returns>`true` if every child block's rounded X is between 0 and width - 1, rounded Y is greater than or equal to 0, and no occupied grid cell exists at the rounded coordinates (overlap check is performed only when the rounded Y is less than height); `false` otherwise.</returns>
     bool ValidMove()
     {
         foreach (Transform children in transform)

@@ -10,13 +10,16 @@ public class SpawnTetromino : MonoBehaviour
 
     private bool spawnTrigger;
 
-    // [Hold ±â´É¿ë º¯¼ö Ãß°¡] 
-    public int currentBlockIndex;     // ÇöÀç È­¸é¿¡¼­ ¶³¾îÁö°í ÀÖ´Â ºí·ÏÀÇ ¹øÈ£
-    public int heldBlockIndex = -1;   // È¦µåÄ­¿¡ ÀÖ´Â ºí·Ï ¹øÈ£ (-1Àº ºñ¾îÀÖÀ½À» ÀÇ¹Ì)
-    public bool canHold = true;       // 1ÅÏ 1È¦µå Á¦ÇÑ¿ë ½ºÀ§Ä¡
-    private GameObject holdDummy;     // È¦µå ±¸¿ª(Çã°ø)¿¡ º¸¿©ÁÙ °¡Â¥ ºí·Ï
+    // [Hold ê¸°ëŠ¥ìš© ë³€ìˆ˜ ì¶”ê°€] 
+    public int currentBlockIndex;     // í˜„ì¬ í™”ë©´ì—ì„œ ë–¨ì–´ì§€ê³  ìˆëŠ” ë¸”ë¡ì˜ ë²ˆí˜¸
+    public int heldBlockIndex = -1;   // í™€ë“œì¹¸ì— ìˆëŠ” ë¸”ë¡ ë²ˆí˜¸ (-1ì€ ë¹„ì–´ìˆìŒì„ ì˜ë¯¸)
+    public bool canHold = true;       // 1í„´ 1í™€ë“œ ì œí•œìš© ìŠ¤ìœ„ì¹˜
+    private GameObject holdDummy;     // í™€ë“œ êµ¬ì—­(í—ˆê³µ)ì— ë³´ì—¬ì¤„ ê°€ì§œ ë¸”ë¡
     public Transform holdPos;
 
+    /// <summary>
+    /// Initializes the class-level singleton Instance; if another instance already exists, destroys this component.
+    /// </summary>
     private void Awake()
     {
         if(Instance != null)
@@ -29,6 +32,9 @@ public class SpawnTetromino : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enables piece spawning and spawns the initial tetromino when the component starts.
+    /// </summary>
     void Start()
     {
         spawnTrigger = true;
@@ -39,12 +45,23 @@ public class SpawnTetromino : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Disables spawning of new tetrominoes by setting the internal spawn trigger to false.
+    /// </summary>
     public void TogglespawnTrigger()
     {
         spawnTrigger = false;
     }
 
-    // ´ÙÀ½ ºí·ÏÀ» »Ì´Â ¸Ş¼­µå
+    /// <summary>
+    /// Spawns the next tetromino from the bag and prepares hold state for the new piece.
+    /// </summary>
+    /// <remarks>
+    /// If spawning is disabled via <c>spawnTrigger</c>, the method does nothing.
+    /// If the internal bag is empty it will be refilled before selecting a piece.
+    /// The selected tetromino index becomes <c>currentBlockIndex</c>, <c>canHold</c> is set to <c>true</c>,
+    /// and the corresponding prefab from <c>Tetrominoes</c> is instantiated at this object's position with no rotation.
+    /// </remarks>
     public void NewTetromino()
     {
         if(!spawnTrigger)
@@ -55,34 +72,41 @@ public class SpawnTetromino : MonoBehaviour
             FillAndShuffleBag();
         }
 
-        // ÁÖ¸Ó´Ï¿¡¼­ ¸Ç ¾ÕÀÇ ºí·ÏÀ» ²¨³»°í ¸®½ºÆ®¿¡¼­ »èÁ¦
+        // ì£¼ë¨¸ë‹ˆì—ì„œ ë§¨ ì•ì˜ ë¸”ë¡ì„ êº¼ë‚´ê³  ë¦¬ìŠ¤íŠ¸ì—ì„œ ì‚­ì œ
         int index = bag[0];
         bag.RemoveAt(0);
 
-        //1ÅÏ 1HOLD¸¦ ±¸ÇöÇÏ±â À§ÇÔ. »õ·Î ²¨³½ ºí·ÏÀÇ ¹øÈ£¸¦ ±â¾ïÇÏ°í, È¦µå ½ºÀ§Ä¡¸¦ ´Ù½Ã ON.
+        //1í„´ 1HOLDë¥¼ êµ¬í˜„í•˜ê¸° ìœ„í•¨. ìƒˆë¡œ êº¼ë‚¸ ë¸”ë¡ì˜ ë²ˆí˜¸ë¥¼ ê¸°ì–µí•˜ê³ , í™€ë“œ ìŠ¤ìœ„ì¹˜ë¥¼ ë‹¤ì‹œ ON.
         currentBlockIndex = index;
         canHold = true;
 
         Instantiate(Tetrominoes[index], transform.position, Quaternion.identity);
     }
 
+    /// <summary>
+    /// Performs the hold action: stores the current active tetromino in the hold slot or swaps it with the previously held tetromino, and updates the active piece accordingly.
+    /// </summary>
+    /// <param name="activeBlock">The currently falling tetromino GameObject to remove and place into the hold slot or swap out.</param>
+    /// <remarks>
+    /// Creates a non-interactive dummy representation of the held tetromino in the hold area, destroys the provided activeBlock, and either spawns a new tetromino when the hold was empty or replaces the active tetromino with the previously held one. Disables further holds until the next spawn by setting <c>canHold</c> to false.
+    /// </remarks>
     public void HoldBlock(GameObject activeBlock)
     {
         if (!canHold) return;
 
 
-        //1. È­¸é¿¡¼­ ¶³¾îÁö°í ÀÖ´ø ÇöÀç ºí·Ï »èÁ¦.
+        //1. í™”ë©´ì—ì„œ ë–¨ì–´ì§€ê³  ìˆë˜ í˜„ì¬ ë¸”ë¡ ì‚­ì œ.
         Destroy(activeBlock);
 
-        //2. È¦µå ±¸¿ª¿¡ ¶ç¿ï °¡Â¥(´õ¹Ì) ºí·Ï »ı¼º.
-        if (holdDummy != null) Destroy(holdDummy); //±âÁ¸ HOLDÄ­ÀÇ ´õ¹Ì ºí·Ï »èÁ¦.
+        //2. í™€ë“œ êµ¬ì—­ì— ë„ìš¸ ê°€ì§œ(ë”ë¯¸) ë¸”ë¡ ìƒì„±.
+        if (holdDummy != null) Destroy(holdDummy); //ê¸°ì¡´ HOLDì¹¸ì˜ ë”ë¯¸ ë¸”ë¡ ì‚­ì œ.
 
         holdDummy = Instantiate(Tetrominoes[currentBlockIndex], holdPos.position, Quaternion.identity);
-        holdDummy.GetComponent<TetrisBlock>().enabled = false; // ¿òÁ÷ÀÌÁö ¾Ê°Ô 
+        holdDummy.GetComponent<TetrisBlock>().enabled = false; // ì›€ì§ì´ì§€ ì•Šê²Œ 
 
-        //3. ºí·Ï Swap ·ÎÁ÷. ºñ¾îÀÖ¾ú´ø °æ¿ì¿Í, ÀÌ¹Ì È¦µåµÈ ºí·ÏÀÌ ÀÖ´Â °æ¿ì µÎ°¡Áö·Î ³ª´¶´Ù.
+        //3. ë¸”ë¡ Swap ë¡œì§. ë¹„ì–´ìˆì—ˆë˜ ê²½ìš°ì™€, ì´ë¯¸ í™€ë“œëœ ë¸”ë¡ì´ ìˆëŠ” ê²½ìš° ë‘ê°€ì§€ë¡œ ë‚˜ë‰œë‹¤.
 
-        //ÄÉÀÌ½º A : Ã³À½¿¡ È¦µå Ä­ÀÌ ºñ¾îÀÖ¾ú´ø °æ¿ì
+        //ì¼€ì´ìŠ¤ A : ì²˜ìŒì— í™€ë“œ ì¹¸ì´ ë¹„ì–´ìˆì—ˆë˜ ê²½ìš°
         if (heldBlockIndex == -1)
         {
             heldBlockIndex = currentBlockIndex;
@@ -91,7 +115,7 @@ public class SpawnTetromino : MonoBehaviour
             canHold = false;
         }
 
-        //ÄÉÀÌ½º B : ÀÌ¹Ì È¦µåµÈ ºí·ÏÀÌ ÀÖ¾ú´ø °æ¿ì (¼­·Î ±³È¯)
+        //ì¼€ì´ìŠ¤ B : ì´ë¯¸ í™€ë“œëœ ë¸”ë¡ì´ ìˆì—ˆë˜ ê²½ìš° (ì„œë¡œ êµí™˜)
         else
         {
             int temp = currentBlockIndex;
@@ -104,17 +128,19 @@ public class SpawnTetromino : MonoBehaviour
 
     }
 
-    // ÁÖ¸Ó´Ï¸¦ Ã¤¿ì°í ¼¯´Â ¸Ş¼­µå
+    /// <summary>
+    /// Refills the internal bag with one copy of each tetromino index (0â€“6) and randomizes their order.
+    /// </summary>
     private void FillAndShuffleBag()
     {
-        // 1. ÁÖ¸Ó´Ï¿¡ 0¹øºÎÅÍ 6¹ø±îÁö ÃÑ 7°³ÀÇ ÀÎµ¦½º¸¦ Ã¤¿ö ³ÖÀ½
+        // 1. ì£¼ë¨¸ë‹ˆì— 0ë²ˆë¶€í„° 6ë²ˆê¹Œì§€ ì´ 7ê°œì˜ ì¸ë±ìŠ¤ë¥¼ ì±„ì›Œ ë„£ìŒ
         for (int i = 0; i < 7; i++)
         {
             bag.Add(i);
         }
 
 
-        // 2. Fisher - Yates ¾Ë°í¸®ÁòÀ¸·Î ¸®½ºÆ®¸¦ ¹«ÀÛÀ§·Î ¼¯À½
+        // 2. Fisher - Yates ì•Œê³ ë¦¬ì¦˜ìœ¼ë¡œ ë¦¬ìŠ¤íŠ¸ë¥¼ ë¬´ì‘ìœ„ë¡œ ì„ìŒ
         for (int i = 0; i < bag.Count; i++)
         {
             int randomIndex = Random.Range(i, bag.Count);
