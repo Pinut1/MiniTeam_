@@ -6,8 +6,9 @@ public class SpawnTetromino : MonoBehaviour
 {
     public GameObject[] Tetrominoes;
     private List<int> bag = new List<int>();
-
     public static SpawnTetromino Instance;
+
+    private bool spawnTrigger;
 
     private void Awake()
     {
@@ -23,16 +24,25 @@ public class SpawnTetromino : MonoBehaviour
 
     void Start()
     {
+        spawnTrigger = true;
         NewTetromino();
     }
     void Update()
     {
+
     }
 
+    public void TogglespawnTrigger()
+    {
+        spawnTrigger = false;
+    }
 
     // 다음 블록을 뽑는 메서드
     public void NewTetromino()
     {
+        if(!spawnTrigger)
+            return;
+
         if (bag.Count == 0)
         {
             FillAndShuffleBag();

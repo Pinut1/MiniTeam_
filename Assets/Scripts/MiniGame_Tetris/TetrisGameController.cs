@@ -24,7 +24,7 @@ namespace MiniTeam.Tetris
 
         public void OnGameFail()
         {
-            Debug.Log("[Tetris] Game Fail!");
+            
             MiniGameManager.Instance.OnMiniGameFail();
         }
     }

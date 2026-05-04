@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TetrisBlock : MonoBehaviour
 {
-    public enum BlockType { Normal, I, O }
+    public enum BlockType { Normal, I_enable,I_disable, O }
     public BlockType type = BlockType.Normal;
 
     public Vector3 rotationPoint;
@@ -48,7 +48,9 @@ public class TetrisBlock : MonoBehaviour
              
                 AddToGrid();
                 CheckForLines();
+
                 this.enabled = false;
+
                 SpawnTetromino.Instance.NewTetromino();
             }
             previousTime = Time.time;
@@ -99,7 +101,7 @@ public class TetrisBlock : MonoBehaviour
 
     bool PerformWallKick(int currentState)
     {
-        Vector2[,] kickTable = (type == BlockType.I) ? iKickData : normalKickData;
+        Vector2[,] kickTable = (type == BlockType.I_enable) ? iKickData : normalKickData;
 
         for (int testIndex = 0; testIndex < 4; testIndex++)
         {
@@ -148,7 +150,25 @@ public class TetrisBlock : MonoBehaviour
     {
         for (int j = 0; j < width; j++)
         {
-            Destroy(grid[j, i].gameObject);
+            Transform cell = grid[j, i];
+            if (cell != null) // 안전장치
+            {
+                Transform parentTransform = cell.parent;
+
+                if (parentTransform != null)
+                {
+                    if (parentTransform.TryGetComponent(out TetrisBlock parentBlock))
+                    {
+                        if (parentBlock.type == BlockType.I_enable)
+                        {
+                            Debug.Log("I_enable 블록의 파편을 찾았습니다");
+                            parentBlock.type = BlockType.I_disable;
+                            //TODO 타마마 임펙트 처리
+                        }
+                    }
+                }
+            }
+            Destroy(cell.gameObject);
             grid[j, i] = null;
         }
     }
@@ -175,6 +195,16 @@ public class TetrisBlock : MonoBehaviour
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
+            if (roundedY >= height)
+            {
+                Debug.LogWarning("블록이 천장을 뚫었습니다. GAME OVER");
+                // TODO
+                // 게임 오버시 처리
+                SpawnTetromino.Instance.TogglespawnTrigger();
+
+                continue;
+            }
+
             grid[roundedX, roundedY] = children;
 
         }
@@ -188,12 +218,12 @@ public class TetrisBlock : MonoBehaviour
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
-            if (roundedX < 0 || roundedX >= width || roundedY < 0 || roundedY >= height)
+            if (roundedX < 0 || roundedX >= width || roundedY < 0)
             {
                 return false;
             }
 
-            if (grid[roundedX, roundedY] != null)
+            if ((roundedY < height && grid[roundedX, roundedY] != null))
             {
                 return false;
             }
