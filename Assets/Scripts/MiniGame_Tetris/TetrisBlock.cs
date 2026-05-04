@@ -97,6 +97,13 @@ public class TetrisBlock : MonoBehaviour
 
             rotationState = (rotationState + 1) % 4;
         }
+
+        //HOLD 입력
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            //SpawnTetromino 한테 자신을 넘기며 홀드 요청
+            SpawnTetromino.Instance.HoldBlock(this.gameObject);
+        }
     }
 
     bool PerformWallKick(int currentState)
