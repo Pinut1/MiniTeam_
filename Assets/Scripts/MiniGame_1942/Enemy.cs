@@ -83,7 +83,10 @@ namespace MiniTeam.Shooting1942
         {
             hp--;
             if (hp <= 0)
+            {
+                ShootingUIManager.Instance?.AddScore(10);
                 Destroy(gameObject);
+            }
         }
     }
 }

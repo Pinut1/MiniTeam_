@@ -98,6 +98,7 @@ namespace MiniTeam.Shooting1942
 
             if (currentHp <= 0)
             {
+                ShootingUIManager.Instance?.AddScore(200);
                 OnBossDefeated?.Invoke();
                 Destroy(gameObject);
             }

@@ -3,50 +3,95 @@ using MiniTeam.Core;
 
 namespace MiniTeam.Shooting1942
 {
-    // 담당: 김영욱
-    // 전체 게임 흐름 총괄 (웨이브 → 보스 → 클리어/실패)
     public class ShootingGameController : MonoBehaviour, IMiniGame
     {
         [Header("연출")]
-        public GameObject spaceshipRewardObj;  // 클리어 시 등장할 우주선 오브젝트
+        public GameObject spaceshipRewardObj;
+
+        [Header("결과 화면 표시 후 허브 복귀까지 대기 시간")]
+        public float resultHoldTime = 3f;
 
         private bool isGameOver = false;
+        private bool isCleared  = false;
+        private bool isPaused   = false;
+        private WaveManager waveManager;
 
         void Start()
         {
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(false);
+
+            waveManager = GetComponent<WaveManager>();
+            if (waveManager == null)
+                waveManager = FindAnyObjectByType<WaveManager>();
         }
 
-        void Update() { }
+        void Update()
+        {
+            if (isGameOver) return;
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                TogglePause();
+        }
+
+        // ── 일시정지 ──────────────────────────────
+
+        void TogglePause()
+        {
+            isPaused = !isPaused;
+            Time.timeScale = isPaused ? 0f : 1f;
+            ShootingUIManager.Instance?.ShowPause(isPaused);
+        }
+
+        // ── IMiniGame ─────────────────────────────
 
         public void OnGameClear()
         {
             if (isGameOver) return;
             isGameOver = true;
+            isCleared  = true;
 
-            Debug.Log("[1942] Game Clear! 우주선 획득");
+            if (isPaused) Time.timeScale = 1f;
 
-            // 우주선 오브제 등장 연출
+            Debug.Log("[1942] Game Clear!");
+            waveManager?.StopGame();
+
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(true);
 
-            // 2초 후 허브로 복귀
-            Invoke(nameof(ExitToHub), 2f);
+            ShootingUIManager.Instance?.ShowResult(true);
+            Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         public void OnGameFail()
         {
             if (isGameOver) return;
             isGameOver = true;
+            isCleared  = false;
+
+            if (isPaused) Time.timeScale = 1f;
 
             Debug.Log("[1942] Game Fail!");
-            Invoke(nameof(ExitToHub), 1.5f);
+            waveManager?.StopGame();
+
+            ShootingUIManager.Instance?.ShowResult(false);
+            Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         void ExitToHub()
         {
-            MiniGameManager.Instance.OnMiniGameClear();
+            Time.timeScale = 1f;
+
+            if (MiniGameManager.Instance == null)
+            {
+                Debug.Log("[1942] MiniGameManager 없음 - 씬 단독 테스트 중");
+                return;
+            }
+
+            if (isCleared)
+                MiniGameManager.Instance.OnMiniGameClear();
+            else
+                MiniGameManager.Instance.OnMiniGameFail();
         }
     }
 }
