@@ -164,6 +164,18 @@ public class TetrisBlock : MonoBehaviour
                             Debug.Log("I_enable 블록의 파편을 찾았습니다");
                             parentBlock.type = BlockType.I_disable;
                             //TODO 타마마 임펙트 처리
+
+                            foreach (Transform sibling in parentTransform)
+                            {
+                                // 이번에 지워질 자기 자신은 어차피 곧 파괴되니 색칠할 필요 없음
+                                if (sibling != cell)
+                                {
+                                    if (sibling.TryGetComponent(out SpriteRenderer sr))
+                                    {
+                                        sr.color = Color.gray; // 살아남은 파편들은 회색으로 굳어버림!
+                                    }
+                                }
+                            }
                         }
                     }
                 }
