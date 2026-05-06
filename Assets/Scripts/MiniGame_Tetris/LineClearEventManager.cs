@@ -29,10 +29,10 @@ public class LineClearEventManager : MonoBehaviour
 
     private void TriggerTripleEffect()
     {
-        Debug.Log("3ÁÙ Áö¿ò");
+        Debug.Log("3ì¤„ ì§€ì›€");
     }
     private void TriggerTetrisEffect()
     {
-        Debug.Log("4ÁÙ Áö¿ò");
+        Debug.Log("4ì¤„ ì§€ì›€");
     }
 }
