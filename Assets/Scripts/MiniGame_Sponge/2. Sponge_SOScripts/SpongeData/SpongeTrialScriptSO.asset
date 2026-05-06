@@ -12,6 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 879a103bafab70642a84e0df76bf7f9f, type: 3}
   m_Name: SpongeTrialScriptSO
   m_EditorClassIdentifier: Assembly-CSharp::SpongeTrialScriptSO
-  openingLines: []
-  testimonyLines: []
-  endingLines: []
+  openingLines:
+  - lineId: 
+    speaker: 
+    txt: 
+    animationTrig: 
+    backgroundImg: {fileID: 0}
+    charaterImg: {fileID: 0}
+    characterPos: 0
+    sceneToLoad: 
+    nextLineId: 
+  testimonyLines:
+  - txt: 
+    ispressable: 0
+    firstPressDialogueId: 
+    isRequiredPress: 0
+    validEvidenceIds: []
+    evidenceSuccessDialogueId: 
+    isRequiredEvidence: 0
+  endingLines:
+  - lineId: 
+    speaker: 
+    txt: 
+    animationTrig: 
+    backgroundImg: {fileID: 0}
+    charaterImg: {fileID: 0}
+    characterPos: 0
+    sceneToLoad: 
+    nextLineId: 

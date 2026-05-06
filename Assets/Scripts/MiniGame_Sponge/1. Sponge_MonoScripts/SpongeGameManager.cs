@@ -9,7 +9,7 @@ public class SpongeGameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != null)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
@@ -25,7 +25,6 @@ public class SpongeGameManager : MonoBehaviour
     [SerializeField] private SpongeGameState gmState;
     private GameState startState = GameState.Dialogue;
     private GameState currentState;
-
     public GameState CurrentState => currentState;
 
     /// <summary>
@@ -41,8 +40,8 @@ public class SpongeGameManager : MonoBehaviour
     }
 
     public bool IsInputBlocked() => currentState == GameState.Resolution;
-    public bool CanPress() => currentState == GameState.CrossExzamination;
-    public bool CanOpenEvidence => currentState == GameState.Dialogue || currentState == GameState.CrossExzamination;
+    public bool CanPress() => currentState == GameState.CrossExamination;
+    public bool CanOpenEvidence => currentState == GameState.Dialogue || currentState == GameState.CrossExamination;
 
     // ── 진행 조건 (ProgeressTraccker) ────────────────────────────────────────────
     [Header("필수 완료 조건")]
@@ -51,6 +50,7 @@ public class SpongeGameManager : MonoBehaviour
 
     private HashSet<int> completedPresses = new(); 
     private HashSet<string> completedEvidences = new();
+    private bool conditionJustMet = false;
 
     void InitializeRequiredConditions()
     {
@@ -62,33 +62,42 @@ public class SpongeGameManager : MonoBehaviour
     {
         completedPresses.Add(lineIdx);
         Debug.Log($"[GameManager] 추궁 완료 : {lineIdx}번 증언");
+        conditionJustMet = IsAllConditionsMet();
     }
 
     public void RegisterEvidence(string evidenceId)
     {
         completedEvidences.Add(evidenceId);
         Debug.Log($"[GameManager] 증거 제시 완료 :  {evidenceId}");
+        conditionJustMet = IsAllConditionsMet();
     }
 
     public bool IsAllConditionsMet()
     {
         foreach (int i in requiredPressIndices)
-            if (completedPresses.Contains(i)) return false;
+            if (!completedPresses.Contains(i)) return false;
         foreach (string id in requiredEvidenceIds)
-            if (completedEvidences.Contains(id)) return false;
+            if (!completedEvidences.Contains(id)) return false;
         return true;
+    }
+
+    public bool ConsumeConditionMet()
+    {
+        bool result = conditionJustMet;
+        conditionJustMet = false; // 한 번 읽으면 초기화
+        return result;
     }
 
     // 조건 충족 즉시 체크 - 필요 시 자동 Resolution 전환
     void CheckAllConditions()
     {
-
+        // 필요시 사용
     }
 
     // ── 게임 시작 / 재시작 ───────────────────────────────────
     private void Start()
     {
         currentState = GameState.Dialogue;
-        
+        SpongeDialogueManager.Instance.ShowLine("opening_01");
     }
 }

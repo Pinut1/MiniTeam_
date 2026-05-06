@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -29,7 +30,7 @@ public class SpongeDialogueManager : MonoBehaviour
     [SerializeField] private Image characterJipgeSajang; // 집게사장
 
     [Header("Animater")]
-    [SerializeField] private Animator characterAnim;
+    //[SerializeField] private Animator characterAnim;
 
     private Dictionary<string, SpongeDialogueLine> lineMap;
     private Coroutine typingCoroutine;
@@ -46,10 +47,10 @@ public class SpongeDialogueManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        BulidLineMap();
+        BuildLineMap();
     }
 
-    void BulidLineMap()
+    void BuildLineMap()
     {
         lineMap = new Dictionary<string, SpongeDialogueLine>();
 
@@ -85,6 +86,16 @@ public class SpongeDialogueManager : MonoBehaviour
         typingCoroutine = StartCoroutine(TypeLine(line));
     }
 
+    public void ShowTestimonyLine(SpongeTestimonyLine testimony)
+    {
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        isTyping = false;
+
+        speakerTxt.text = "집게사장";
+        dialogueTxt.text = testimony.txt;
+        choicePnl.SetActive(false);
+    }
+
     // ── 씬 전환 후 대사 표시 ─────────────────────────────────
     /// <summary>
     /// 대사 표시 코루틴
@@ -116,11 +127,12 @@ public class SpongeDialogueManager : MonoBehaviour
         UpdateCharacter(line);
 
         // 3. 해당 위치 Animator에 트리거
-        if (!string.IsNullOrEmpty(line.animationTrig))
+        /*if (!string.IsNullOrEmpty(line.animationTrig))
         {
             TriggerAnimation(line);
             yield return new WaitForSeconds(0.5f);
         }
+        */
 
         isTyping = true;
         speakerTxt.text = line.speaker;
@@ -155,6 +167,7 @@ public class SpongeDialogueManager : MonoBehaviour
         // 전체 숨기기
         characterPlayer.gameObject.SetActive(false);
         characterSpongeBob.gameObject.SetActive(false);
+        characterDdungi.gameObject.SetActive(false);
         characterJingJingi.gameObject.SetActive(false);
         characterPlankton.gameObject.SetActive(false);
         characterJipgeSajang.gameObject.SetActive(false);
@@ -198,14 +211,27 @@ public class SpongeDialogueManager : MonoBehaviour
     // ── 클릭 처리 ────────────────────────────────────────────
     public void OnScreenClick()
     {
+        // 글자가 타이핑 중이라면 즉시 완성
         if (isTyping)
         {
             StopCoroutine(typingCoroutine);
             isTyping = false;
             dialogueTxt.text = currentLine.txt;
+            // 타이핑이 멈췄으면 대사가 끝났을 때의 처리 호출
+            // 선택지 표시 여부 등을 확인하기 위함
             OnLineFinished(currentLine);
             return;
         }
+        
+        // 선택지가 떠 있을 경우 클릭으로 넘기기 X
+        if (choicePnl.activeSelf) return;
+        
+        // 다음 대사가 있다면 해당 대사 보여줌
+        if (!string.IsNullOrEmpty(currentLine.nextLineId))
+            ShowLine(currentLine.nextLineId);
+         // 다음 대사가 없다면 시퀀스 종료
+        else
+            OnSequenceEnd();
     }
 
     // ── 대사 종료 처리 ───────────────────────────────────────
@@ -217,7 +243,7 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
         if (string.IsNullOrEmpty(line.nextLineId))
-            OnSeqeuenceEnd();
+            OnSequenceEnd();
     }
 
     // ── 선택지 표시 ──────────────────────────────────────────
@@ -238,12 +264,14 @@ public class SpongeDialogueManager : MonoBehaviour
         }
     }
 
-    void OnSeqeuenceEnd()
+    void OnSequenceEnd()
     {
         switch (SpongeGameManager.Instance.CurrentState)
         {
             case SpongeGameState.GameState.Pressing:
-                SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExzamination);
+            case SpongeGameState.GameState.EvidenceSelect:
+                SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                SpongeCrossExaminationManager.Instance.ShowCurrentTestimony();
                 break;
             case SpongeGameState.GameState.Dialogue:
                 SpongeCrossExaminationManager.Instance.StartCrossExamination();
