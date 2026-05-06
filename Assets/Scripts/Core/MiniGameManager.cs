@@ -9,6 +9,8 @@ namespace MiniTeam.Core
 
         private string currentScene;
 
+        public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
+
         void Awake()
         {
             if (Instance != null && Instance != this)
