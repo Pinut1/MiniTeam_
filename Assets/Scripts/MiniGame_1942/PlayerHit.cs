@@ -35,14 +35,15 @@ namespace MiniTeam.Shooting1942
         {
             isInvincible = true;
 
+            float step    = Mathf.Max(0.01f, blinkInterval);
             float elapsed = 0f;
             while (elapsed < invincibleTime)
             {
                 SetRenderersVisible(false);
-                yield return new WaitForSeconds(blinkInterval);
+                yield return new WaitForSeconds(step);
                 SetRenderersVisible(true);
-                yield return new WaitForSeconds(blinkInterval);
-                elapsed += blinkInterval * 2f;
+                yield return new WaitForSeconds(step);
+                elapsed += step * 2f;
             }
 
             SetRenderersVisible(true);

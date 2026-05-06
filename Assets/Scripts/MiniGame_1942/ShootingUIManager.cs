@@ -113,7 +113,10 @@ namespace MiniTeam.Shooting1942
             if (resultScoreText != null)
                 resultScoreText.text = $"SCORE: {score}";
 
-            if (wavePanel != null) wavePanel.SetActive(false);
+            CancelInvoke(nameof(HideWaveMessage));
+            if (wavePanel    != null) wavePanel.SetActive(false);
+            if (pausePanel   != null) pausePanel.SetActive(false);
+            if (bossHpPanel  != null) bossHpPanel.SetActive(false);
             resultPanel.SetActive(true);
         }
     }

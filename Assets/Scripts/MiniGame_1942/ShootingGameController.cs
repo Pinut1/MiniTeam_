@@ -51,10 +51,7 @@ namespace MiniTeam.Shooting1942
             isGameOver = true;
             isCleared  = true;
 
-            if (isPaused) Time.timeScale = 1f;
-
-            Debug.Log("[1942] Game Clear!");
-            waveManager?.StopGame();
+            EndGame();
 
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(true);
@@ -69,13 +66,26 @@ namespace MiniTeam.Shooting1942
             isGameOver = true;
             isCleared  = false;
 
-            if (isPaused) Time.timeScale = 1f;
-
-            Debug.Log("[1942] Game Fail!");
-            waveManager?.StopGame();
+            EndGame();
 
             ShootingUIManager.Instance?.ShowResult(false);
             Invoke(nameof(ExitToHub), resultHoldTime);
+        }
+
+        void EndGame()
+        {
+            waveManager?.StopGame();
+
+            if (isPaused)
+            {
+                isPaused = false;
+                ShootingUIManager.Instance?.ShowPause(false);
+            }
+
+            Time.timeScale = 1f;
+
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player != null) player.enabled = false;
         }
 
         // ── 디버그 패널 (Development Build 전용) ──
