@@ -56,7 +56,11 @@ namespace MiniTeam.Shooting1942
         void GameOver()
         {
             Debug.Log("[Formation] 게임오버");
-            MiniGameManager.Instance.OnMiniGameFail();
+            var gc = FindAnyObjectByType<ShootingGameController>();
+            if (gc != null)
+                gc.OnGameFail();
+            else if (MiniGameManager.Instance != null)
+                MiniGameManager.Instance.OnMiniGameFail();
         }
 
         void SetActive(GameObject obj, bool active)

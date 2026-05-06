@@ -1,23 +1,28 @@
+using System.Collections;
 using UnityEngine;
 
 namespace MiniTeam.Shooting1942
 {
-    // 역할: 피격 감지 → FormationManager 호출
     public class PlayerHit : MonoBehaviour
     {
         public float invincibleTime = 2f;
+        public float blinkInterval  = 0.1f;
+
+        public bool IsGodMode = false;
 
         private FormationManager formation;
+        private SpriteRenderer[]  renderers;
         private bool isInvincible = false;
 
         void Start()
         {
             formation = GetComponent<FormationManager>();
+            renderers = GetComponentsInChildren<SpriteRenderer>(true);
         }
 
         void OnTriggerEnter(Collider other)
         {
-            if (isInvincible) return;
+            if (isInvincible || IsGodMode) return;
 
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
             {
@@ -26,11 +31,29 @@ namespace MiniTeam.Shooting1942
             }
         }
 
-        System.Collections.IEnumerator InvincibleRoutine()
+        IEnumerator InvincibleRoutine()
         {
             isInvincible = true;
-            yield return new WaitForSeconds(invincibleTime);
+
+            float step    = Mathf.Max(0.01f, blinkInterval);
+            float elapsed = 0f;
+            while (elapsed < invincibleTime)
+            {
+                SetRenderersVisible(false);
+                yield return new WaitForSeconds(step);
+                SetRenderersVisible(true);
+                yield return new WaitForSeconds(step);
+                elapsed += step * 2f;
+            }
+
+            SetRenderersVisible(true);
             isInvincible = false;
+        }
+
+        void SetRenderersVisible(bool visible)
+        {
+            foreach (var sr in renderers)
+                if (sr != null) sr.enabled = visible;
         }
     }
 }
