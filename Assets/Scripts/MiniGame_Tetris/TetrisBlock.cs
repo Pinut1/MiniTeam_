@@ -142,7 +142,8 @@ public class TetrisBlock : MonoBehaviour
                 transform.position += new Vector3(0, 1, 0);
              
                 AddToGrid();
-                CheckForLines();
+                int cleared = CheckForLines();
+                LineClearEventManager.Instance.ProcessLineClear(cleared);
 
                 this.enabled = false;
 
@@ -191,18 +192,21 @@ public class TetrisBlock : MonoBehaviour
     /// <remarks>
     /// The method iterates rows from the top of the playfield to the bottom. After deleting a line and shifting rows down, it rechecks the same row index to detect consecutive cleared lines that moved into this row.
     /// </remarks>
-    private void CheckForLines()
+    private int CheckForLines()
     {
+        int clearedLines = 0;
+
         for (int i = height-1; i >= 0; i--)
         {
             if (HasLine(i))
             {
                 DeleteLine(i);
                 RowDown(i);
-
+                clearedLines++;
                 i++;
             }
         }
+        return clearedLines;
     }
 
 
