@@ -3,50 +3,151 @@ using MiniTeam.Core;
 
 namespace MiniTeam.Shooting1942
 {
-    // 담당: 김영욱
-    // 전체 게임 흐름 총괄 (웨이브 → 보스 → 클리어/실패)
     public class ShootingGameController : MonoBehaviour, IMiniGame
     {
         [Header("연출")]
-        public GameObject spaceshipRewardObj;  // 클리어 시 등장할 우주선 오브젝트
+        public GameObject spaceshipRewardObj;
+
+        [Header("결과 화면 표시 후 허브 복귀까지 대기 시간")]
+        public float resultHoldTime = 3f;
 
         private bool isGameOver = false;
+        private bool isCleared  = false;
+        private bool isPaused   = false;
+        private WaveManager waveManager;
 
         void Start()
         {
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(false);
+
+            waveManager = GetComponent<WaveManager>();
+            if (waveManager == null)
+                waveManager = FindAnyObjectByType<WaveManager>();
         }
 
-        void Update() { }
+        void Update()
+        {
+            if (isGameOver) return;
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                TogglePause();
+        }
+
+        // ── 일시정지 ──────────────────────────────
+
+        void TogglePause()
+        {
+            isPaused = !isPaused;
+            Time.timeScale = isPaused ? 0f : 1f;
+            ShootingUIManager.Instance?.ShowPause(isPaused);
+        }
+
+        // ── IMiniGame ─────────────────────────────
 
         public void OnGameClear()
         {
             if (isGameOver) return;
             isGameOver = true;
+            isCleared  = true;
 
-            Debug.Log("[1942] Game Clear! 우주선 획득");
+            EndGame();
 
-            // 우주선 오브제 등장 연출
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(true);
 
-            // 2초 후 허브로 복귀
-            Invoke(nameof(ExitToHub), 2f);
+            ShootingUIManager.Instance?.ShowResult(true);
+            Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         public void OnGameFail()
         {
             if (isGameOver) return;
             isGameOver = true;
+            isCleared  = false;
 
-            Debug.Log("[1942] Game Fail!");
-            Invoke(nameof(ExitToHub), 1.5f);
+            EndGame();
+
+            ShootingUIManager.Instance?.ShowResult(false);
+            Invoke(nameof(ExitToHub), resultHoldTime);
         }
+
+        void EndGame()
+        {
+            waveManager?.StopGame();
+
+            if (isPaused)
+            {
+                isPaused = false;
+                ShootingUIManager.Instance?.ShowPause(false);
+            }
+
+            Time.timeScale = 1f;
+
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player != null) player.enabled = false;
+        }
+
+        // ── 디버그 패널 (Development Build 전용) ──
+
+#pragma warning disable CS0162
+        private PlayerHit      debugPlayerHit;
+        private PlayerController debugPlayerCtrl;
+
+        void OnGUI()
+        {
+            if (!Debug.isDebugBuild) return;
+
+            if (debugPlayerHit  == null) debugPlayerHit  = FindAnyObjectByType<PlayerHit>();
+            if (debugPlayerCtrl == null) debugPlayerCtrl = FindAnyObjectByType<PlayerController>();
+
+            GUILayout.BeginArea(new Rect(10, 10, 200, 200));
+            GUILayout.Label("[ DEBUG ]");
+
+            if (GUILayout.Button("보스 바로 소환"))
+                waveManager?.DebugSkipToBoss();
+
+            BossController boss = FindAnyObjectByType<BossController>();
+            if (boss != null)
+            {
+                string phaseLabel = boss.IsPhase2 ? "2페이즈 중" : "2페이즈 강제 진입";
+                GUI.enabled = !boss.IsPhase2;
+                if (GUILayout.Button(phaseLabel)) boss.ForcePhase2();
+                GUI.enabled = true;
+            }
+
+            if (debugPlayerHit != null)
+            {
+                string godLabel = debugPlayerHit.IsGodMode ? "무적 ON" : "무적 OFF";
+                if (GUILayout.Button(godLabel))
+                    debugPlayerHit.IsGodMode = !debugPlayerHit.IsGodMode;
+            }
+
+            if (debugPlayerCtrl != null)
+            {
+                string rapidLabel = debugPlayerCtrl.DebugRapidFire ? "공격력 증가 ON" : "공격력 증가 OFF";
+                if (GUILayout.Button(rapidLabel))
+                    debugPlayerCtrl.DebugRapidFire = !debugPlayerCtrl.DebugRapidFire;
+            }
+
+            GUILayout.EndArea();
+        }
+#pragma warning restore CS0162
 
         void ExitToHub()
         {
-            MiniGameManager.Instance.OnMiniGameClear();
+            Time.timeScale = 1f;
+
+            if (MiniGameManager.Instance == null)
+            {
+                Debug.Log("[1942] MiniGameManager 없음 - 씬 단독 테스트 중");
+                return;
+            }
+
+            if (isCleared)
+                MiniGameManager.Instance.OnMiniGameClear();
+            else
+                MiniGameManager.Instance.OnMiniGameFail();
         }
     }
 }
