@@ -16,6 +16,12 @@ namespace MiniTeam.Shooting1942
         private bool isPaused   = false;
         private WaveManager waveManager;
 
+        /// <summary>
+        /// Initializes controller state by hiding the configured spaceship reward object and resolving the WaveManager reference.
+        /// </summary>
+        /// <remarks>
+        /// If <c>spaceshipRewardObj</c> is assigned, it will be deactivated. Attempts to obtain <c>waveManager</c> from the same GameObject first; if not found, searches the scene for any <c>WaveManager</c>.
+        /// </remarks>
         void Start()
         {
             if (spaceshipRewardObj != null)
@@ -26,6 +32,12 @@ namespace MiniTeam.Shooting1942
                 waveManager = FindAnyObjectByType<WaveManager>();
         }
 
+        /// <summary>
+        /// Handles per-frame input to toggle the game's pause state and ignores input once the game is over.
+        /// </summary>
+        /// <remarks>
+        /// If the game is marked as over, the method returns immediately. When the Escape key is pressed and the game is not over, it toggles pause/resume.
+        /// </remarks>
         void Update()
         {
             if (isGameOver) return;
@@ -34,7 +46,12 @@ namespace MiniTeam.Shooting1942
                 TogglePause();
         }
 
-        // ── 일시정지 ──────────────────────────────
+        /// <summary>
+        /// Toggles the game's paused state.
+        /// </summary>
+        /// <remarks>
+        /// Updates the global time scale and notifies the UI of the new pause state.
+        /// </remarks>
 
         void TogglePause()
         {
@@ -43,7 +60,12 @@ namespace MiniTeam.Shooting1942
             ShootingUIManager.Instance?.ShowPause(isPaused);
         }
 
-        // ── IMiniGame ─────────────────────────────
+        /// <summary>
+        /// Finalize the game as a win and start the post-win sequence.
+        /// </summary>
+        /// <remarks>
+        /// Marks the game as ended and cleared, restores time scale if paused, stops the wave manager, activates the spaceship reward object if assigned, shows the victory result UI, and schedules ExitToHub to run after <c>resultHoldTime</c>.
+        /// </remarks>
 
         public void OnGameClear()
         {
@@ -63,6 +85,13 @@ namespace MiniTeam.Shooting1942
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
+        /// <summary>
+        /// Handle a game failure by finalizing state and starting the failure result sequence.
+        /// </summary>
+        /// <remarks>
+        /// Marks the game as over and not cleared; if the game was paused, restores normal time scale.
+        /// Stops the wave manager, displays the failure result UI, and schedules ExitToHub to run after <c>resultHoldTime</c> seconds.
+        /// </remarks>
         public void OnGameFail()
         {
             if (isGameOver) return;
@@ -84,6 +113,17 @@ namespace MiniTeam.Shooting1942
         private PlayerHit      debugPlayerHit;
         private PlayerController debugPlayerCtrl;
 
+        /// <summary>
+        /// Renders a small on-screen debug panel in development builds for testing gameplay features.
+        /// </summary>
+        /// <remarks>
+        /// The panel appears only when Debug.isDebugBuild is true. It provides controls to:
+        /// - immediately summon the boss,
+        /// - force the boss into phase 2,
+        /// - toggle the player's god mode,
+        /// - toggle the player's rapid-fire debug mode.
+        /// The method also lazily resolves player-related debug objects when needed.
+        /// </remarks>
         void OnGUI()
         {
             if (!Debug.isDebugBuild) return;
@@ -124,6 +164,12 @@ namespace MiniTeam.Shooting1942
         }
 #pragma warning restore CS0162
 
+        /// <summary>
+        /// Restores game time scale and notifies the MiniGameManager of the mini-game result, returning to the hub.
+        /// </summary>
+        /// <remarks>
+        /// If MiniGameManager.Instance is null, logs a debug message and exits without notifying.
+        /// </remarks>
         void ExitToHub()
         {
             Time.timeScale = 1f;

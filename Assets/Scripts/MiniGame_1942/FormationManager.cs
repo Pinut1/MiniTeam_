@@ -53,6 +53,12 @@ namespace MiniTeam.Shooting1942
             Debug.Log($"[Formation] 복귀 - 현재 HP: {CurrentHP}");
         }
 
+        /// <summary>
+        /// Handle formation failure: logs the game-over event and notifies the appropriate game controller.
+        /// </summary>
+        /// <remarks>
+        /// Attempts to notify a <c>ShootingGameController</c> by calling <c>OnGameFail()</c>; if none is found and <c>MiniGameManager.Instance</c> exists, calls <c>OnMiniGameFail()</c>.
+        /// </remarks>
         void GameOver()
         {
             Debug.Log("[Formation] 게임오버");
@@ -63,6 +69,11 @@ namespace MiniTeam.Shooting1942
                 MiniGameManager.Instance.OnMiniGameFail();
         }
 
+        /// <summary>
+        /// Sets the active state of the provided GameObject if it is not null.
+        /// </summary>
+        /// <param name="obj">The GameObject to modify; if null the call is ignored.</param>
+        /// <param name="active">True to activate the object, false to deactivate it.</param>
         void SetActive(GameObject obj, bool active)
         {
             if (obj != null) obj.SetActive(active);

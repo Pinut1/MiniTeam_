@@ -79,6 +79,9 @@ namespace MiniTeam.Shooting1942
             }
         }
 
+        /// <summary>
+        /// Applies a single hit to the enemy; decreases its HP by one and, if HP is now zero or less, awards 10 points and destroys the enemy GameObject.
+        /// </summary>
         public void TakeHit()
         {
             hp--;

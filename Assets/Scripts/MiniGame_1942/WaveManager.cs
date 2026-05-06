@@ -43,6 +43,12 @@ namespace MiniTeam.Shooting1942
 
         private ShootingGameController gameController;
 
+        /// <summary>
+        /// Initializes runtime state for the WaveManager: locates the ShootingGameController, calculates enemy spawn bounds, and begins the wave sequence.
+        /// </summary>
+        /// <remarks>
+        /// If a ShootingGameController is not attached to the same GameObject, one will be located in the scene. The running wave coroutine is stored so it can be stopped later.
+        /// </remarks>
         void Start()
         {
             gameController = GetComponent<ShootingGameController>();
@@ -53,7 +59,10 @@ namespace MiniTeam.Shooting1942
             waveCoroutine = StartCoroutine(RunWaves());
         }
 
-        // ── 웨이브 흐름 ──────────────────────────
+        /// <summary>
+        /// Controls the timed progression of Wave 1 and Wave 2, then stops enemy spawning and triggers the boss spawn when appropriate.
+        /// </summary>
+        /// <returns>An IEnumerator that performs the sequential wait-driven wave flow and finalizes by stopping spawning and (if the game is not stopped) spawning the boss.</returns>
 
         IEnumerator RunWaves()
         {
@@ -68,6 +77,10 @@ namespace MiniTeam.Shooting1942
                 SpawnBoss();
         }
 
+        /// <summary>
+        /// Activates the specified wave configuration, updates the spawn interval, displays the wave UI message, and begins enemy spawning.
+        /// </summary>
+        /// <param name="wave">Wave number to start; if `1` uses Wave 1 settings, otherwise uses Wave 2 settings.</param>
         void StartWave(int wave)
         {
             currentWave     = wave;
@@ -102,6 +115,13 @@ namespace MiniTeam.Shooting1942
             }
         }
 
+        /// <summary>
+        /// Instantiates a random enemy at a random horizontal position along the spawn top and configures its behavior for the current wave.
+        /// </summary>
+        /// <remarks>
+        /// If no enemy prefabs are configured the method does nothing. If the instantiated object lacks an Enemy component the object is left as-is and no configuration is applied.
+        /// </remarks>
+        /// <returns></returns>
         void SpawnEnemy()
         {
             if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
@@ -124,7 +144,9 @@ namespace MiniTeam.Shooting1942
                 enemy.movementType = Enemy.MovementType.Sine;
         }
 
-        // ── 보스 ─────────────────────────────────
+        /// <summary>
+        /// Immediately ends the current waves and spawns the boss for debugging purposes.
+        /// </summary>
 
         public void DebugSkipToBoss()
         {
@@ -133,6 +155,12 @@ namespace MiniTeam.Shooting1942
             SpawnBoss();
         }
 
+        /// <summary>
+        /// Marks the boss as spawned and instantiates the boss GameObject at the configured spawn point or a default position.
+        /// </summary>
+        /// <remarks>
+        /// Subscribes to the boss's OnBossDefeated event to handle defeat and requests the UI to display a "BOSS!" message.
+        /// </remarks>
         void SpawnBoss()
         {
             IsBossSpawned = true;
@@ -148,13 +176,24 @@ namespace MiniTeam.Shooting1942
             ShootingUIManager.Instance?.ShowWaveMessage("BOSS!", 2f);
         }
 
+        /// <summary>
+        /// Marks the boss as defeated and notifies the game controller to trigger game-clear handling.
+        /// </summary>
+        /// <remarks>
+        /// If a game controller is available, its <c>OnGameClear</c> method is invoked.
+        /// </remarks>
         void HandleBossDefeated()
         {
             IsBossDefeated = true;
             gameController?.OnGameClear();
         }
 
-        // ── 외부 호출 ─────────────────────────────
+        /// <summary>
+        /// Stops wave progression and enemy spawning, and marks the game as stopped.
+        /// </summary>
+        /// <remarks>
+        /// Sets the internal stopped flag, halts the active spawn loop, and stops the running wave coroutine if present.
+        /// </remarks>
 
         public void StopGame()
         {
@@ -163,7 +202,12 @@ namespace MiniTeam.Shooting1942
             if (waveCoroutine != null) StopCoroutine(waveCoroutine);
         }
 
-        // ── 유틸 ─────────────────────────────────
+        /// <summary>
+        /// Computes world-space spawn bounds from the main camera's viewport and stores them for spawning.
+        /// </summary>
+        /// <remarks>
+        /// Sets <c>spawnTopY</c>, <c>spawnMinX</c>, and <c>spawnMaxX</c> using the camera's top/right and bottom/left viewport corners converted to world coordinates. The vertical bound includes <c>spawnYOffset</c>, and horizontal bounds include a 0.5 unit padding from the screen edges.
+        /// </remarks>
 
         void CalculateSpawnBounds()
         {

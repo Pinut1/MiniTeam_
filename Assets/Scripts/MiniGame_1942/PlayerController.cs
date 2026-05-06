@@ -30,6 +30,12 @@ namespace MiniTeam.Shooting1942
             CalculateBounds();
         }
 
+        /// <summary>
+        /// Processes player input each frame: moves the player, constrains position within bounds, and fires bullets when the fire key is held and the firing cooldown has elapsed.
+        /// </summary>
+        /// <remarks>
+        /// Uses a reduced fire interval of 0.02 seconds when <c>DebugRapidFire</c> is true; otherwise uses <c>fireRate</c>. When a shot is fired, <c>nextFireTime</c> is advanced by the effective fire interval.
+        /// </remarks>
         void Update()
         {
             Move();
