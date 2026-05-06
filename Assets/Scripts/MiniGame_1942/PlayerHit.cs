@@ -8,6 +8,8 @@ namespace MiniTeam.Shooting1942
         public float invincibleTime = 2f;
         public float blinkInterval  = 0.1f;
 
+        public bool IsGodMode = false;
+
         private FormationManager formation;
         private SpriteRenderer[]  renderers;
         private bool isInvincible = false;
@@ -20,7 +22,7 @@ namespace MiniTeam.Shooting1942
 
         void OnTriggerEnter(Collider other)
         {
-            if (isInvincible) return;
+            if (isInvincible || IsGodMode) return;
 
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
             {

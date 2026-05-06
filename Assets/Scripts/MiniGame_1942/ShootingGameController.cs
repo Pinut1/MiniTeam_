@@ -78,6 +78,52 @@ namespace MiniTeam.Shooting1942
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
+        // ── 디버그 패널 (Development Build 전용) ──
+
+#pragma warning disable CS0162
+        private PlayerHit      debugPlayerHit;
+        private PlayerController debugPlayerCtrl;
+
+        void OnGUI()
+        {
+            if (!Debug.isDebugBuild) return;
+
+            if (debugPlayerHit  == null) debugPlayerHit  = FindAnyObjectByType<PlayerHit>();
+            if (debugPlayerCtrl == null) debugPlayerCtrl = FindAnyObjectByType<PlayerController>();
+
+            GUILayout.BeginArea(new Rect(10, 10, 200, 200));
+            GUILayout.Label("[ DEBUG ]");
+
+            if (GUILayout.Button("보스 바로 소환"))
+                waveManager?.DebugSkipToBoss();
+
+            BossController boss = FindAnyObjectByType<BossController>();
+            if (boss != null)
+            {
+                string phaseLabel = boss.IsPhase2 ? "2페이즈 중" : "2페이즈 강제 진입";
+                GUI.enabled = !boss.IsPhase2;
+                if (GUILayout.Button(phaseLabel)) boss.ForcePhase2();
+                GUI.enabled = true;
+            }
+
+            if (debugPlayerHit != null)
+            {
+                string godLabel = debugPlayerHit.IsGodMode ? "무적 ON" : "무적 OFF";
+                if (GUILayout.Button(godLabel))
+                    debugPlayerHit.IsGodMode = !debugPlayerHit.IsGodMode;
+            }
+
+            if (debugPlayerCtrl != null)
+            {
+                string rapidLabel = debugPlayerCtrl.DebugRapidFire ? "공격력 증가 ON" : "공격력 증가 OFF";
+                if (GUILayout.Button(rapidLabel))
+                    debugPlayerCtrl.DebugRapidFire = !debugPlayerCtrl.DebugRapidFire;
+            }
+
+            GUILayout.EndArea();
+        }
+#pragma warning restore CS0162
+
         void ExitToHub()
         {
             Time.timeScale = 1f;

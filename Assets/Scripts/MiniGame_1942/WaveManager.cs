@@ -73,7 +73,6 @@ namespace MiniTeam.Shooting1942
             currentWave     = wave;
             currentInterval = wave == 1 ? wave1Interval : wave2Interval;
 
-            SetEnemySpeed(wave == 1 ? wave1Speed : wave2Speed);
             ShootingUIManager.Instance?.ShowWaveMessage($"WAVE {wave}", 2f);
 
             StartSpawning();
@@ -116,6 +115,8 @@ namespace MiniTeam.Shooting1942
             Enemy enemy = obj.GetComponent<Enemy>();
             if (enemy == null) return;
 
+            enemy.moveSpeed = currentWave == 1 ? wave1Speed : wave2Speed;
+
             float shootRatio = currentWave == 1 ? wave1ShootRatio : wave2ShootRatio;
             enemy.canShoot = Random.value < shootRatio;
 
@@ -123,17 +124,14 @@ namespace MiniTeam.Shooting1942
                 enemy.movementType = Enemy.MovementType.Sine;
         }
 
-        void SetEnemySpeed(float speed)
-        {
-            foreach (var prefab in enemyPrefabs)
-            {
-                if (prefab == null) continue;
-                Enemy e = prefab.GetComponent<Enemy>();
-                if (e != null) e.moveSpeed = speed;
-            }
-        }
-
         // ── 보스 ─────────────────────────────────
+
+        public void DebugSkipToBoss()
+        {
+            StopGame();
+            gameStopped = false;
+            SpawnBoss();
+        }
 
         void SpawnBoss()
         {

@@ -15,6 +15,8 @@ namespace MiniTeam.Shooting1942
         public Transform firePoint;
         public float fireRate = 0.15f;
 
+        public bool DebugRapidFire = false;
+
         private float minX, maxX, minY, maxY;
         private float nextFireTime = 0f;
         private Rigidbody rb;
@@ -33,10 +35,11 @@ namespace MiniTeam.Shooting1942
             Move();
             ClampPosition();
 
+            float currentFireRate = DebugRapidFire ? 0.02f : fireRate;
             if (Input.GetKey(KeyCode.Space) && Time.time >= nextFireTime)
             {
                 Shoot();
-                nextFireTime = Time.time + fireRate;
+                nextFireTime = Time.time + currentFireRate;
             }
         }
 
