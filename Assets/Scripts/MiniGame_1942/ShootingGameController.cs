@@ -56,6 +56,7 @@ namespace MiniTeam.Shooting1942
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(true);
 
+            AudioManager.Instance?.PlayBGM(AudioManager.Instance.bgmClear);
             ShootingUIManager.Instance?.ShowResult(true);
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
@@ -68,6 +69,7 @@ namespace MiniTeam.Shooting1942
 
             EndGame();
 
+            AudioManager.Instance?.PlayBGM(AudioManager.Instance.bgmGameOver);
             ShootingUIManager.Instance?.ShowResult(false);
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
@@ -75,6 +77,7 @@ namespace MiniTeam.Shooting1942
         void EndGame()
         {
             waveManager?.StopGame();
+            AudioManager.Instance?.StopBGM();
 
             if (isPaused)
             {
