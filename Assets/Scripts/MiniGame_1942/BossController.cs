@@ -38,6 +38,7 @@ namespace MiniTeam.Shooting1942
         private float startX;
         private bool  isPhase2      = false;
         private bool  isInvincible  = false;
+        private bool  isDefeated    = false;
 
         private Coroutine moveCoroutine;
         private readonly List<Coroutine> patternCoroutines = new();
@@ -135,13 +136,14 @@ namespace MiniTeam.Shooting1942
 
         public void TakeHit()
         {
-            if (isInvincible) return;
+            if (isInvincible || isDefeated) return;
 
-            currentHp--;
+            currentHp = Mathf.Clamp(currentHp - 1, 0, maxHp);
             ShootingUIManager.Instance?.UpdateBossHp(currentHp, maxHp);
 
             if (currentHp <= 0)
             {
+                isDefeated = true;
                 ShootingUIManager.Instance?.AddScore(200);
                 OnBossDefeated?.Invoke();
                 Destroy(gameObject);
