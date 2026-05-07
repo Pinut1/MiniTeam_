@@ -69,104 +69,58 @@ public class TetrisBlock : MonoBehaviour
     /// </remarks>
     void Update()
     {
-
-        //블록 하강
-        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        // 입력 1순위 : HOLD (가장 먼저 검사)
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            transform.position += new Vector3(0, -1, 0);
-            if (!ValidMove())
-            {
-                transform.position += new Vector3(0, 1, 0);
-             
-                AddToGrid();
-                CheckForLines();
-
-                this.enabled = false;
-
-                SpawnTetromino.Instance.NewTetromino();
-                return;
-            }
-            previousTime = Time.time;
+            SpawnTetromino.Instance.HoldBlock(this.gameObject);
+            return;
         }
 
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            if (type != BlockType.O)
+            {
+                // 일단 돌려봄
+                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
 
-        //블록 좌우
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                bool rotationSuccess = true;
+
+                // 벽에 걸렸다면 벽차기 시도
+                if (!ValidMove())
+                {
+                    if (!PerformWallKick(rotationState))
+                    {
+                        // 벽차기마저 실패하면 원상복구
+                        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                        rotationSuccess = false;
+                    }
+                }
+
+                // 회전에 최종적으로 성공했을 때만 상태값 증가
+                if (rotationSuccess)
+                {
+                    rotationState = (rotationState + 1) % 4;
+                }
+            }
+        }
+
+        // ⭐️ 3순위: 좌우 이동 (독립된 if문. 좌/우끼리만 동시 입력 안 되게 else if로 묶음)
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             MoveHorizontal(-1);
             horizontalTimer = Time.time + das;
         }
-
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             MoveHorizontal(1);
             horizontalTimer = Time.time + das;
         }
-
-        // 키를 '꾹' 누르고 있을때
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            if(Time.time > horizontalTimer)
-            {
-                MoveHorizontal(-1);
-                horizontalTimer = Time.time + arr;
-
-            }
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            if(Time.time > horizontalTimer)
-            {
-                MoveHorizontal(1);
-                horizontalTimer = Time.time + arr;
-
-            }
-        }
-
-        //블록 회전
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            if (type == BlockType.O) return;
-
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
-
-            // 회전하는데 벽에 걸린 경우
-            if (!ValidMove())
-            {
-
-                if (!PerformWallKick(rotationState))
-                {
-                    transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-                    return;
-                }
-
-            }
-
-            rotationState = (rotationState + 1) % 4;
-        }
-
-        //HOLD 입력
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            //SpawnTetromino 한테 자신을 넘기며 홀드 요청
-            SpawnTetromino.Instance.HoldBlock(this.gameObject);
-        }
-
-
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            MoveHorizontal(1);
-            horizontalTimer = Time.time + das;
-        }
-
-        // 키를 '꾹' 누르고 있을때
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
             if (Time.time > horizontalTimer)
             {
                 MoveHorizontal(-1);
                 horizontalTimer = Time.time + arr;
-
             }
         }
         else if (Input.GetKey(KeyCode.RightArrow))
@@ -175,36 +129,180 @@ public class TetrisBlock : MonoBehaviour
             {
                 MoveHorizontal(1);
                 horizontalTimer = Time.time + arr;
-
             }
         }
 
-        //4 순위 입력. 블록 하강
-        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        // ⭐️ 4순위: 하강 로직 (독립된 if문)
+        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10f : fallTime))
         {
             transform.position += new Vector3(0, -1, 0);
+
+            // 바닥이나 다른 블록에 닿았을 때
             if (!ValidMove())
             {
-                transform.position += new Vector3(0, 1, 0);
-             
+                transform.position += new Vector3(0, 1, 0); // 닿기 직전으로 원상복구
+
                 AddToGrid();
                 int cleared = CheckForLines();
-                LineClearEventManager.Instance?.ProcessLineClear(cleared);
+                LineClearEventManager.Instance?.ProcessLineClear(cleared); // Null-safe 호출!
 
-                this.enabled = false;
+                // 메모리 누수 방지 (자식들은 놔두고 부모 껍데기만 깔끔하게 파괴)
+                // I_enable 특수 블록은 나중에 폭발 검사를 받아야 하니 껍데기를 살려둠
+               
+                if (type != BlockType.I_enable)
+                {
+                    transform.DetachChildren();
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    
+                    this.enabled = false;
+                }
 
                 SpawnTetromino.Instance.NewTetromino();
                 return;
             }
+
+            // 무사히 한 칸 떨어졌다면 타이머 리셋
             previousTime = Time.time;
         }
 
+        //블록 하강
+        //if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        //{
+        //    transform.position += new Vector3(0, -1, 0);
+        //    if (!ValidMove())
+        //    {
+        //        transform.position += new Vector3(0, 1, 0);
 
-        
+        //        AddToGrid();
+        //        CheckForLines();
 
-        
+        //        this.enabled = false;
 
-       
+        //        SpawnTetromino.Instance.NewTetromino();
+        //        return;
+        //    }
+        //    previousTime = Time.time;
+        //}
+
+
+        //블록 좌우
+        //else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        //{
+        //    MoveHorizontal(-1);
+        //    horizontalTimer = Time.time + das;
+        //}
+
+        //else if (Input.GetKeyDown(KeyCode.RightArrow))
+        //{
+        //    MoveHorizontal(1);
+        //    horizontalTimer = Time.time + das;
+        //}
+
+        //키를 '꾹' 누르고 있을때
+        //else if (Input.GetKey(KeyCode.LeftArrow))
+        //{
+        //    if (Time.time > horizontalTimer)
+        //    {
+        //        MoveHorizontal(-1);
+        //        horizontalTimer = Time.time + arr;
+
+        //    }
+        //}
+        //else if (Input.GetKey(KeyCode.RightArrow))
+        //{
+        //    if (Time.time > horizontalTimer)
+        //    {
+        //        MoveHorizontal(1);
+        //        horizontalTimer = Time.time + arr;
+
+        //    }
+        //}
+
+        //블록 회전
+        //else if (Input.GetKeyDown(KeyCode.UpArrow))
+        //{
+        //    if (type == BlockType.O) return;
+
+        //    transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+
+        //    회전하는데 벽에 걸린 경우
+        //    if (!ValidMove())
+        //    {
+
+        //        if (!PerformWallKick(rotationState))
+        //        {
+        //            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+        //            return;
+        //        }
+
+        //    }
+
+        //    rotationState = (rotationState + 1) % 4;
+        //}
+
+        //HOLD 입력
+        //if (Input.GetKeyDown(KeyCode.LeftShift))
+        //{
+        //    SpawnTetromino 한테 자신을 넘기며 홀드 요청
+        //    SpawnTetromino.Instance.HoldBlock(this.gameObject);
+        //}
+
+
+        //else if (Input.GetKeyDown(KeyCode.RightArrow))
+        //{
+        //    MoveHorizontal(1);
+        //    horizontalTimer = Time.time + das;
+        //}
+
+        //키를 '꾹' 누르고 있을때
+        //else if (Input.GetKey(KeyCode.LeftArrow))
+        //{
+        //    if (Time.time > horizontalTimer)
+        //    {
+        //        MoveHorizontal(-1);
+        //        horizontalTimer = Time.time + arr;
+
+        //    }
+        //}
+        //else if (Input.GetKey(KeyCode.RightArrow))
+        //{
+        //    if (Time.time > horizontalTimer)
+        //    {
+        //        MoveHorizontal(1);
+        //        horizontalTimer = Time.time + arr;
+
+        //    }
+        //}
+
+        //4 순위 입력. 블록 하강
+        //if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        //{
+        //    transform.position += new Vector3(0, -1, 0);
+        //    if (!ValidMove())
+        //    {
+        //        transform.position += new Vector3(0, 1, 0);
+
+        //        AddToGrid();
+        //        int cleared = CheckForLines();
+        //        LineClearEventManager.Instance?.ProcessLineClear(cleared);
+
+        //        this.enabled = false;
+
+        //        SpawnTetromino.Instance.NewTetromino();
+        //        return;
+        //    }
+        //    previousTime = Time.time;
+        //}
+
+
+
+
+
+
+
 
     }
 
@@ -348,8 +446,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.01f);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.01f);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.2f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.2f);
 
             if (roundedY >= height)
             {
@@ -374,8 +472,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.01f);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.01f);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.2f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.2f);
 
             if (roundedX < 0 || roundedX >= width || roundedY < 0)
             {

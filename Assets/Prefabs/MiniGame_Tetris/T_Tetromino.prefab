@@ -299,9 +299,9 @@ Transform:
   m_GameObject: {fileID: 7706169124325306601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 15, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1845806431279362659}
   - {fileID: 9118484992495514704}
@@ -321,8 +321,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93dbadee1a59124ba4d3f02d89e8901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TetrisBlock
+  type: 0
   rotationPoint: {x: 0, y: 0, z: 0}
   fallTime: 0.8
+  das: 0.17
+  arr: 0.05
 --- !u!1 &8332586844927160262
 GameObject:
   m_ObjectHideFlags: 0
