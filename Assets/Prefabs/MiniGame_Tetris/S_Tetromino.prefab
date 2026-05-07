@@ -48,8 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93dbadee1a59124ba4d3f02d89e8901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TetrisBlock
-  rotationPoint: {x: 0, y: 0, z: 0}
+  type: 0
+  rotationPoint: {x: 0, y: -1, z: 0}
   fallTime: 0.8
+  das: 0.17
+  arr: 0.05
 --- !u!1 &1999747223351123687
 GameObject:
   m_ObjectHideFlags: 0

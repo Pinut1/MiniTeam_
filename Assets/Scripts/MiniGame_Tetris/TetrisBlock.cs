@@ -278,7 +278,7 @@ public class TetrisBlock : MonoBehaviour
     /// <param name="i">The starting row index (inclusive); all occupied cells in row <c>i</c> and above are shifted down one row. This updates both the static grid references and each moved transform's world position.</param>
     private void RowDown(int i)
     {
-        for (int y = i + 1; y < height; y++)
+        for (int y = i ; y < height; y++)
         {
             for (int j = 0; j < width; j++)
             {
@@ -303,8 +303,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.01f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.01f);
 
             if (roundedY >= height)
             {
@@ -329,8 +329,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.01f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.01f);
 
             if (roundedX < 0 || roundedX >= width || roundedY < 0)
             {
