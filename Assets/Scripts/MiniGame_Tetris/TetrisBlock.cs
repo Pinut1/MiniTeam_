@@ -378,6 +378,9 @@ public class TetrisBlock : MonoBehaviour
     /// <param name="i">Index of the row to delete (0-based, 0 is the bottom row).</param>
     private void DeleteLine(int i)
     {
+        //타마마 임팩트를 1번만 체크하기 위한 Trigger
+        bool hasTriggeredEffect = false;
+
         for (int j = 0; j < width; j++)
         {
             Transform cell = grid[j, i];
@@ -393,8 +396,8 @@ public class TetrisBlock : MonoBehaviour
                         {
                             Debug.Log("I_enable 블록의 파편을 찾았습니다");
                             parentBlock.type = BlockType.I_disable;
-                            //TODO 타마마 임펙트 처리
-
+                         
+                            // I_Disable 처리는 모든 I_Enable 블록에.
                             foreach (Transform sibling in parentTransform)
                             {
                                 // 이번에 지워질 자기 자신은 어차피 곧 파괴되니 색칠할 필요 없음
@@ -405,6 +408,13 @@ public class TetrisBlock : MonoBehaviour
                                         sr.color = Color.gray; // 살아남은 파편들은 회색으로 굳어버림!
                                     }
                                 }
+                            }
+
+                            if (!hasTriggeredEffect)
+                            {
+                                Debug.Log($"[{j}]번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
+                                //TODO 타마마 임팩트
+                                hasTriggeredEffect = true;
                             }
                         }
                     }
