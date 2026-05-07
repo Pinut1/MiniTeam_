@@ -151,7 +151,7 @@ public class TetrisBlock : MonoBehaviour
             //SpawnTetromino 한테 자신을 넘기며 홀드 요청
             SpawnTetromino.Instance.HoldBlock(this.gameObject);
         }
-<<<<<<< HEAD
+
 
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -205,8 +205,7 @@ public class TetrisBlock : MonoBehaviour
         
 
        
-=======
->>>>>>> parent of beedd7f (refactor: 입력 구조 개선.)
+
     }
 
     /// <summary>
