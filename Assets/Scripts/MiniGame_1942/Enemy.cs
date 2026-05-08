@@ -25,6 +25,7 @@ namespace MiniTeam.Shooting1942
         private float destroyY;
         private float startX;
         private float elapsed = 0f;
+        private bool  isDead  = false;
 
         void Start()
         {
@@ -81,9 +82,15 @@ namespace MiniTeam.Shooting1942
 
         public void TakeHit()
         {
+            if (isDead) return;
             hp--;
             if (hp <= 0)
+            {
+                isDead = true;
+                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyDie);
+                ShootingUIManager.Instance?.AddScore(10);
                 Destroy(gameObject);
+            }
         }
     }
 }

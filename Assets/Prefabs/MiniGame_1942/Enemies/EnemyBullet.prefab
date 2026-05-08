@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4727226418819896721}
   - component: {fileID: 4235627089449037061}
   - component: {fileID: 8414651113031226532}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyBullet
   m_TagString: EnemyBullet
   m_Icon: {fileID: 0}
@@ -79,8 +79,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1207170411
-  m_SortingLayer: 1
+  m_SortingLayerID: 1314381033
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4169436348209870221, guid: 8cc80e685c6ae2b489abf4bf861a9c5c, type: 3}

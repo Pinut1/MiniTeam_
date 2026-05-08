@@ -92,7 +92,7 @@ SpriteRenderer:
   m_Size: {x: 2.25, y: 2.25}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1610868321817586416
 MonoBehaviour:
