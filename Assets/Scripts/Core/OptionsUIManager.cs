@@ -84,6 +84,15 @@ namespace MiniTeam.Core
 
         // ── 볼륨 슬라이더 ─────────────────────────
 
+        void OnDestroy()
+        {
+            var sm = SoundManager.Instance;
+            if (sm == null) return;
+            if (masterVolumeSlider != null) masterVolumeSlider.onValueChanged.RemoveListener(sm.SetMasterVolume);
+            if (bgmVolumeSlider    != null) bgmVolumeSlider.onValueChanged.RemoveListener(sm.SetBGMVolume);
+            if (sfxVolumeSlider    != null) sfxVolumeSlider.onValueChanged.RemoveListener(sm.SetSFXVolume);
+        }
+
         void InitSliders()
         {
             if (SoundManager.Instance == null) return;

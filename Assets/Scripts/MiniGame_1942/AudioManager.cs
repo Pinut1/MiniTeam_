@@ -27,6 +27,11 @@ namespace MiniTeam.Shooting1942
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         public void PlayBGM(AudioClip clip) => SoundManager.Instance?.PlayBGM(clip);
         public void StopBGM()              => SoundManager.Instance?.StopBGM();
         public void PlaySFX(AudioClip clip) => SoundManager.Instance?.PlaySFX(clip);
