@@ -11,7 +11,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - NPC
   - 
   - 
   - 
@@ -40,6 +40,18 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1384838389
+    locked: 0
+  - name: Students
+    uniqueID: 4069936831
+    locked: 0
+  - name: Player
+    uniqueID: 1976330389
+    locked: 0
+  - name: Objects
+    uniqueID: 972479335
     locked: 0
   m_RenderingLayers:
   - Default
