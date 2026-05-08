@@ -1,10 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// ¼±ÅÃÁö µ¥ÀÌÅÍ
+/// ì„ íƒì§€ ë°ì´í„°
 /// </summary>
 public class SpongeChoice
 {
-    public string choiceTxt; // ¹öÆ°¿¡ Ç¥½ÃµÉ ÅØ½ºÆ®
-    public string nextLineId; // ¼±ÅÃ ½Ã ÀÌµ¿ÇÒ ´ë»ç ID
+    [Header("ì„ íƒì§€ ë²„íŠ¼ í…ìŠ¤íŠ¸")] public string choiceTxt;
+    [Header("ì„ íƒì§€ ì„ íƒì‹œ ì´ë™í•  ëŒ€ì‚¬")] public string nextLineId;
 }

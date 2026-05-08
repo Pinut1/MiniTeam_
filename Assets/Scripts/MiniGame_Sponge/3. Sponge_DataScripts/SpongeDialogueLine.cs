@@ -2,25 +2,27 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ´ë»ç ÇÑ ÁÙ µ¥ÀÌÅÍ
+/// ëŒ€ì‚¬ í•œ ì¤„ ë°ì´í„°
 /// </summary>
 [System.Serializable]
 public class SpongeDialogueLine
 {
-    public string lineId;
-    public string speaker; // "½ºÆùÁö¹ä", "Â¡Â¡ÀÌ", "ÇÃ¶ûÅ©Åæ", "ÇÃ·¹ÀÌ¾î" µî
-    [TextArea(2, 5)] public string txt; // RichTxt ÅÂ±× »ç¿ë °¡´É
-    public string animationTrig; // Animator Trigger ÀÌ¸§, ºñ¿ì¸é ÀÌÀü À¯Áö
+    [Header("ëŒ€ì‚¬ ì°¾ì„ ë•Œ ì“°ëŠ” ID - ê²¹ì¹˜ë©´ X")] public string lineId;
 
-    [Header("¾À / È­¸é ÀüÈ¯")]
-    public Image backgroundImg; // ¹Ù²Ü ¹è°æ, ºñ¿ì¸é ÀÌÀü À¯Áö
-    public Image charaterImg; // ¹Ù²Ü Ä³¸¯ÅÍ, ºñ¿ì¸é ÀÌÀü À¯Áö
-    public CharacterPosition characterPos;
-    public string sceneToLoad;
+    [Header("ëŒ€ì‚¬ì°½ì— í‘œì‹œë  í™”ì ì´ë¦„")] public string speaker; // "ìŠ¤í°ì§€ë°¥", "ì§•ì§•ì´", "í”Œë‘í¬í†¤", "í”Œë ˆì´ì–´" ë“±
+    [Header("ì‹¤ì œ ëŒ€ì‚¬ ì‚¬ìš© - RichText íƒœê·¸ ì‚¬ìš© ê°€ëŠ¥")] [TextArea(2, 5)] public string txt; // RichTxt íƒœê·¸ ì‚¬ìš© ê°€ëŠ¥ : <color=red></color>
 
-    public SpongeChoice[] choices; // nullÀÌ¸é ¼±ÅÃÁö X
-    public string nextLineId; // ¼±ÅÃÁö ¾øÀ» ¶§ ´ÙÀ½ ´ë»ç ID
+    [Header("Animator Trigger ì´ë¦„ - ë¹„ìš°ë©´ ì´ì „ ìœ ì§€")] public string animationTrig;
+    [Header("ì”¬ì „í™˜")] public string sceneToLoad;
+    [Header("ë°°ê²½ / ìºë¦­í„° ì „í™˜")]
+    public Image backgroundImg; // ë°”ê¿€ ë°°ê²½, ë¹„ìš°ë©´ ì´ì „ ìœ ì§€
+    public Image charaterImg; // ë°”ê¿€ ìºë¦­í„°, ë¹„ìš°ë©´ ì´ì „ ìœ ì§€
+    [Space(5f)] public CharacterPosition characterPos;
 
+    [Header("ì„ íƒì§€ - nullì´ë©´ ì„ íƒì§€ X")]
+    public SpongeChoice[] choices;
+    public string nextLineId; // ì„ íƒì§€ ì—†ì„ ë•Œ ë‹¤ìŒ ëŒ€ì‚¬ ID
+    
     public enum CharacterPosition
     {
         None, SpongeBob, Ddungi, JingJingi, Plankton, JipgeSajang, Player

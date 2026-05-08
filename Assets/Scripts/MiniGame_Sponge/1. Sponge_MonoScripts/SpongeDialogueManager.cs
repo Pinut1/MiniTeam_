@@ -6,35 +6,50 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// ëŒ€ì‚¬ ì¶œë ¥, íƒ€ì´í•‘ ì—°ì¶œ, ì„ íƒì§€, ì”¬ ì „í™˜ì„ ë‹´ë‹¹
+/// 1. lineIdë¡œ ëŒ€ì‚¬ë¥¼ ì°¾ì•„ì„œ íƒ€ì´í•‘ ì—°ì¶œê³¼ í•¨ê»˜ ì¶œë ¥
+/// 2. ëŒ€ì‚¬ë§ˆë‹¤ ë°°ê²½/ìºë¦­í„° ìœ„ì¹˜ êµì²´
+/// 3. ì”¬ ì „í™˜ì´ í•„ìš”í•˜ë©´ ì”¬ì„ ë¨¼ì € ë¡œë“œí•˜ê³  ëŒ€ì‚¬ ì¶œë ¥
+/// 4. ì„ íƒì§€ê°€ ìˆìœ¼ë©´ ë²„íŠ¼ UI í‘œì‹œ
+/// 5. ëŒ€ì‚¬ ì‹œí€€ìŠ¤ê°€ ëë‚˜ë©´ ë‹¤ìŒ ìƒíƒœë¡œ ì „í™˜ (OnSequenceEnd)
+/// </summary>
 public class SpongeDialogueManager : MonoBehaviour
 {
     public static SpongeDialogueManager Instance { get; private set; }
 
+    // ì¬íŒ ëŒ€ë³¸ ì—ì…‹
     [SerializeField] private SpongeTrialScriptSO trialScript;
 
-    [Header("´ë»ç UI")]
-    [SerializeField] private TMP_Text speakerTxt;
-    [SerializeField] private TMP_Text dialogueTxt;
+    [Header("í™”ì / ëŒ€ì‚¬ í…ìŠ¤íŠ¸")]
+    [SerializeField] private TMP_Text speakerTxt; // í™”ì ì´ë¦„ í‘œì‹œ
+    [SerializeField] private TMP_Text dialogueTxt; // ì‹¤ì œ ëŒ€ì‚¬ê°€ íƒ€ì´í•‘ ë˜ëŠ” í…ìŠ¤íŠ¸
 
-    [Header("¼±ÅÃÁö UI")]
+    [Header("ì„ íƒì§€ UI")]
     [SerializeField] private GameObject choicePnl;
-    [SerializeField] private Button[] choiceBtns; // ¹öÆ° 2°³ °íÁ¤ (¼±ÅÃÁö ´õ Ãß°¡ µÉ ¿¹Á¤X)
+    [SerializeField] private Button[] choiceBtns; // ë²„íŠ¼ 2ê°œ ê³ ì • (ì„ íƒì§€ ë” ì¶”ê°€ ë  ì˜ˆì •X)
 
-    [Header("¹è°æ / Ä³¸¯ÅÍ")]
-    [SerializeField] private Image backgroundImg; // ¹è°æ
-    [SerializeField] private Image characterPlayer; // ÇÃ·¹ÀÌ¾î
-    [SerializeField] private Image characterPlankton; // ÆÇ»ç
-    [SerializeField] private Image characterSpongeBob; // ½ºÆùÁö¹ä
+    [Header("ë°°ê²½ / ìºë¦­í„°")]
+    [SerializeField] private Image backgroundImg; // ë°°ê²½
+    [Space(10f)]
+    [SerializeField] private Image characterPlayer; // í”Œë ˆì´ì–´
+    [SerializeField] private Image characterPlankton; // íŒì‚¬
+    [SerializeField] private Image characterSpongeBob; // ìŠ¤í°ì§€ë°¥
     [SerializeField] private Image characterDdungi;
-    [SerializeField] private Image characterJingJingi; // Â¡Â¡ÀÌ
-    [SerializeField] private Image characterJipgeSajang; // Áı°Ô»çÀå
+    [SerializeField] private Image characterJingJingi; // ì§•ì§•ì´
+    [SerializeField] private Image characterJipgeSajang; // ì§‘ê²Œì‚¬ì¥
 
-    [Header("Animater")]
+    [Header("ìºë¦­í„° Animater")]
     //[SerializeField] private Animator characterAnim;
 
-    private Dictionary<string, SpongeDialogueLine> lineMap;
+    // â”€â”€ ë‚´ë¶€ ë³€ìˆ˜ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    [Header("lineId â†’ DialogueLine ë”•ì…”ë„ˆë¦¬")] private Dictionary<string, SpongeDialogueLine> lineMap; // ë¹ ë¥´ê²Œ ëŒ€ì‚¬ ì°¾ê¸° ìœ„í•´ ì‚¬ìš©
+
+    // íƒ€ì´í•‘ ì½”ë£¨í‹´
     private Coroutine typingCoroutine;
+    // íƒ€ì´í•‘ ì—¬ë¶€ íŒë‹¨ - íƒ€ì´í•‘ ìŠ¤í‚µ ì—¬ë¶€ íŒë‹¨ìš©
     private bool isTyping;
+    // í˜„ì¬ í‘œì‹œ ì¤‘ì¸ ëŒ€ì‚¬ ë°ì´í„° - íƒ€ì´í•‘ ìŠ¤í‚µ ì‹œ ì „ì²´ í…ìŠ¤íŠ¸ë¥¼ ì¦‰ì‹œ í‘œì‹œí•˜ê¸° ìœ„í•´ ë³´ê´€
     private SpongeDialogueLine currentLine;
 
     private void Awake()
@@ -47,86 +62,114 @@ public class SpongeDialogueManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        // ëŒ€ì‚¬ ëª©ë¡ì„ ë”•ì…”ë„ˆë¦¬ë¡œ ë³€í™˜
         BuildLineMap();
     }
 
+    /// <summary>
+    /// TrialScriptSOì˜ ëª¨ë“  ëŒ€ì‚¬ ë°°ì—´ì„ ë”•ì…”ë„ˆë¦¬ë¡œ ë³€í™˜
+    /// lineIdë¥¼ í‚¤ë¡œ ì‚¬ìš©í•´ì„œ O(1)ë¡œ ë¹ ë¥´ê²Œ ê²€ìƒ‰ ê°€ëŠ¥
+    /// </summary>
     void BuildLineMap()
     {
         lineMap = new Dictionary<string, SpongeDialogueLine>();
 
+        // ì˜¤í”„ë‹ ëŒ€ì‚¬ ë“±ë¡
         foreach (var line in trialScript.openingLines)
+            lineMap[line.lineId] = line;
+        // ì¶”ê¶ ëŒ€ì‚¬ ë“±ë¡
+        foreach (var line in trialScript.endingLines)
+            lineMap[line.lineId] = line;
+        foreach (var line in trialScript.evidenceDialogueLines)
             lineMap[line.lineId] = line;
         foreach (var line in trialScript.endingLines)
             lineMap[line.lineId] = line;
-
-        // Ãß±Ã ´ë»çµµ lineMap¿¡ µî·Ï (CrossExaminationManager¿¡¼­ ShowLine È£Ãâ ½Ã ÇÊ¿ä)
+        
+        /*
         foreach (var testimony in trialScript.testimonyLines)
         {
-            // Ãß±Ã ´ë»ç ID´Â TrialSriptSO¿Í º°µµ ¹è¿­·Î °ü¸®
-            // PressDialogueLines ¹è¿­ Âü°í
+            // ì¶”ê¶ ëŒ€ì‚¬ IDëŠ” TrialSriptSOì™€ ë³„ë„ ë°°ì—´ë¡œ ê´€ë¦¬
+            // PressDialogueLines ë°°ì—´ ì°¸ê³ 
         }
+        */
     }
-    // ¦¡¦¡ ´ë»ç Ç¥½Ã ÁøÀÔÁ¡ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ëŒ€ì‚¬ í‘œì‹œ ì§„ì…ì  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// linedë¡œ ëŒ€ì‚¬ë¥¼ ì°¾ì•„ì„œ ì¶œë ¥ ì‹œì‘
+    /// ëª¨ë“  ëŒ€ì‚¬ ì¶œë ¥ì€ ì´ ë©”ì„œë“œë¥¼ í†µí•´ ì‹œì‘
+    /// </summary>
+    /// <param name="lineId"></param>
     public void ShowLine(string lineId)
     {
+        // ë”•ì…”ë„ˆë¦¬ì—ì„œ linedë¡œ ëŒ€ì‚¬ë¥¼ ì°¾ìŒ
+        // ì—†ìœ¼ë©´ ê²½ê³  ë©”ì„¸ì§€
         if (!lineMap.TryGetValue(lineId, out var line))
         {
-            Debug.Log($"[DialogueManager] lineId¸¦ Ã£À» ¼ö ¾øÀ½ : {lineId}");
+            Debug.LogWarning($"[DialogueManager] lineIdë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ : {lineId}");
             return;
         }
         currentLine = line;
 
+        // ì”¬ ì „í™˜ì´ í•„ìš”í•œ ê²½ìš° - ì”¬ ë¨¼ì € ë¡œë“œ í›„ ëŒ€ì‚¬
         if (!string.IsNullOrEmpty(line.sceneToLoad))
         {
             StartCoroutine(LoadSceneAndShowLine(line));
             return;
         }
-
+        // ì´ì „ íƒ€ì´í•‘ ì½”ë£¨í‹´ì´ ìˆìœ¼ë©´ ì¤‘ë‹¨
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         typingCoroutine = StartCoroutine(TypeLine(line));
     }
 
+   
+    /// <summary>
+    /// ì¦ì–¸ ë¼ì¸ì„ ëŒ€ì‚¬ì°½ì— ì¦‰ì‹œ í‘œì‹œ
+    /// </summary>
+    /// <param name="testimony"></param>
     public void ShowTestimonyLine(SpongeTestimonyLine testimony)
     {
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         isTyping = false;
 
-        speakerTxt.text = "Áı°Ô»çÀå";
+        speakerTxt.text = "ì§‘ê²Œì‚¬ì¥";
         dialogueTxt.text = testimony.txt;
         choicePnl.SetActive(false);
     }
 
-    // ¦¡¦¡ ¾À ÀüÈ¯ ÈÄ ´ë»ç Ç¥½Ã ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+
+    // â”€â”€ ì”¬ ì „í™˜ í›„ ëŒ€ì‚¬ í‘œì‹œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// <summary>
-    /// ´ë»ç Ç¥½Ã ÄÚ·çÆ¾
+    /// ì”¬ì„ ë¨¼ì € ë¹„ë™ê¸°ë¡œ ë¡œë“œí•œ í›„ ëŒ€ì‚¬ í‘œì‹œ ì½”ë£¨í‹´
     /// </summary>
     /// <param name="line"></param>
     /// <returns></returns>
     IEnumerator LoadSceneAndShowLine(SpongeDialogueLine line)
     {
+        // ì”¬ ë¹„ë™ê¸° ë¡œë“œ - ë¡œë“œ ì™„ë£Œê¹Œì§€ ê¸°ë‹¤ë¦¼
         AsyncOperation op = SceneManager.LoadSceneAsync(line.sceneToLoad);
         yield return op;
 
+        // ì”¬ ë¡œë“œ ì™„ë£Œ í›„ íƒ€ì´í•‘ ì‹œì‘
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         typingCoroutine = StartCoroutine(TypeLine(line));
     }
 
-    // ¦¡¦¡ Å¸ÀÌÇÎ ¿¬Ãâ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íƒ€ì´í•‘ ì—°ì¶œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// <summary>
-    /// ´ë»ç Å¸ÀÌÇÎ ¿¬Ãâ ÄÚ·çÆ¾
+    /// ëŒ€ì‚¬ íƒ€ì´í•‘ ì—°ì¶œ ì½”ë£¨í‹´
+    /// ë°°ê²½/ìºë¦­í„° êµì²´ -> ì• ë‹ˆë©”ì´ì…˜ -> íƒ€ì´í•‘
     /// </summary>
     /// <param name="line"></param>
     /// <returns></returns>
     IEnumerator TypeLine(SpongeDialogueLine line)
     {
-        // 1. ¹è°æ ±³Ã¼, nullÀÌ¸é ÀÌÀü ¹è°æ À¯Áö
-        if (line.backgroundImg != null)
-            backgroundImg.sprite = line.backgroundImg.sprite;
+        // 1. ë°°ê²½ êµì²´, nullì´ë©´ ì´ì „ ë°°ê²½ ìœ ì§€
+        if (line.backgroundImg != null) backgroundImg.sprite = line.backgroundImg.sprite;
 
-        // 2. Ä³¸¯ÅÍ À§Ä¡ È°¼ºÈ­
+        // 2. ìºë¦­í„° ìœ„ì¹˜ í™œì„±í™”
         UpdateCharacter(line);
 
-        // 3. ÇØ´ç À§Ä¡ Animator¿¡ Æ®¸®°Å
+        // 3. í•´ë‹¹ ìœ„ì¹˜ Animatorì— íŠ¸ë¦¬ê±°
         /*if (!string.IsNullOrEmpty(line.animationTrig))
         {
             TriggerAnimation(line);
@@ -134,15 +177,18 @@ public class SpongeDialogueManager : MonoBehaviour
         }
         */
 
+        // íƒ€ì´í•‘ ì‹œì‘
         isTyping = true;
         speakerTxt.text = line.speaker;
-        dialogueTxt.text = "";
-        choicePnl.SetActive(false);
+        dialogueTxt.text = ""; // í…ìŠ¤íŠ¸ ì´ˆê¸°í™”
+        choicePnl.SetActive(false); // ì„ íƒì§€ íŒ¨ë„ ìˆ¨ê¸°ê¸°
 
+        // RichText íƒœê·¸ ë­ ì €ì‹œê¸° ì•ˆë³´ì´ê²Œ
         int i = 0;
         string fullTxt = line.txt;
         while (i < fullTxt.Length)
         {
+            // < ë¡œ íƒœê·¸ ì‹œì‘ >ë¡œ í•œ ë²ˆì— ì‚½ì…
             if (fullTxt[i] == '<')
             {
                 int closeIdx = fullTxt.IndexOf('>', i);
@@ -153,18 +199,25 @@ public class SpongeDialogueManager : MonoBehaviour
                     continue;
                 }
             }
+            // ì¼ë°˜ ë¬¸ìëŠ” í•œ ê¸€ìì”© ì¶”ê°€
             dialogueTxt.text += fullTxt[i];
             i++;
+            // í•œ ê¸€ì ì¶”ê°€ í›„ ëŒ€ê¸° (íƒ€ì´í•‘ ì†ë„)
             yield return new WaitForSeconds(0.04f);
         }
         isTyping = false;
+        // íƒ€ì´í•‘ ì™„ë£Œ -> ì„ íƒì§€ í‘œì‹œ ë˜ëŠ” ì‹œí€€ìŠ¤ ì¢…ë£Œ
         OnLineFinished(line);
     }
 
-    // ¦¡¦¡ Ä³¸¯ÅÍ À§Ä¡ È°¼ºÈ­ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ìºë¦­í„° ìœ„ì¹˜ í™œì„±í™” â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// ëŒ€ì‚¬ì˜ ìºë¦­í„°Posì— ë”°ë¼ í•´ë‹¹ ìœ„ì¹˜ ìºë¦­í„° ì´ë¯¸ì§€ í™œì„±í™”
+    /// </summary>
+    /// <param name="line"></param>
     void UpdateCharacter(SpongeDialogueLine line)
     {
-        // ÀüÃ¼ ¼û±â±â
+        // ëª¨ë“  ìºë¦­í„° ì „ì²´ ìˆ¨ê¸°ê¸°
         characterPlayer.gameObject.SetActive(false);
         characterSpongeBob.gameObject.SetActive(false);
         characterDdungi.gameObject.SetActive(false);
@@ -172,7 +225,10 @@ public class SpongeDialogueManager : MonoBehaviour
         characterPlankton.gameObject.SetActive(false);
         characterJipgeSajang.gameObject.SetActive(false);
 
+        // Noneì´ë©´ ìºë¦­í„° X - ë°°ê²½ë§Œ í‘œì‹œ
         if (line.characterPos == SpongeDialogueLine.CharacterPosition.None) return;
+        
+        // ìœ„ì¹˜ì— ë§ëŠ” ì´ë¯¸ì§€ ì„ íƒ
         Image target = line.characterPos switch
         {
             SpongeDialogueLine.CharacterPosition.SpongeBob => characterSpongeBob,
@@ -183,17 +239,17 @@ public class SpongeDialogueManager : MonoBehaviour
             SpongeDialogueLine.CharacterPosition.JipgeSajang => characterJipgeSajang,
             _ => null
         };
-        // ½ºÇÁ¶óÀÌÆ® ±³Ã¼ ¾øÀÌ È°¼ºÈ­¸¸ - ½ºÇÁ¶óÀÌÆ®´Â Animator°¡ Á¦¾î
+        // ìŠ¤í”„ë¼ì´íŠ¸ êµì²´ ì—†ì´ í™œì„±í™”ë§Œ - ìŠ¤í”„ë¼ì´íŠ¸ëŠ” Animatorê°€ ì œì–´
         target?.gameObject.SetActive(true);
     }
 
-    // ¦¡¦¡ Ä³¸¯ÅÍ À§Ä¡¿¡ ¸Â´Â Animator¿¡ Æ®¸®°Å ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ìºë¦­í„° ìœ„ì¹˜ì— ë§ëŠ” Animatorì— íŠ¸ë¦¬ê±° â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     void TriggerAnimation(SpongeDialogueLine line)
     {
         /*
         Animator targer = line.characterPos switch
         {
-            // ¾Ö´Ï¸ŞÀÌÅÍ ±¸ÇöÈÄ ÀûÀ» ¿¹Á¤ÀÎµ¥ ¹Ì¸® Àû¾îµÎ°Ú½À´Ï´Ù^.^
+            // ì• ë‹ˆë©”ì´í„° êµ¬í˜„í›„ ì ì„ ì˜ˆì •ì¸ë° ë¯¸ë¦¬ ì ì–´ë‘ê² ìŠµë‹ˆë‹¤^.^
             
             SpongeDialogueLine.CharacterPosition.SpongeBob => animSpongeBob,
             SpongeDialogueLine.CharacterPosition.Player => animPlayer,
@@ -208,62 +264,88 @@ public class SpongeDialogueManager : MonoBehaviour
         */
     }
 
-    // ¦¡¦¡ Å¬¸¯ Ã³¸® ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í´ë¦­ ì²˜ë¦¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// í™”ë©´ í´ë¦­ì‹œ í˜¸ì¶œ
+    /// íƒ€ì´í•‘ ì¤‘ì´ë©´ ì „ì²´ í…ìŠ¤íŠ¸ ì¦‰ì‹œ ì¶œë ¥(ìŠ¤í‚µ)
+    /// íƒ€ì´í•‘ ì™„ë£Œ í›„ë©´ ë‹¤ìŒ ëŒ€ì‚¬ë¡œ ì´ë™
+    /// UIManagerì—ì„œ í˜¸ì¶œ
+    /// </summary>
     public void OnScreenClick()
     {
-        // ±ÛÀÚ°¡ Å¸ÀÌÇÎ ÁßÀÌ¶ó¸é Áï½Ã ¿Ï¼º
+        // ê¸€ìê°€ íƒ€ì´í•‘ ì¤‘ì´ë¼ë©´ ì¦‰ì‹œ ì™„ì„±
         if (isTyping)
         {
             StopCoroutine(typingCoroutine);
             isTyping = false;
             dialogueTxt.text = currentLine.txt;
-            // Å¸ÀÌÇÎÀÌ ¸ØÃèÀ¸¸é ´ë»ç°¡ ³¡³µÀ» ¶§ÀÇ Ã³¸® È£Ãâ
-            // ¼±ÅÃÁö Ç¥½Ã ¿©ºÎ µîÀ» È®ÀÎÇÏ±â À§ÇÔ
+            // íƒ€ì´í•‘ì´ ë©ˆì·„ìœ¼ë©´ ëŒ€ì‚¬ê°€ ëë‚¬ì„ ë•Œì˜ ì²˜ë¦¬ í˜¸ì¶œ
+            // ì„ íƒì§€ í‘œì‹œ ì—¬ë¶€ ë“±ì„ í™•ì¸í•˜ê¸° ìœ„í•¨
             OnLineFinished(currentLine);
             return;
         }
         
-        // ¼±ÅÃÁö°¡ ¶° ÀÖÀ» °æ¿ì Å¬¸¯À¸·Î ³Ñ±â±â X
+        // ì„ íƒì§€ê°€ ë–  ìˆì„ ê²½ìš° í´ë¦­ìœ¼ë¡œ ë„˜ê¸°ê¸° X
         if (choicePnl.activeSelf) return;
         
-        // ´ÙÀ½ ´ë»ç°¡ ÀÖ´Ù¸é ÇØ´ç ´ë»ç º¸¿©ÁÜ
+        // ë‹¤ìŒ ëŒ€ì‚¬ê°€ ìˆë‹¤ë©´ í•´ë‹¹ ëŒ€ì‚¬ ë³´ì—¬ì¤Œ
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
-         // ´ÙÀ½ ´ë»ç°¡ ¾ø´Ù¸é ½ÃÄö½º Á¾·á
+         // ë‹¤ìŒ ëŒ€ì‚¬ê°€ ì—†ë‹¤ë©´ ì‹œí€€ìŠ¤ ì¢…ë£Œ
         else
             OnSequenceEnd();
     }
 
-    // ¦¡¦¡ ´ë»ç Á¾·á Ã³¸® ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ëŒ€ì‚¬ ì¢…ë£Œ ì²˜ë¦¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// íƒ€ì´í•‘ì´ ì™„ë£Œëì„ ë•Œ
+    /// ì„ íƒì§€ ìˆìœ¼ë©´ ì„ íƒì§€ í‘œì‹œ, ì—†ìœ¼ë©´ ì‹œí€€ìŠ¤ ì¢…ë£Œ
+    /// </summary>
+    /// <param name="line"></param>
     void OnLineFinished(SpongeDialogueLine line)
     {
+        // ì„ íƒì§€ ìˆìœ¼ë©´ ì„ íƒì§€ UI í‘œì‹œ
         if (line.choices != null && line.choices.Length > 0)
         {
             ShowChoice(line);
             return;
         }
+        // ì—†ìœ¼ë©´ ì¢…ë£Œ
         if (string.IsNullOrEmpty(line.nextLineId))
             OnSequenceEnd();
     }
 
-    // ¦¡¦¡ ¼±ÅÃÁö Ç¥½Ã ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì„ íƒì§€ í‘œì‹œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// ì„ íƒì§€ ë²„íŠ¼ë“¤ì„ í™œì„±í™” -> í…ìŠ¤íŠ¸/ì´ë²¤íŠ¸ ì—°ê²°
+    /// </summary>
+    /// <param name="line"></param>
     void ShowChoice(SpongeDialogueLine line)
     {
         choicePnl.SetActive(true);
 
         for (int i = 0; i < choiceBtns.Length; i++)
         {
+            // ì„ íƒì§€ ìˆ˜ë³´ë‹¤ ë²„íŠ¼ì´ ë§ìœ¼ë©´ ë‚˜ë¨¸ì§€ ë²„íŠ¼ ìˆ¨ê¸°ê¸°
             bool active = i < line.choices.Length;
             choiceBtns[i].gameObject.SetActive(active);
             if (!active) continue;
 
+            // í´ë¡œì € ìº¡ì³ - ëŒë‹¤ ì•ˆì—ì„œ ië¥¼ ì“°ë©´ ë£¨í”„ ëë‚œ ê°’ìœ¼ë¡œ ê³ ì •ë˜ë¯€ë¡œ idxë¡œ ë³µì‚¬í•´ì„œ ì‚¬ìš©
             int idx = i;
             choiceBtns[i].GetComponentInChildren<TMP_Text>().text = line.choices[i].choiceTxt;
+            
+            // ì´ì „ ì´ë²¤íŠ¸ ì œê±° -> ìƒˆ ì´ë²¤íŠ¸ ì—°ê²°
             choiceBtns[i].onClick.RemoveAllListeners();
             choiceBtns[i].onClick.AddListener(() => ShowLine(line.choices[idx].nextLineId));
         }
     }
 
+    // â”€â”€ ëŒ€ì‚¬ ì‹œí€€ìŠ¤ ì¢…ë£Œ â†’ ë‹¤ìŒ ìƒíƒœë¡œ ì „í™˜ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// <summary>
+    /// nextLineIdê°€ ë¹„ì–´ìˆëŠ” ëŒ€ì‚¬ê°€ ëë‚˜ë©´ í˜¸ì¶œ
+    /// í˜„ì¬ GameStateì— ë”°ë¼ ë‹¤ìŒ í–‰ë™ ê²°ì •
+    /// </summary>
     void OnSequenceEnd()
     {
         switch (SpongeGameManager.Instance.CurrentState)
@@ -271,8 +353,19 @@ public class SpongeDialogueManager : MonoBehaviour
             case SpongeGameState.GameState.Pressing:
             case SpongeGameState.GameState.EvidenceSelect:
                 SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-                SpongeCrossExaminationManager.Instance.ShowCurrentTestimony();
+
+                // ConsumeConditionMet() = "ë°©ê¸ˆ ì¡°ê±´ì´ ì¶©ì¡±ëì–´?"
+                if (SpongeGameManager.Instance.ConsumeConditionMet())
+                    // ì¡°ê±´ ì¶©ì¡± -> ì—”ë”© ëŒ€ì‚¬ ì‹œì‘,ShowLine()ì„ ì§ì ‘ í˜¸ì¶œí•˜ë©´ ì¬ê·€ê°€ ë˜ë¯€ë¡œ Instanceë¥¼ í†µí•´ í˜¸ì¶œ
+                    Instance.ShowLine("ending_01");
+                else
+                {
+                    // ì¡°ê±´ ë¯¸ì¶©ì¡± -> ë‹¤ìŒ ì¦ì–¸ìœ¼ë¡œ ë„˜ì–´ê°
+                    // SpongeCrossExaminationManager.Instance.CurrentIdx++; ì´ ë¶€ë¶„ ìˆ˜ì •í•´ì•¼í•¨!!!!!!!!!!!!
+                    SpongeCrossExaminationManager.Instance.ShowCurrentTestimony();
+                }
                 break;
+
             case SpongeGameState.GameState.Dialogue:
                 SpongeCrossExaminationManager.Instance.StartCrossExamination();
                 break;

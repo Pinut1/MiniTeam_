@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Áõ°Å ¾ÆÀÌÅÛ µ¥ÀÌÅÍ
+/// ì¦ê±° ì•„ì´í…œ ë°ì´í„°
 /// </summary>
 [System.Serializable]
 public class SpongeEvidenceData
 {
-    public string id; // ÄÚµå¿¡ Âü°íÇÒ °íÀ¯ ID ¿¹ : "knife"
-    public string evidenceName; // Áõ°Å ¸ñ·Ï¿¡ Ç¥½ÃµÉ ÀÌ¸§
-    [TextArea(2, 4)] public string description; // Áõ°Å ¼³¸í
-    public Sprite icon;  // Áõ°Å ¾ÆÀÌÄÜ ÀÌ¹ÌÁö
+    [Header("ì½”ë“œì— ì°¸ê³ í•  ê³ ìœ  ID - ì˜ˆ) knaife")] public string id;
+    [Header("ì¦ê±° ëª©ë¡ì— í‘œì‹œë  ì´ë¦„")] public string evidenceName;
+    [Header("ì¦ê±° ìƒì„¸ ì„¤ëª… - ì¦ê±° ì„ íƒ ì‹œ í‘œì‹œ")] [TextArea(2, 4)] public string description;
+    [Header("ì¦ê±° ì•„ì´ì½˜ ì´ë¯¸ì§€")] public Sprite icon;
 }

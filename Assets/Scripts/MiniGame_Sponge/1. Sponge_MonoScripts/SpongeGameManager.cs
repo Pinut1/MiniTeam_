@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SpongeGameState;
 
+/// <summary>
+/// ì „ì²´ ê²Œì„ ìƒíƒœ ê´€ë¦¬í•˜ëŠ” í•µì‹¬
+/// 1. í˜„ì¬ GameStateë¥¼ ë“¤ê³  ìˆìœ¼ë©´ì„œ ìƒíƒœ ì „í™˜ ê´€ë¦¬
+/// 2. í•„ìˆ˜ ì¶”ê¶/ì¦ê±° ì œì‹œ ì¡°ê±´ ì™„ë£Œ ì—¬ë¶€ ì¶”ì 
+/// </summary>
 public class SpongeGameManager : MonoBehaviour
 {
     public static SpongeGameManager Instance { get; private set; }
@@ -20,84 +25,127 @@ public class SpongeGameManager : MonoBehaviour
         InitializeRequiredConditions();
     }
 
-    // ¦¡¦¡ »óÅÂ °ü¸® ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
-    [Header("ÃÊ±â »óÅÂ")]
+    // â”€â”€ ìƒíƒœ ê´€ë¦¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    [Header("ì´ˆê¸° ìƒíƒœ")]
     [SerializeField] private SpongeGameState gmState;
-    private GameState startState = GameState.Dialogue;
+
+    // í˜„ì¬ ê²Œì„ ìƒíƒœ
     private GameState currentState;
-    public GameState CurrentState => currentState;
+    [Header("currentStateë¥¼ ì½ì„ ìˆ˜ ìˆê²Œ ê³µê°œ")] public GameState CurrentState => currentState;
 
     /// <summary>
-    /// »óÅÂ ÀüÈ¯
+    /// ê²Œì„ ìƒíƒœ ì „í™˜ - ëª¨ë“  ìƒíƒœ ì „í™˜ì€ ë°˜ë“œì‹œ ì´ ë©”ì„œë“œë¥¼ í†µí•´ì„œ í•´ì•¼í•¨
     /// </summary>
     /// <param name="newState"></param>
     public void ChangeState(GameState newState)
     {
+        // í˜„ì¬ ìƒíƒœì™€ ê°™ìœ¼ë©´ ì „í™˜ X
         if (currentState == newState) return;
 
         currentState = newState;
-        Debug.Log($"[GameManager] »óÅÂ ÀüÈ¯ -> {newState}");
+        Debug.Log($"[GameManager] ìƒíƒœ ì „í™˜ -> {newState}");
     }
 
+    // í˜„ì¬ ìƒíƒœì—ì„œ ì…ë ¥ì„ ì™„ì „íˆ ì°¨ë‹¨í•´ì•¼ í•˜ëŠ”ì§€
+    // Resolution(ê²Œì„ í´ë¦¬ì–´) ìƒíƒœì—ì„œë§Œ true
     public bool IsInputBlocked() => currentState == GameState.Resolution;
+
+    // Qí‚¤(ì¶”ê¶í•˜ê¸°)ë¥¼ ëˆ„ë¥¼ ìˆ˜ ìˆëŠ” ìƒíƒœì¸ì§€
+    // CrossExamination(ì‹¬ë¬¸) ìƒíƒœì—ì„œë§Œ true
     public bool CanPress() => currentState == GameState.CrossExamination;
+
+    // â”€í”„ë¡œí¼í‹°ë¥¼ ì´ìš©í•´ ìº¡ìŠí™” (ì‹¤ì‹œê°„ìœ¼ë¡œ ìƒíƒœë¥¼ í™•ì¸í•˜ì—¬ ê²°ê³¼ë¥¼ ë°˜í™˜)â”€
+    // TABí‚¤(ì¦ê±° ëª©ë¡)ë¥¼ ì—´ ìˆ˜ ìˆëŠ” ìƒíƒœì¸ì§€
+    // ì¼ë°˜ ëŒ€ì‚¬ ì¤‘ì´ê±°ë‚˜ ì‹¬ë¬¸ ì¤‘ì¼ë•Œë§Œ ê°€ëŠ¥
     public bool CanOpenEvidence => currentState == GameState.Dialogue || currentState == GameState.CrossExamination;
 
-    // ¦¡¦¡ ÁøÇà Á¶°Ç (ProgeressTraccker) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
-    [Header("ÇÊ¼ö ¿Ï·á Á¶°Ç")]
-    [SerializeField] private int[] requiredPressIndices; // ¿¹ : {0, 2}
-    [SerializeField] private string[] requiredEvidenceIds; // ¿¹ : {"knife", "receipt"}
+    // â”€â”€ ì§„í–‰ ì¡°ê±´ (ProgeressTraccker) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    [Header("í•„ìˆ˜ ì¶”ê¶")]
+    [SerializeField] private int[] requiredPressIndices; // ì˜ˆ : {0, 2}, në²ˆì§¸ ì¦ì–¸ì€ ë°˜ë“œì‹œ ì¶”ê¶ í•´ì•¼í•¨
+    [Header("í•„ìˆ˜ ì œì‹œ ì¦ê±°")]
+    [SerializeField] private string[] requiredEvidenceIds; // ì˜ˆ : {"knife", "receipt"}
 
-    private HashSet<int> completedPresses = new(); 
+    // ì™„ë£Œëœ ì¶”ê¶ ì¸ë±ìŠ¤ë¥¼ ì €ì¥
+    private HashSet<int> completedPresses = new();
+    // ì™„ë£Œëœ ì¦ê±° IDë¥¼ ì €ì¥
     private HashSet<string> completedEvidences = new();
+    // ì¶”ê¶ ë˜ëŠ” ì¦ê±° ì œì‹œë¡œ ì¡°ê±´ì´ ë°©ê¸ˆ ì¶©ì¡± ëëŠ”ì§€ ì €ì¥
+    // RegisterPress / RegisterEvidence í˜¸ì¶œ ì‹œ ìë™ìœ¼ë¡œ ê°±ì‹ ë¨
+    // ConsumeConditionMet()ìœ¼ë¡œ í•œ ë²ˆë§Œ ì½ì„ ìˆ˜ ìˆìŒ
     private bool conditionJustMet = false;
 
+    /// <summary>
+    /// ê²Œì„ ì‹œì‘ ì‹œ ì™„ë£Œ ëª©ë¡ ì´ˆê¸°í™”
+    /// </summary>
     void InitializeRequiredConditions()
     {
         completedPresses.Clear();
         completedEvidences.Clear();
     }
 
+    /// <summary>
+    /// ì¶”ê¶ ì™„ë£Œ ë“±ë¡
+    /// </summary>
+    /// <param name="lineIdx"></param>
     public void RegisterPress(int lineIdx)
     {
         completedPresses.Add(lineIdx);
-        Debug.Log($"[GameManager] Ãß±Ã ¿Ï·á : {lineIdx}¹ø Áõ¾ğ");
+        Debug.Log($"[GameManager] ì¶”ê¶ ì™„ë£Œ : {lineIdx}ë²ˆ ì¦ì–¸");
         conditionJustMet = IsAllConditionsMet();
     }
 
+    /// <summary>
+    /// ì¦ê±° ì œì‹œ ì™„ë£Œ ë“±ë¡
+    /// </summary>
+    /// <param name="evidenceId"></param>
     public void RegisterEvidence(string evidenceId)
     {
         completedEvidences.Add(evidenceId);
-        Debug.Log($"[GameManager] Áõ°Å Á¦½Ã ¿Ï·á :  {evidenceId}");
+        Debug.Log($"[GameManager] ì¦ê±° ì œì‹œ ì™„ë£Œ :  {evidenceId}");
         conditionJustMet = IsAllConditionsMet();
     }
 
+    /// <summary>
+    /// ëª¨ë“  í•„ìˆ˜ ì¡°ê±´ì´ ì¶©ì¡± ëëŠ”ì§€ í™•ì¸
+    /// </summary>
+    /// <returns></returns>
     public bool IsAllConditionsMet()
     {
+        // í•„ìˆ˜ ì¶”ê¶ ëª©ë¡ì„ ìˆœíšŒ - í•˜ë‚˜ë¼ë„ ì™„ë£Œ ì•ˆëìœ¼ë©´ false
         foreach (int i in requiredPressIndices)
             if (!completedPresses.Contains(i)) return false;
+        // í•„ìˆ˜ ì¦ê±° ëª©ë¡ì„ ìˆœíšŒ - í•˜ë‚˜ë¼ë„ ì™„ë£Œ ì•ˆëìœ¼ë©´ false
         foreach (string id in requiredEvidenceIds)
             if (!completedEvidences.Contains(id)) return false;
+        // ëª¨ë“  ì¡°ê±´ ì™„ë£Œì‹œ trueë¡œ ë°˜í™˜
         return true;
     }
 
+    /// <summary>
+    /// ConsumeConditionMetì„ í•œ ë²ˆë§Œ ì½ê³  ì¦‰ì‹œ falseë¡œ ì´ˆê¸°í™”
+    /// DialogueManager.OnSequenceEnd()ì—ì„œ ì—”ë”© ì—¬ë¶€ íŒë‹¨ ì‹œ ì‚¬ìš©
+    /// "ë°©ê¸ˆ ì¡°ê±´ì´ ì¶©ì¡±ëì–´?" ë¼ê³  í•œ ë²ˆ ë¬¼ì–´ë³´ë©´ ìë™ìœ¼ë¡œ ë¦¬ì…‹
+    /// </summary>
+    /// <returns></returns>
     public bool ConsumeConditionMet()
     {
-        bool result = conditionJustMet;
-        conditionJustMet = false; // ÇÑ ¹ø ÀĞÀ¸¸é ÃÊ±âÈ­
-        return result;
+        bool result = conditionJustMet; // í˜„ì¬ ê°’ì„ ì„ì‹œ ì €ì¥
+        conditionJustMet = false; // í•œ ë²ˆ ì½ìœ¼ë©´ ì´ˆê¸°í™”
+        return result; // ì €ì¥í•´ë’€ë˜ ê°’ ë°˜í™˜
     }
 
-    // Á¶°Ç ÃæÁ· Áï½Ã Ã¼Å© - ÇÊ¿ä ½Ã ÀÚµ¿ Resolution ÀüÈ¯
+    // ì¡°ê±´ ì¶©ì¡± ì¦‰ì‹œ ì²´í¬ - í•„ìš” ì‹œ ìë™ Resolution ì „í™˜
     void CheckAllConditions()
     {
-        // ÇÊ¿ä½Ã »ç¿ë
+        // í•„ìš”ì‹œ ì‚¬ìš©
     }
 
-    // ¦¡¦¡ °ÔÀÓ ½ÃÀÛ / Àç½ÃÀÛ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ê²Œì„ ì‹œì‘ / ì¬ì‹œì‘ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void Start()
     {
+        // ìƒíƒœ Dialogueë¡œ ë³€ê²½
         currentState = GameState.Dialogue;
+        // ì˜¤í”„ë‹ ì²« ëŒ€ì‚¬ í˜¸ì¶œ
         SpongeDialogueManager.Instance.ShowLine("opening_01");
     }
 }

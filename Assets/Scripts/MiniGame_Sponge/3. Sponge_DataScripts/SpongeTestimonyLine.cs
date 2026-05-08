@@ -1,17 +1,19 @@
 using UnityEngine;
 
+/// <summary>
+/// ì¦ì–¸ í•œ ì¤„ ë°ì´í„°
+/// </summary>
 [System.Serializable]
 public class SpongeTestimonyLine
 {
-    [TextArea(2, 5)] public string txt; // Áõ¾ğ Ã¢¿¡ Ç¥½ÃµÉ ÅØ½ºÆ®
+    [Header("ì¦ì–¸ ëŒ€ì‚¬ì°½ì— í‘œì‹œë  í…ìŠ¤íŠ¸")]
+    [TextArea(2, 5)] public string txt;
 
-    [Header("Ãß±Ã ¼³Á¤")]
-    public bool ispressable; // Ãß±Ã °¡´É ¿©ºÎ
-    public string firstPressDialogueId; // Ãß±Ã ½Ã ½ÃÀÛÇÒ Ã¹ ´ë»ç ID
-    public bool isRequiredPress; // ÇÊ¼ö Ãß±Ã ¿©ºÎ
+    [Header("ì¶”ê¶ ê°€ëŠ¥ ì—¬ë¶€")] public bool ispressable;
+    [Header("ì¶”ê¶ì‹œ ì‹œì‘í•  ì²« ëŒ€ì‚¬")] public string firstPressDialogueId;
+    [Header("í•„ìˆ˜ ì¶”ê¶ ì—¬ë¶€")] public bool isRequiredPress;
 
-    [Header("Áõ°Å Á¦½Ã ¼³Á¤")]
-    public string[] validEvidenceIds; // Á¤´ä Áõ°Å ID ¸ñ·Ï
-    public string evidenceSuccessDialogueId; // ¿Ã¹Ù¸¥ Áõ°Å Á¦½Ã ÈÄ ´ë»ç ID
-    public bool isRequiredEvidence; // ÇÊ¼ö Áõ°Å Á¦½Ã ¿©ºÎ
+    [Header("ì •ë‹µ ì¦ê±° ID ëª©ë¡")] public string[] validEvidenceIds;
+    [Header("ì˜¬ë°”ë¥¸ ì¦ê±° ì œì‹œ í›„ ëŒ€ì‚¬ ID")] public string evidenceSuccessDialogueId;
+    [Header("í•„ìˆ˜ ì¦ê±° ì œì‹œ ì—¬ë¶€")] public bool isRequiredEvidence;
 }

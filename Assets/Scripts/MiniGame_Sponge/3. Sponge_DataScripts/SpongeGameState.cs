@@ -1,15 +1,16 @@
 using UnityEngine;
 /// <summary>
-/// »óÅÂ enum
+/// ìƒíƒœ enum
+/// GameManagerê°€ ì´ ê°’ì„ ë“¤ê³  ëª¨ë“  ìŠ¤í¬ë¦½íŠ¸ê°€ ì°¸ì¡°
 /// </summary>
 public class SpongeGameState
 {
     public enum GameState
     {
-        Dialogue,              // ÀÏ¹İ ´ë»ç ÁøÇà Áß
-        CrossExamination, // ½É¹® ¸ğµå (Áõ¾ğ ³Ñ±â±â / Q / TAB °¡´É)
-        Pressing,              // Ãß±Ã ´ë»ç Ãâ·Â
-        EvidenceSelect,     // Áõ°Å ¼±ÅÃ Ã¢ ¿­¸²
-        Resolution          // »ç°Ç ÇØ°á - ¸ğµç ÀÔ·Â Â÷´Ü
+        Dialogue,              // ì¼ë°˜ ëŒ€ì‚¬ ì§„í–‰ ì¤‘
+        CrossExamination, // ì‹¬ë¬¸ ëª¨ë“œ (ì¦ì–¸ ë„˜ê¸°ê¸° / Q / TAB ê°€ëŠ¥)
+        Pressing,              // ì¶”ê¶ ëŒ€ì‚¬ ì¶œë ¥
+        EvidenceSelect,     // ì¦ê±° ì„ íƒ ì°½ ì—´ë¦¼
+        Resolution          // ì‚¬ê±´ í•´ê²° - ëª¨ë“  ì…ë ¥ ì°¨ë‹¨
     }
 }

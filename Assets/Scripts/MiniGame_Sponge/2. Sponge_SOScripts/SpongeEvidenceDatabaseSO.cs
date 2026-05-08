@@ -1,14 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// Áõ°Å ¸ñ·Ï ¿¡¼Â
+/// ì¦ê±° ëª©ë¡ ì—ì…‹
 /// </summary>
 [CreateAssetMenu(fileName = "SpongeEvidenceDatabaseSO", menuName = "Scriptable Objects/SpongeEvidenceDatabaseSO")]
 public class SpongeEvidenceDatabaseSO : ScriptableObject
 {
     public SpongeEvidenceData[] evidences;
 
-    // ÄÚµå¿¡¼­ ID·Î ºü¸£°Ô Ã£À» ¶§ »ç¿ës
+    // ì½”ë“œì—ì„œ IDë¡œ ë¹ ë¥´ê²Œ ì°¾ì„ ë•Œ ì‚¬ìš©s
     public SpongeEvidenceData GetById(string id)
     {
         return System.Array.Find(evidences, e => e.id == id);
