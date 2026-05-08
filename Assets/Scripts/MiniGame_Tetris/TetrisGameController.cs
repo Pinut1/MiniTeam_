@@ -22,9 +22,12 @@ namespace MiniTeam.Tetris
             MiniGameManager.Instance.OnMiniGameClear();
         }
 
+        /// <summary>
+        /// Signals that the Tetris mini-game has failed and notifies the central mini-game manager to handle failure.
+        /// </summary>
         public void OnGameFail()
         {
-            Debug.Log("[Tetris] Game Fail!");
+            
             MiniGameManager.Instance.OnMiniGameFail();
         }
     }
