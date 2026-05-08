@@ -63,6 +63,7 @@ namespace MiniTeam.Shooting1942
         void Shoot()
         {
             Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerShoot);
         }
 
         void CalculateBounds()

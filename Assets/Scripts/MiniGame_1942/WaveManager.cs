@@ -73,6 +73,10 @@ namespace MiniTeam.Shooting1942
             currentWave     = wave;
             currentInterval = wave == 1 ? wave1Interval : wave2Interval;
 
+            AudioManager.Instance?.PlayBGM(wave == 1
+                ? AudioManager.Instance.bgmWave1
+                : AudioManager.Instance.bgmWave2);
+
             ShootingUIManager.Instance?.ShowWaveMessage($"WAVE {wave}", 2f);
 
             StartSpawning();
@@ -145,6 +149,7 @@ namespace MiniTeam.Shooting1942
             if (boss != null)
                 boss.OnBossDefeated += HandleBossDefeated;
 
+            AudioManager.Instance?.PlayBGM(AudioManager.Instance.bgmBoss);
             ShootingUIManager.Instance?.ShowWaveMessage("BOSS!", 2f);
         }
 

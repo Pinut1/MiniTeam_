@@ -13,7 +13,6 @@ namespace MiniTeam.Shooting1942
 
         private bool isGameOver = false;
         private bool isCleared  = false;
-        private bool isPaused   = false;
         private WaveManager waveManager;
 
         void Start()
@@ -24,23 +23,6 @@ namespace MiniTeam.Shooting1942
             waveManager = GetComponent<WaveManager>();
             if (waveManager == null)
                 waveManager = FindAnyObjectByType<WaveManager>();
-        }
-
-        void Update()
-        {
-            if (isGameOver) return;
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-                TogglePause();
-        }
-
-        // ── 일시정지 ──────────────────────────────
-
-        void TogglePause()
-        {
-            isPaused = !isPaused;
-            Time.timeScale = isPaused ? 0f : 1f;
-            ShootingUIManager.Instance?.ShowPause(isPaused);
         }
 
         // ── IMiniGame ─────────────────────────────
@@ -56,6 +38,8 @@ namespace MiniTeam.Shooting1942
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(true);
 
+            var am = AudioManager.Instance;
+            if (am != null) am.PlayBGM(am.bgmClear);
             ShootingUIManager.Instance?.ShowResult(true);
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
@@ -68,6 +52,8 @@ namespace MiniTeam.Shooting1942
 
             EndGame();
 
+            var am = AudioManager.Instance;
+            if (am != null) am.PlayBGM(am.bgmGameOver);
             ShootingUIManager.Instance?.ShowResult(false);
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
@@ -75,13 +61,8 @@ namespace MiniTeam.Shooting1942
         void EndGame()
         {
             waveManager?.StopGame();
-
-            if (isPaused)
-            {
-                isPaused = false;
-                ShootingUIManager.Instance?.ShowPause(false);
-            }
-
+            AudioManager.Instance?.StopBGM();
+            OptionsUIManager.Instance?.ForceClose();
             Time.timeScale = 1f;
 
             var player = FindAnyObjectByType<PlayerController>();
