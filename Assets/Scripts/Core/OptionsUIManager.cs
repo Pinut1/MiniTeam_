@@ -19,6 +19,13 @@ namespace MiniTeam.Core
 
         private bool isOpen = false;
 
+        /// <summary>
+        /// Enforces a single persistent instance of this manager and prevents duplicates.
+        /// </summary>
+        /// <remarks>
+        /// If another instance already exists, this GameObject is destroyed. Otherwise the instance
+        /// reference is set and the GameObject is marked to persist across scene loads.
+        /// </remarks>
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -26,19 +33,30 @@ namespace MiniTeam.Core
             DontDestroyOnLoad(gameObject);
         }
 
+        /// <summary>
+        /// Initializes the options UI: hides the options panel (if assigned) and configures volume sliders.
+        /// </summary>
+        /// <remarks>
+        /// Called by Unity when the component becomes active at the start of its lifecycle.
+        /// </remarks>
         void Start()
         {
             if (optionsPanel != null) optionsPanel.SetActive(false);
             InitSliders();
         }
 
+        /// <summary>
+        /// Monitors input each frame and toggles the options panel when the Escape key is pressed.
+        /// </summary>
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
                 Toggle();
         }
 
-        // ── 패널 열기/닫기 ───────────────────────
+        /// <summary>
+        /// Toggles the options panel between open and closed states.
+        /// </summary>
 
         public void Toggle()
         {
@@ -46,6 +64,12 @@ namespace MiniTeam.Core
             else Open();
         }
 
+        /// <summary>
+        /// Opens the options panel and pauses game time.
+        /// </summary>
+        /// <remarks>
+        /// Marks the manager as open, sets Time.timeScale to 0, and activates the assigned optionsPanel if present.
+        /// </remarks>
         public void Open()
         {
             isOpen = true;
@@ -53,6 +77,9 @@ namespace MiniTeam.Core
             if (optionsPanel != null) optionsPanel.SetActive(true);
         }
 
+        /// <summary>
+        /// Closes the options panel, resumes normal game time, and marks the panel as not open.
+        /// </summary>
         public void Close()
         {
             isOpen = false;
@@ -60,7 +87,12 @@ namespace MiniTeam.Core
             if (optionsPanel != null) optionsPanel.SetActive(false);
         }
 
-        // 게임 종료/클리어 시 강제로 닫기
+        /// <summary>
+        /// Forcefully closes the options panel and marks it as closed without altering the game's time scale.
+        /// </summary>
+        /// <remarks>
+        /// Deactivates the configured optionsPanel GameObject if assigned. This method does not modify Time.timeScale.
+        /// </remarks>
         public void ForceClose()
         {
             isOpen = false;
@@ -69,10 +101,14 @@ namespace MiniTeam.Core
 
         // ── 버튼 콜백 ─────────────────────────────
 
-        // "게임으로 돌아가기" 버튼
+        /// <summary>
+/// Closes the options panel in response to the resume button.
+/// </summary>
         public void OnResumeClicked() => Close();
 
-        // "나가기" 버튼 — 미니게임 중이면 허브로, 허브면 앱 종료
+        /// <summary>
+        /// Closes the options panel and either exits the active mini-game or quits the application.
+        /// </summary>
         public void OnExitClicked()
         {
             Close();
@@ -82,7 +118,12 @@ namespace MiniTeam.Core
                 Application.Quit();
         }
 
-        // ── 볼륨 슬라이더 ─────────────────────────
+        /// <summary>
+        /// Initializes assigned volume sliders with current values from the SoundManager and registers their change listeners to update SoundManager volumes.
+        /// </summary>
+        /// <remarks>
+        /// If <c>SoundManager.Instance</c> is null, the method returns without modifying any sliders. Only sliders that are assigned (non-null) are updated and wired.
+        /// </remarks>
 
         void InitSliders()
         {

@@ -60,12 +60,21 @@ namespace MiniTeam.Shooting1942
             transform.position = pos;
         }
 
+        /// <summary>
+        /// Spawns a bullet at the configured fire point and plays the player's shooting sound effect.
+        /// </summary>
         void Shoot()
         {
             Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerShoot);
         }
 
+        /// <summary>
+        /// Computes world-space movement bounds from the main camera's viewport and stores them in the controller's min/max fields.
+        /// </summary>
+        /// <remarks>
+        /// Uses the main camera's position to convert the viewport corners (0,0) and (1,1) to world coordinates, then applies a 0.3 unit margin and assigns the results to <c>minX</c>, <c>maxX</c>, <c>minY</c>, and <c>maxY</c>.
+        /// </remarks>
         void CalculateBounds()
         {
             Camera cam = Camera.main;

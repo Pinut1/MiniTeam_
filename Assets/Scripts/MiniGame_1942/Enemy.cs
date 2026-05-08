@@ -80,6 +80,12 @@ namespace MiniTeam.Shooting1942
             }
         }
 
+        /// <summary>
+        /// Applies one point of damage to the enemy and handles its death when HP reaches zero.
+        /// </summary>
+        /// <remarks>
+        /// Decrements the enemy's HP by 1. If HP is less than or equal to 0, plays the enemy-death sound effect, awards 10 points, marks the enemy as dead to ignore further hits, and destroys the enemy GameObject.
+        /// </remarks>
         public void TakeHit()
         {
             if (isDead) return;

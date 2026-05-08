@@ -20,6 +20,11 @@ namespace MiniTeam.Shooting1942
             renderers = GetComponentsInChildren<SpriteRenderer>(true);
         }
 
+        /// <summary>
+        /// Handles trigger collisions: if the player is neither invincible nor in god mode, processes hits from objects tagged "Enemy" or "EnemyBullet".
+        /// Plays the player hit SFX, notifies the formation of the hit, and starts temporary invincibility with blinking.
+        /// </summary>
+        /// <param name="other">The collider that entered the trigger.</param>
         void OnTriggerEnter(Collider other)
         {
             if (isInvincible || IsGodMode) return;

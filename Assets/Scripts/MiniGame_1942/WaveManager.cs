@@ -68,6 +68,10 @@ namespace MiniTeam.Shooting1942
                 SpawnBoss();
         }
 
+        /// <summary>
+        /// Starts the specified enemy wave, updates wave timing, and begins spawning enemies.
+        /// </summary>
+        /// <param name="wave">Wave number to start; 1 selects first-wave settings, 2 selects second-wave settings.</param>
         void StartWave(int wave)
         {
             currentWave     = wave;
@@ -137,6 +141,12 @@ namespace MiniTeam.Shooting1942
             SpawnBoss();
         }
 
+        /// <summary>
+        /// Spawns the boss at the configured spawn point (or a default position) and begins boss-related behavior.
+        /// </summary>
+        /// <remarks>
+        /// Sets <see cref="IsBossSpawned"/> to true, instantiates the boss prefab, subscribes <see cref="HandleBossDefeated"/> to the boss's <c>OnBossDefeated</c> event if available, plays the boss background music, and shows the "BOSS!" wave message.
+        /// </remarks>
         void SpawnBoss()
         {
             IsBossSpawned = true;

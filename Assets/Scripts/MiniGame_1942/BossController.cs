@@ -132,7 +132,12 @@ namespace MiniTeam.Shooting1942
             }
         }
 
-        // ── 피격 ─────────────────────────────────
+        /// <summary>
+        /// Apply one point of damage to the boss and handle hit effects, phase transition, and defeat.
+        /// </summary>
+        /// <remarks>
+        /// If the boss is invincible or already defeated, the call is ignored. Otherwise the boss's HP is decremented and clamped to the range [0, maxHp], a hit sound is played, and the boss HP UI is updated. If HP reaches 0 the boss is marked defeated, awards 200 score, invokes OnBossDefeated, and the GameObject is destroyed. If HP falls to half or below and the boss is not yet in phase 2, begins the phase‑2 transition.
+        /// </remarks>
 
         public void TakeHit()
         {

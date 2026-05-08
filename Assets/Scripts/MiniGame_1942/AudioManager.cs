@@ -21,14 +21,31 @@ namespace MiniTeam.Shooting1942
         public AudioClip sfxBossHit;
         public AudioClip sfxPlayerHit;
 
+        /// <summary>
+        /// Ensures a single active AudioManager instance for the scene by enforcing the singleton pattern.
+        /// </summary>
+        /// <remarks>
+        /// If another AudioManager instance already exists, the current GameObject is destroyed; otherwise this instance becomes the singleton.
+        /// </remarks>
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
         }
 
-        public void PlayBGM(AudioClip clip) => SoundManager.Instance?.PlayBGM(clip);
-        public void StopBGM()              => SoundManager.Instance?.StopBGM();
-        public void PlaySFX(AudioClip clip) => SoundManager.Instance?.PlaySFX(clip);
+        /// <summary>
+/// Plays the provided audio clip as the current background music.
+/// </summary>
+/// <param name="clip">The audio clip to play as background music. If the audio subsystem is unavailable, the call is ignored.</param>
+public void PlayBGM(AudioClip clip) => SoundManager.Instance?.PlayBGM(clip);
+        /// <summary>
+/// Stops any currently playing background music.
+/// </summary>
+public void StopBGM()              => SoundManager.Instance?.StopBGM();
+        /// <summary>
+/// Plays the provided sound effect through the project's global SoundManager; does nothing if no SoundManager is available.
+/// </summary>
+/// <param name="clip">The audio clip to play as a sound effect.</param>
+public void PlaySFX(AudioClip clip) => SoundManager.Instance?.PlaySFX(clip);
     }
 }

@@ -15,6 +15,10 @@ namespace MiniTeam.Shooting1942
         private bool isCleared  = false;
         private WaveManager waveManager;
 
+        /// <summary>
+        /// Initializes runtime state for the shooting mini-game: disables the optional spaceship reward object (if assigned)
+        /// and locates the WaveManager, first attempting to get it from the same GameObject and then searching the scene.
+        /// </summary>
         void Start()
         {
             if (spaceshipRewardObj != null)
@@ -25,7 +29,13 @@ namespace MiniTeam.Shooting1942
                 waveManager = FindAnyObjectByType<WaveManager>();
         }
 
-        // ── IMiniGame ─────────────────────────────
+        /// <summary>
+        /// Handles successful completion of the mini-game and initiates the end-of-game sequence.
+        /// </summary>
+        /// <remarks>
+        /// Marks the game as cleared and over, performs end-game teardown, enables the optional spaceship reward (if present),
+        /// plays the clear background music, displays the success result UI, and schedules returning to the hub after <c>resultHoldTime</c> seconds.
+        /// </remarks>
 
         public void OnGameClear()
         {
@@ -43,6 +53,12 @@ namespace MiniTeam.Shooting1942
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
+        /// <summary>
+        /// Marks the mini-game as failed and triggers the end-of-game sequence for a failure.
+        /// </summary>
+        /// <remarks>
+        /// Sets internal state to indicate the game is over and failed, invokes EndGame, plays the game-over BGM, shows the failure result UI, and schedules a return to the hub after <c>resultHoldTime</c>.
+        /// </remarks>
         public void OnGameFail()
         {
             if (isGameOver) return;
@@ -56,6 +72,12 @@ namespace MiniTeam.Shooting1942
             Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
+        /// <summary>
+        /// Finalizes the mini-game by stopping gameplay systems and restoring global state.
+        /// </summary>
+        /// <remarks>
+        /// Stops wave progression and background music, force-closes the options UI, resets the game's time scale to 1, and disables the first found PlayerController to prevent further player input.
+        /// </remarks>
         void EndGame()
         {
             waveManager?.StopGame();
