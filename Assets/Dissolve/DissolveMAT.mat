@@ -31,12 +31,20 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_b0f7c8d3391c4e2b949cee09e615ea8a_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 51ed782942d2548468736af30ba59a66, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
+    - _DissolveAmount: 0.762
+    - _DissolveScale: 30
+    - _OutlineThickness: 0.1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 1, g: 0, b: 0.8217411, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7701301310431923964
