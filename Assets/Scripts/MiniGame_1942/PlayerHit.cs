@@ -13,6 +13,7 @@ namespace MiniTeam.Shooting1942
         private FormationManager formation;
         private SpriteRenderer[]  renderers;
         private bool isInvincible = false;
+        public bool IsInvincible => isInvincible;
 
         void Start()
         {
@@ -20,16 +21,14 @@ namespace MiniTeam.Shooting1942
             renderers = GetComponentsInChildren<SpriteRenderer>(true);
         }
 
-        void OnTriggerEnter(Collider other)
+        // HitboxPoint에서 호출 — 피탄점에 맞았을 때
+        public void TakeHit()
         {
             if (isInvincible || IsGodMode) return;
 
-            if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
-            {
-                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerHit);
-                formation.TakeHit();
-                StartCoroutine(InvincibleRoutine());
-            }
+            AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerHit);
+            formation.TakeHit();
+            StartCoroutine(InvincibleRoutine());
         }
 
         IEnumerator InvincibleRoutine()

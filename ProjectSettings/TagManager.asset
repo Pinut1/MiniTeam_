@@ -51,6 +51,12 @@ TagManager:
   - name: BG_Effect
     uniqueID: 3354770137
     locked: 0
+  - name: UI
+    uniqueID: 2043359829
+    locked: 0
+  - name: Player
+    uniqueID: 3160150289
+    locked: 0
   - name: Entity
     uniqueID: 3087796885
     locked: 0

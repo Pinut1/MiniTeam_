@@ -14,21 +14,25 @@ namespace MiniTeam.Shooting1942
         public float moveSpeed = 1.5f;
         public float moveRange = 3f;
 
-        [Header("패턴 1 - 직선 탄")]
-        public GameObject bulletPrefab;
-        public float pattern1Interval = 2f;
-
-        [Header("패턴 2 - 3방향 산탄")]
+        [Header("탄 프리팹")]
         public GameObject bossBulletPrefab;
-        public float pattern2Interval = 4f;
-        public float spreadAngle = 25f;
+
+        [Header("패턴 1 - 플레이어 조준 산탄")]
+        public float pattern1Interval = 2f;
+        public int   pattern1Count    = 3;
+        public float spreadAngle      = 20f;
+
+        [Header("패턴 2 - 전방위 원형탄")]
+        public float pattern2Interval    = 5f;
+        public int   pattern2CircleCount = 8;
 
         [Header("2페이즈")]
-        public float phase2MoveSpeed     = 2.5f;
+        public float phase2MoveSpeed       = 2.5f;
         public float phase2Pattern1Interval = 1f;
-        public float phase2Pattern2Interval = 2.5f;
-        public int   phase2SpreadCount   = 5;
-        public float phase2TransitionTime = 0.8f;
+        public int   phase2Pattern1Count   = 5;
+        public float phase2Pattern2Interval = 3f;
+        public int   phase2CircleCount     = 12;
+        public float phase2TransitionTime  = 0.8f;
 
         public event Action OnBossDefeated;
 
@@ -40,6 +44,14 @@ namespace MiniTeam.Shooting1942
         private bool  isInvincible  = false;
         private bool  isDefeated    = false;
 
+        [Header("스프라이트")]
+        public Sprite spriteIdle;
+        public Sprite spriteLeft;
+        public Sprite spriteRight;
+
+        private SpriteRenderer sr;
+        private float prevX;
+
         private Coroutine moveCoroutine;
         private readonly List<Coroutine> patternCoroutines = new();
 
@@ -47,6 +59,8 @@ namespace MiniTeam.Shooting1942
         {
             currentHp = maxHp;
             startX    = transform.position.x;
+            prevX     = startX;
+            sr        = GetComponentInChildren<SpriteRenderer>();
 
             moveCoroutine = StartCoroutine(MoveRoutine());
             StartAllPatterns();
@@ -77,48 +91,59 @@ namespace MiniTeam.Shooting1942
                 elapsed += Time.deltaTime;
                 float x = startX + Mathf.Sin(elapsed * moveSpeed) * moveRange;
                 transform.position = new Vector3(x, transform.position.y, 0f);
+
+                float dx = x - prevX;
+                if (sr != null)
+                {
+                    if (Mathf.Approximately(dx, 0f)) sr.sprite = spriteIdle;
+                    else if (dx < 0f)                sr.sprite = spriteLeft;
+                    else                             sr.sprite = spriteRight;
+                }
+                prevX = x;
+
                 yield return null;
             }
         }
 
-        // ── 패턴 1: 직선탄 ───────────────────────
+        // ── 패턴 1: 플레이어 조준 산탄 ──────────────
 
         IEnumerator Pattern1Routine()
         {
             yield return new WaitForSeconds(1f);
-            float interval = isPhase2 ? phase2Pattern1Interval : pattern1Interval;
             while (true)
             {
-                FireStraight();
+                int   count    = isPhase2 ? phase2Pattern1Count    : pattern1Count;
+                float interval = isPhase2 ? phase2Pattern1Interval : pattern1Interval;
+                FireAimed(count);
                 yield return new WaitForSeconds(interval);
             }
         }
 
-        // ── 패턴 2: 산탄 ─────────────────────────
+        // ── 패턴 2: 전방위 원형탄 ────────────────
 
         IEnumerator Pattern2Routine()
         {
             yield return new WaitForSeconds(2.5f);
-            int   count    = isPhase2 ? phase2SpreadCount    : 3;
-            float interval = isPhase2 ? phase2Pattern2Interval : pattern2Interval;
             while (true)
             {
-                FireSpread(count);
+                int   count    = isPhase2 ? phase2CircleCount      : pattern2CircleCount;
+                float interval = isPhase2 ? phase2Pattern2Interval : pattern2Interval;
+                FireCircle(count);
                 yield return new WaitForSeconds(interval);
             }
         }
 
         // ── 발사 ─────────────────────────────────
 
-        void FireStraight()
-        {
-            if (bulletPrefab == null) return;
-            Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        }
-
-        void FireSpread(int count)
+        // 플레이어 방향을 중심으로 count발 부채꼴 발사
+        void FireAimed(int count)
         {
             if (bossBulletPrefab == null) return;
+
+            GameObject player = GameObject.FindWithTag("Player");
+            Vector3 aimDir = player != null
+                ? (player.transform.position - transform.position).normalized
+                : Vector3.down;
 
             float totalAngle = spreadAngle * (count - 1);
             float startAngle = -totalAngle / 2f;
@@ -126,6 +151,20 @@ namespace MiniTeam.Shooting1942
             for (int i = 0; i < count; i++)
             {
                 float angle = startAngle + spreadAngle * i;
+                Vector3 dir = Quaternion.Euler(0f, 0f, angle) * aimDir;
+                GameObject b = Instantiate(bossBulletPrefab, transform.position, Quaternion.identity);
+                b.GetComponent<BossBullet>()?.SetDirection(dir);
+            }
+        }
+
+        // 360도 균등 분할 원형 발사
+        void FireCircle(int count)
+        {
+            if (bossBulletPrefab == null) return;
+
+            for (int i = 0; i < count; i++)
+            {
+                float angle = 360f / count * i;
                 Vector3 dir = Quaternion.Euler(0f, 0f, angle) * Vector3.down;
                 GameObject b = Instantiate(bossBulletPrefab, transform.position, Quaternion.identity);
                 b.GetComponent<BossBullet>()?.SetDirection(dir);
@@ -171,8 +210,6 @@ namespace MiniTeam.Shooting1942
             isInvincible = true;
 
             StopAllPatterns();
-
-            SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
 
             // 빨간색으로 깜빡이며 전환
             float elapsed = 0f;
