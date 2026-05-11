@@ -1,11 +1,7 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/_Scenes/1942_Shooting.unity.meta
 guid: 78bc414013246cf4db9db1b34e71b21b
-========
-guid: 4b8ec94cd8835e0448fafd4ecfb7254b
->>>>>>>> origin/feature/1942-shooting:Assets/_Scenes/Hub.unity.meta
 DefaultImporter:
   externalObjects: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:

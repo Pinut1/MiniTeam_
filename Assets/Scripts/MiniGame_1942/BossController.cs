@@ -15,6 +15,7 @@ namespace MiniTeam.Shooting1942
         public float moveRange = 3f;
 
         [Header("탄 프리팹")]
+        [UnityEngine.Serialization.FormerlySerializedAs("bulletPrefab")]
         public GameObject bossBulletPrefab;
 
         [Header("패턴 1 - 플레이어 조준 산탄")]

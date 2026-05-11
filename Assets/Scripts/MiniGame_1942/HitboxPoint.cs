@@ -35,11 +35,18 @@ namespace MiniTeam.Shooting1942
             transform.Rotate(0f, 0f, 90f * Time.deltaTime);
         }
 
+        void OnDisable()
+        {
+            if (playerController != null)
+                playerController.currentSpeedMultiplier = 1f;
+            if (dotRenderer != null)
+                dotRenderer.enabled = false;
+        }
+
         void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
                 playerHit?.TakeHit();
         }
-
     }
 }

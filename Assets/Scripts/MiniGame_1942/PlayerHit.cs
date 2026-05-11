@@ -28,7 +28,7 @@ namespace MiniTeam.Shooting1942
             if (isInvincible || IsGodMode) return;
 
             AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerHit);
-            formation.TakeHit();
+            if (formation != null) formation.TakeHit();
             StartCoroutine(InvincibleRoutine());
         }
 
