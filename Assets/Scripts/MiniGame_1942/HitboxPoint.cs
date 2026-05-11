@@ -25,7 +25,7 @@ namespace MiniTeam.Shooting1942
             bool isFocus = Input.GetKey(KeyCode.LeftShift);
 
             // 무적 중에는 PlayerHit의 깜빡임이 dotRenderer를 제어하므로 건드리지 않음
-            if (dotRenderer != null && !playerHit.IsInvincible)
+            if (dotRenderer != null && playerHit != null && !playerHit.IsInvincible)
                 dotRenderer.enabled = isFocus;
 
             if (playerController != null)

@@ -22,6 +22,7 @@ namespace MiniTeam.Shooting1942
         }
 
         // HitboxPoint에서 호출 — 피탄점에 맞았을 때
+        // ※ 플레이어 프리팹에 HitboxPoint 컴포넌트 필수 (없으면 피격 판정 없음)
         public void TakeHit()
         {
             if (isInvincible || IsGodMode) return;

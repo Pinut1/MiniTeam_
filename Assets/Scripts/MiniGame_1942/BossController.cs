@@ -51,16 +51,18 @@ namespace MiniTeam.Shooting1942
 
         private SpriteRenderer sr;
         private float prevX;
+        private Transform playerTransform;
 
         private Coroutine moveCoroutine;
         private readonly List<Coroutine> patternCoroutines = new();
 
         void Start()
         {
-            currentHp = maxHp;
-            startX    = transform.position.x;
-            prevX     = startX;
-            sr        = GetComponentInChildren<SpriteRenderer>();
+            currentHp       = maxHp;
+            startX          = transform.position.x;
+            prevX           = startX;
+            sr              = GetComponentInChildren<SpriteRenderer>();
+            playerTransform = GameObject.FindWithTag("Player")?.transform;
 
             moveCoroutine = StartCoroutine(MoveRoutine());
             StartAllPatterns();
@@ -95,9 +97,9 @@ namespace MiniTeam.Shooting1942
                 float dx = x - prevX;
                 if (sr != null)
                 {
-                    if (Mathf.Approximately(dx, 0f)) sr.sprite = spriteIdle;
-                    else if (dx < 0f)                sr.sprite = spriteLeft;
-                    else                             sr.sprite = spriteRight;
+                    if (Mathf.Abs(dx) < 0.001f) sr.sprite = spriteIdle;
+                    else if (dx < 0f)           sr.sprite = spriteLeft;
+                    else                        sr.sprite = spriteRight;
                 }
                 prevX = x;
 
@@ -140,9 +142,8 @@ namespace MiniTeam.Shooting1942
         {
             if (bossBulletPrefab == null) return;
 
-            GameObject player = GameObject.FindWithTag("Player");
-            Vector3 aimDir = player != null
-                ? (player.transform.position - transform.position).normalized
+            Vector3 aimDir = playerTransform != null
+                ? (playerTransform.position - transform.position).normalized
                 : Vector3.down;
 
             float totalAngle = spreadAngle * (count - 1);
