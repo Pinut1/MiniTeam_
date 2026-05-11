@@ -17,16 +17,17 @@ namespace MiniTeam.Shooting1942
 
         public bool DebugRapidFire = false;
 
+        [HideInInspector] public float currentSpeedMultiplier = 1f;
+
         private float minX, maxX, minY, maxY;
         private float nextFireTime = 0f;
-        private Rigidbody rb;
+        private Rigidbody2D rb;
 
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.constraints = RigidbodyConstraints.FreezeRotation
-                           | RigidbodyConstraints.FreezePositionZ;
+            rb = GetComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             CalculateBounds();
         }
 
@@ -47,8 +48,8 @@ namespace MiniTeam.Shooting1942
         {
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
-            Vector3 dir = new Vector3(h, v, 0f).normalized;
-            rb.linearVelocity = dir * moveSpeed;
+            Vector2 dir = new Vector2(h, v).normalized;
+            rb.linearVelocity = dir * moveSpeed * currentSpeedMultiplier;
         }
 
         void ClampPosition()
