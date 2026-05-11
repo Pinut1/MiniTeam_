@@ -918,7 +918,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &722711102
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2563,8 +2563,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8152375ecf377a24fbfc3a34496be547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  requiredPressIndices: 
+  requiredPressIndices: 00000000
   requiredEvidenceIds: []
+  requiredRetestimonyPressIndices: 
+  requiredRetestimonyEvidenceIds: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -12,6 +12,9 @@ public class SpongeTrialScriptSO : ScriptableObject
     // 심문 대상 증언 목록 / CrossExaminationManager
     [Header("증언 목록(심문 대상) - 순서 중요")] public SpongeTestimonyLine[] testimonyLines;
 
+    [Header("재증언 시작 전 대사")] public SpongeDialogueLine[] beforeRetestimonyLines;
+    [Header("재증언 목록")] public SpongeTestimonyLine[] retestimonyLines;
+
     // TestimonyLine.firstPressDialogueId로 첫 번째 대사를 찾고
     // 이후 nextLineId 체인으로 연결됨
     [Header("추궁 대사")] public SpongeDialogueLine[] pressDialogueLines;

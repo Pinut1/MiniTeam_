@@ -41,9 +41,21 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     {
         // 인덱스 초기화 - 항상 첫번째 증언부터 시작
         currentIdx = 0;
+        // 첫번쩨 심문부터 시작
+        SpongeGameManager.Instance.SetRound(1);
         // 심문 상태로 전환 - Q/TAB 키 활성화
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
         // 첫번쩨 증언 표시
+        ShowCurrentTestimony();
+    }
+
+    public void StartRetestimony()
+    {
+        currentIdx = 0;
+        lines = trialScript.retestimonyLines;
+
+        SpongeGameManager.Instance.SetRound(2);
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
         ShowCurrentTestimony();
     }
 

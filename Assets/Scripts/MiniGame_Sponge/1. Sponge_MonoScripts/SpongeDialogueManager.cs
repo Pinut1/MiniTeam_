@@ -358,18 +358,26 @@ public class SpongeDialogueManager : MonoBehaviour
 
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
                 if (SpongeGameManager.Instance.ConsumeConditionMet())
-                    // 조건 충족 -> 엔딩 대사 시작,ShowLine()을 직접 호출하면 재귀가 되므로 Instance를 통해 호출
-                    Instance.ShowLine("ending_01");
-                else
                 {
+                    // 첫번째 심문 조건 충족
+                    if (SpongeGameManager.Instance.CurrentRound == 1)
+                        Instance.ShowLine("before_retestimony_01");
+                    // 두번째 심문 조건 충족 -> 엔딩 대사 시작,ShowLine()을 직접 호출하면 재귀가 되므로 Instance를 통해 호출
+                    else
+                        Instance.ShowLine("ending_01");
+                }
+                else
                     // 조건 미충족 -> 다음 증언으로 넘어감
                     SpongeCrossExaminationManager.Instance.NextLine();
-                }
                 break;
 
             case SpongeGameState.GameState.Dialogue:
-                // 오프닝 대사 끝 -> 심문 시작
-                SpongeCrossExaminationManager.Instance.StartCrossExamination();
+                if (SpongeGameManager.Instance.CurrentRound == 1)
+                    // 오프닝 대사 끝 -> 심문 시작
+                    SpongeCrossExaminationManager.Instance.StartCrossExamination();
+                else
+                    // 재증언 전 대사 끝 -> 재증언 시작
+                    SpongeCrossExaminationManager.Instance.StartRetestimony();
                 break;
         }
     }

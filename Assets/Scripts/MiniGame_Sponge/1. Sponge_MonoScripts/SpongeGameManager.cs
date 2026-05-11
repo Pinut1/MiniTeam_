@@ -61,19 +61,35 @@ public class SpongeGameManager : MonoBehaviour
     public bool CanOpenEvidence => currentState == GameState.Dialogue || currentState == GameState.CrossExamination;
 
     // ── 진행 조건 (ProgeressTraccker) ────────────────────────────────────────────
-    [Header("필수 추궁")]
+    [Header("1. 필수 추궁")]
     [SerializeField] private int[] requiredPressIndices; // 예 : {0, 2}, n번째 증언은 반드시 추궁 해야함
-    [Header("필수 제시 증거")]
+    [Header("1. 필수 제시 증거")]
     [SerializeField] private string[] requiredEvidenceIds; // 예 : {"knife", "receipt"}
 
-    // 완료된 추궁 인덱스를 저장
+    [Header("2. 필수 추궁")]
+    [SerializeField] private int[] requiredRetestimonyPressIndices;
+    [Header("2. 필수 제시 증거")]
+    [SerializeField] private string[] requiredRetestimonyEvidenceIds;
+
+   // 완료 목록 - 라운드별 분리
     private HashSet<int> completedPresses = new();
-    // 완료된 증거 ID를 저장
     private HashSet<string> completedEvidences = new();
+    private HashSet<int> completedRetestimonyPresses = new();
+    private HashSet<string> completedRetestimonyEvidences = new();
+
     // 추궁 또는 증거 제시로 조건이 방금 충족 됐는지 저장
     // RegisterPress / RegisterEvidence 호출 시 자동으로 갱신됨
     // ConsumeConditionMet()으로 한 번만 읽을 수 있음
     private bool conditionJustMet = false;
+
+    [Header("몇번째 심문인지")]
+    public int CurrentRound { get; private set; } = 1; // CrossExaminationManager에서 라운드 전환 시 변경
+
+    public void SetRound(int round)
+    {
+        CurrentRound = round;
+        Debug.Log($"[GameManager] 라운드 전환 -> {round}라운드");
+    }
 
     /// <summary>
     /// 게임 시작 시 완료 목록 초기화
@@ -82,6 +98,8 @@ public class SpongeGameManager : MonoBehaviour
     {
         completedPresses.Clear();
         completedEvidences.Clear();
+        completedRetestimonyPresses.Clear();
+        completedRetestimonyEvidences.Clear();
         conditionJustMet = false;
     }
 
@@ -91,7 +109,10 @@ public class SpongeGameManager : MonoBehaviour
     /// <param name="lineIdx"></param>
     public void RegisterPress(int lineIdx)
     {
-        completedPresses.Add(lineIdx);
+        if (CurrentRound == 1)
+            completedPresses.Add(lineIdx);
+        else
+            completedRetestimonyPresses.Add(lineIdx);
         Debug.Log($"[GameManager] 추궁 완료 : {lineIdx}번 증언");
         conditionJustMet = IsAllConditionsMet();
     }
@@ -102,7 +123,10 @@ public class SpongeGameManager : MonoBehaviour
     /// <param name="evidenceId"></param>
     public void RegisterEvidence(string evidenceId)
     {
-        completedEvidences.Add(evidenceId);
+        if (CurrentRound == 1)
+            completedEvidences.Add(evidenceId);
+        else
+            completedRetestimonyEvidences.Add(evidenceId);
         Debug.Log($"[GameManager] 증거 제시 완료 :  {evidenceId}");
         conditionJustMet = IsAllConditionsMet();
     }
@@ -113,12 +137,23 @@ public class SpongeGameManager : MonoBehaviour
     /// <returns></returns>
     public bool IsAllConditionsMet()
     {
-        // 필수 추궁 목록을 순회 - 하나라도 완료 안됐으면 false
-        foreach (int i in requiredPressIndices)
-            if (!completedPresses.Contains(i)) return false;
-        // 필수 증거 목록을 순회 - 하나라도 완료 안됐으면 false
-        foreach (string id in requiredEvidenceIds)
-            if (!completedEvidences.Contains(id)) return false;
+        // 필수 추궁/증거 목록을 순회 - 하나라도 완료 안됐으면 false
+        if (CurrentRound == 1)
+        {
+            // 첫번째 심문
+            foreach (int i in requiredPressIndices)
+                if (!completedPresses.Contains(i)) return false;
+            foreach (string id in requiredEvidenceIds)
+                if (!completedEvidences.Contains(id)) return false;
+        }
+        else
+        {
+            // 두번째 심문
+            foreach (int i in requiredRetestimonyPressIndices)
+                if (!completedRetestimonyPresses.Contains(i)) return false;
+            foreach (string id in requiredRetestimonyEvidenceIds)
+                if (!completedRetestimonyEvidences.Contains(id)) return false;
+        }
         // 모든 조건 완료시 true로 반환
         return true;
     }
