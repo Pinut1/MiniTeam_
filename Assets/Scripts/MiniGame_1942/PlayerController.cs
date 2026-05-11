@@ -21,14 +21,13 @@ namespace MiniTeam.Shooting1942
 
         private float minX, maxX, minY, maxY;
         private float nextFireTime = 0f;
-        private Rigidbody rb;
+        private Rigidbody2D rb;
 
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.constraints = RigidbodyConstraints.FreezeRotation
-                           | RigidbodyConstraints.FreezePositionZ;
+            rb = GetComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             CalculateBounds();
         }
 
@@ -49,7 +48,7 @@ namespace MiniTeam.Shooting1942
         {
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
-            Vector3 dir = new Vector3(h, v, 0f).normalized;
+            Vector2 dir = new Vector2(h, v).normalized;
             rb.linearVelocity = dir * moveSpeed * currentSpeedMultiplier;
         }
 
