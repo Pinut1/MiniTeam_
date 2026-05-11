@@ -23,6 +23,12 @@ namespace MiniTeam.Shooting1942
         private float nextFireTime = 0f;
         private Rigidbody2D rb;
 
+        /// <summary>
+        /// Initializes the player's physics body and computes the movement bounds used for clamping.
+        /// </summary>
+        /// <remarks>
+        /// Caches the Rigidbody2D, disables gravity, prevents rotation, and calls CalculateBounds to set screen-space limits.
+        /// </remarks>
         void Start()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -44,6 +50,12 @@ namespace MiniTeam.Shooting1942
             }
         }
 
+        /// <summary>
+        /// Reads horizontal and vertical input and sets the Rigidbody2D velocity to move the player accordingly.
+        /// </summary>
+        /// <remarks>
+        /// Uses the raw "Horizontal" and "Vertical" axes and normalizes the input so diagonal movement does not increase speed. The resulting velocity is scaled by <c>moveSpeed</c> and <c>currentSpeedMultiplier</c>.
+        /// </remarks>
         void Move()
         {
             float h = Input.GetAxisRaw("Horizontal");
