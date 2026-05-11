@@ -87,6 +87,7 @@ namespace MiniTeam.Shooting1942
             if (hp <= 0)
             {
                 isDead = true;
+                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyDie);
                 ShootingUIManager.Instance?.AddScore(10);
                 Destroy(gameObject);
             }

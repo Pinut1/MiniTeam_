@@ -139,6 +139,7 @@ namespace MiniTeam.Shooting1942
             if (isInvincible || isDefeated) return;
 
             currentHp = Mathf.Clamp(currentHp - 1, 0, maxHp);
+            AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxBossHit);
             ShootingUIManager.Instance?.UpdateBossHp(currentHp, maxHp);
 
             if (currentHp <= 0)

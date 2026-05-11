@@ -126,3 +126,26 @@ chore:    설정 파일 수정     예) chore: .gitignore Unity 항목 추가
 - UI 에셋 → `Assets/Art/UI/`
 - 파일명 규칙: `chr_agumon_idle_01.png` (타입_이름_상태_번호)
 - 용량 큰 파일(.psd, .wav 등)은 Git LFS로 관리
+
+---
+
+## 작업 이력
+
+### 2026-04-29 — feature/1942-shooting
+
+**구현 완료**
+- `WaveManager.cs` — 웨이브 진행 및 적 스폰 통합 (EnemySpawner 흡수)
+- `BossController.cs` — 보스 행동 패턴 및 산탄 로직
+- `ShootingUIManager.cs` — 체력/웨이브/점수 UI
+- `BackgroundScroller.cs` — 배경 스크롤
+- `BossBullet.cs` — 보스 전용 총알
+- 적 프리팹 3종 추가: `Shooting_Enemy`, `Sine_Enemy`, `Straigh_Enemy`
+- 배경 스프라이트 4장 추가: `bg_01~03`
+
+**PR**
+- PR #7: `feature/1942-shooting` → `develop` (리뷰 대기 중)
+- develop 머지 충돌 해결: `manifest.json`(패키지 통합), `ProjectVersion.txt`(6000.3.8f1), `TagManager.asset`(1942 태그/레이어 유지)
+
+**참고**
+- `Scripts/MiniGame_Melon/` → `Scripts/MiniGame_EyeContact/` 로 develop에서 폴더명 변경됨
+- 언트래킹 파일을 커밋하지 않은 상태로 머지 시 경고 발생 → 항상 커밋 or stash 후 머지할 것

@@ -26,6 +26,7 @@ namespace MiniTeam.Shooting1942
 
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
             {
+                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerHit);
                 formation.TakeHit();
                 StartCoroutine(InvincibleRoutine());
             }
