@@ -43,7 +43,7 @@ namespace MiniTeam.Shooting1942
                 dotRenderer.enabled = false;
         }
 
-        void OnTriggerEnter(Collider other)
+        void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))
                 playerHit?.TakeHit();
