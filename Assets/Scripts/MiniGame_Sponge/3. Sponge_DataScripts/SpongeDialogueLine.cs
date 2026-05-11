@@ -15,8 +15,8 @@ public class SpongeDialogueLine
     [Header("Animator Trigger 이름 - 비우면 이전 유지")] public string animationTrig;
     [Header("씬전환")] public string sceneToLoad;
     [Header("배경 / 캐릭터 전환")]
-    public Image backgroundImg; // 바꿀 배경, 비우면 이전 유지
-    public Image charaterImg; // 바꿀 캐릭터, 비우면 이전 유지
+    public Sprite backgroundSpr; // 바꿀 배경, 비우면 이전 유지
+    // public Sprite charaterSpr; // 바꿀 캐릭터, 비우면 이전 유지
     [Space(5f)] public CharacterPosition characterPos;
 
     [Header("선택지 - null이면 선택지 X")]

@@ -43,7 +43,8 @@ public class SpongeDialogueManager : MonoBehaviour
     //[SerializeField] private Animator characterAnim;
 
     // ── 내부 변수 ────────────────────────────────────────────────
-    [Header("lineId → DialogueLine 딕셔너리")] private Dictionary<string, SpongeDialogueLine> lineMap; // 빠르게 대사 찾기 위해 사용
+    //lineId → DialogueLine 딕셔너리
+    private Dictionary<string, SpongeDialogueLine> lineMap; // 빠르게 대사 찾기 위해 사용
 
     // 타이핑 코루틴
     private Coroutine typingCoroutine;
@@ -78,7 +79,7 @@ public class SpongeDialogueManager : MonoBehaviour
         foreach (var line in trialScript.openingLines)
             lineMap[line.lineId] = line;
         // 추궁 대사 등록
-        foreach (var line in trialScript.endingLines)
+        foreach (var line in trialScript.pressDialogueLines)
             lineMap[line.lineId] = line;
         foreach (var line in trialScript.evidenceDialogueLines)
             lineMap[line.lineId] = line;
@@ -164,7 +165,7 @@ public class SpongeDialogueManager : MonoBehaviour
     IEnumerator TypeLine(SpongeDialogueLine line)
     {
         // 1. 배경 교체, null이면 이전 배경 유지
-        if (line.backgroundImg != null) backgroundImg.sprite = line.backgroundImg.sprite;
+        if (line.backgroundSpr != null) backgroundImg.sprite = line.backgroundSpr;
 
         // 2. 캐릭터 위치 활성화
         UpdateCharacter(line);
@@ -352,6 +353,7 @@ public class SpongeDialogueManager : MonoBehaviour
         {
             case SpongeGameState.GameState.Pressing:
             case SpongeGameState.GameState.EvidenceSelect:
+                // 추궁/증거 대사가 끝난 경우
                 SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
 
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
@@ -361,12 +363,12 @@ public class SpongeDialogueManager : MonoBehaviour
                 else
                 {
                     // 조건 미충족 -> 다음 증언으로 넘어감
-                    // SpongeCrossExaminationManager.Instance.CurrentIdx++; 이 부분 수정해야함!!!!!!!!!!!!
-                    SpongeCrossExaminationManager.Instance.ShowCurrentTestimony();
+                    SpongeCrossExaminationManager.Instance.NextLine();
                 }
                 break;
 
             case SpongeGameState.GameState.Dialogue:
+                // 오프닝 대사 끝 -> 심문 시작
                 SpongeCrossExaminationManager.Instance.StartCrossExamination();
                 break;
         }

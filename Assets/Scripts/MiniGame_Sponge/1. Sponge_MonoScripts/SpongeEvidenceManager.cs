@@ -30,7 +30,7 @@ public class SpongeEvidenceManager : MonoBehaviour
     {
         // CrossExaminationManager에서 현재 증언 라인을 가져옴
         // 이 라인의 validEvidenceIds와 비교해서 정답 여부 판단
-        var currentLine = SpongeCrossExaminationManager.Instance.currentLine;
+        var currentLine = SpongeCrossExaminationManager.Instance.CurrentLine;
 
         // 현재 증언 라인의 정답 증거 목록에서 선택한 증거가 있는지 확인
         // Array.Exists = 배열에서 조건에 맞는 요소가 하나라도 있으면 true 반환
@@ -38,7 +38,7 @@ public class SpongeEvidenceManager : MonoBehaviour
                                                         id => id == evidenceId);    // 선택한 증거 ID와 같은지 비교
         
         // 증거 패널 닫기 - 성공/실패 상관 없이 먼저 닫음
-        // SpongeUIManager.Instance.ClossCvidencePanel();
+        SpongeUIManager.Instance.CloseEvidencePanel();
 
         if (isCorrect)
         {

@@ -19,9 +19,12 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     private SpongeTestimonyLine[] lines;
     private int currentIdx = 0; // 증언 인덱스
 
-    // 외부(EvidenceManager)에서 현재 증언 라인 참조용
-    public SpongeTestimonyLine currentLine => lines[currentIdx];
-    public int CurrentIdx { get => currentIdx; set => currentIdx = value; }
+    /// <summary>
+    /// 외부(EvidenceManager)에서 현재 증언 라인 참조용
+    /// </summary>
+    public SpongeTestimonyLine CurrentLine => lines[currentIdx];
+    public int CurrentIdx => currentIdx;
+    
     private void Awake()
     {
         Instance = this;
@@ -67,18 +70,10 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     {
         // 마지막 증언이 아니므로 다음으로
         if (currentIdx < lines.Length - 1)
-        {
             currentIdx++;
-            ShowCurrentTestimony();
-        }
         else
-        {
-            // 마지막에서 처음으로 루프
-            currentIdx = 0;
-            ShowCurrentTestimony();
-        }
-        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Dialogue);
-        SpongeDialogueManager.Instance.ShowLine("ending_01");
+            currentIdx = 0; // 마지막에서 처음으로 루프
+        ShowCurrentTestimony();
     }
     // ── 이전 증언으로 ────────────────────────────────────────────
     /// <summary>
@@ -90,6 +85,8 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         // 첫번째 증언이 아닐때만 이동
         if (currentIdx > 0)
             currentIdx--;
+        else // 마지막 인덱스로 이동
+            currentIdx = lines.Length - 1;
         ShowCurrentTestimony();
     }
 
@@ -105,7 +102,7 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         // 추궁 불가능 증언 - 고정 대사 출력 후 종료
         if (!line.ispressable)
         {
-            SpongeDialogueManager.Instance.ShowLine("Press_fail_default");
+            SpongeDialogueManager.Instance.ShowLine("press_fail_default");
             return;
         }
 
@@ -113,16 +110,8 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Pressing);
         
         // 필수 추궁인 경우 완료 등록
-        if (line.isRequiredEvidence)
-        {
+        if (line.isRequiredPress)
             SpongeGameManager.Instance.RegisterPress(currentIdx);
-
-            if (SpongeGameManager.Instance.IsAllConditionsMet())
-            {
-                // 추궁 대사 끝나면 OnsquenceEnd()가 엔딩으로 보냄
-                // -> OnSequenceEnd()의 Pressing 케이스에서 처리    
-            }
-        }
         // 추궁 대사 시작 - 대사 끝난 뒤 OnSequenceEnd()에서 조건 체크
         SpongeDialogueManager.Instance.ShowLine(line.firstPressDialogueId);
     }

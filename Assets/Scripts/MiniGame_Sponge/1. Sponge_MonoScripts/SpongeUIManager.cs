@@ -11,7 +11,7 @@ using UnityEngine.UI;
 /// </summary>
 public class SpongeUIManager : MonoBehaviour
 {
-    public static SpongeUIManager Instance;
+    public static SpongeUIManager Instance { get; private set; }
     
     [Header("증거 패널")]
     [SerializeField] private GameObject evidencePnl; // 증거 목록 전체를 감싸는 패널
@@ -61,9 +61,9 @@ public class SpongeUIManager : MonoBehaviour
 
         switch (SpongeGameManager.Instance.CurrentState)
         {
+            // 대사중 클릭 -> 타이핑 스킵 or 다음 대사
             case SpongeGameState.GameState.Dialogue:
             case SpongeGameState.GameState.Pressing:
-            // 대사중 클릭 -> 타이핑 스킵 or 다음 대사
             case SpongeGameState.GameState.EvidenceSelect: SpongeDialogueManager.Instance.OnScreenClick();
                 break;
             // 심문중 클릭 -> 다음 증언으로 이동
@@ -73,7 +73,6 @@ public class SpongeUIManager : MonoBehaviour
     }
 
     // ── 증거 패널 ────────────────────────────────────────────────
-
     /// <summary>
     /// 증거 패널 열기 / TAB 입력 시 호출 / 증거 버튼 목록을 동적으로 생성
     /// </summary>

@@ -26,12 +26,13 @@ public class SpongeGameManager : MonoBehaviour
     }
 
     // ── 상태 관리 ────────────────────────────────────────────
-    [Header("초기 상태")]
-    [SerializeField] private SpongeGameState gmState;
+    //[Header("초기 상태")]
+    //[SerializeField] private SpongeGameState gmState;
 
     // 현재 게임 상태
     private GameState currentState;
-    [Header("currentState를 읽을 수 있게 공개")] public GameState CurrentState => currentState;
+    // currentState를 읽을 수 있게 공개 
+    public GameState CurrentState => currentState;
 
     /// <summary>
     /// 게임 상태 전환 - 모든 상태 전환은 반드시 이 메서드를 통해서 해야함
@@ -81,6 +82,7 @@ public class SpongeGameManager : MonoBehaviour
     {
         completedPresses.Clear();
         completedEvidences.Clear();
+        conditionJustMet = false;
     }
 
     /// <summary>
