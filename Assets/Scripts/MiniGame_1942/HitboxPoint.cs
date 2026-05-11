@@ -35,6 +35,9 @@ namespace MiniTeam.Shooting1942
             transform.Rotate(0f, 0f, 90f * Time.deltaTime);
         }
 
+        /// <summary>
+        /// When this component is disabled, reset the player's speed multiplier to 1 and disable the focus dot renderer if those components are present.
+        /// </summary>
         void OnDisable()
         {
             if (playerController != null)
@@ -43,6 +46,10 @@ namespace MiniTeam.Shooting1942
                 dotRenderer.enabled = false;
         }
 
+        /// <summary>
+        /// Invokes the player's hit handler when a collider tagged "Enemy" or "EnemyBullet" enters this hitbox trigger.
+        /// </summary>
+        /// <param name="other">The Collider2D that entered the trigger.</param>
         void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Enemy") || other.CompareTag("EnemyBullet"))

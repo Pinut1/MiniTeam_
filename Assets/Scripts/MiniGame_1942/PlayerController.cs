@@ -23,6 +23,12 @@ namespace MiniTeam.Shooting1942
         private float nextFireTime = 0f;
         private Rigidbody2D rb;
 
+        /// <summary>
+        /// Initializes the player's physics state and computes screen-space movement bounds.
+        /// </summary>
+        /// <remarks>
+        /// Caches the attached Rigidbody2D, disables its gravity, freezes rotation, and updates the movement bounds used to clamp the player's position.
+        /// </remarks>
         void Start()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -44,6 +50,12 @@ namespace MiniTeam.Shooting1942
             }
         }
 
+        /// <summary>
+        /// Update the player's Rigidbody2D velocity based on current horizontal and vertical input.
+        /// </summary>
+        /// <remarks>
+        /// Normalizes the input direction to avoid faster diagonal movement and multiplies it by <c>moveSpeed</c> and <c>currentSpeedMultiplier</c>.
+        /// </remarks>
         void Move()
         {
             float h = Input.GetAxisRaw("Horizontal");
