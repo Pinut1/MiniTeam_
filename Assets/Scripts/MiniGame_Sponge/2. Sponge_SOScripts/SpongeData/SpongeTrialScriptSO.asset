@@ -17,10 +17,28 @@ MonoBehaviour:
     speaker: 
     txt: 
     animationTrig: 
-    backgroundImg: {fileID: 0}
-    charaterImg: {fileID: 0}
-    characterPos: 0
     sceneToLoad: 
+    backgroundSpr: {fileID: 0}
+    characterPos: 0
+    choices: []
+    nextLineId: 
+  - lineId: 
+    speaker: 
+    txt: 
+    animationTrig: 
+    sceneToLoad: 
+    backgroundSpr: {fileID: 0}
+    characterPos: 0
+    choices: []
+    nextLineId: 
+  - lineId: 
+    speaker: 
+    txt: 
+    animationTrig: 
+    sceneToLoad: 
+    backgroundSpr: {fileID: 0}
+    characterPos: 0
+    choices: []
     nextLineId: 
   testimonyLines:
   - txt: 
@@ -30,13 +48,17 @@ MonoBehaviour:
     validEvidenceIds: []
     evidenceSuccessDialogueId: 
     isRequiredEvidence: 0
+  beforeRetestimonyLines: []
+  retestimonyLines: []
+  pressDialogueLines: []
+  evidenceDialogueLines: []
   endingLines:
   - lineId: 
     speaker: 
     txt: 
     animationTrig: 
-    backgroundImg: {fileID: 0}
-    charaterImg: {fileID: 0}
-    characterPos: 0
     sceneToLoad: 
+    backgroundSpr: {fileID: 0}
+    characterPos: 0
+    choices: []
     nextLineId: 

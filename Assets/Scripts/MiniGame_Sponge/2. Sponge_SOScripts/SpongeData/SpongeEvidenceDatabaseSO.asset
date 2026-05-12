@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dca1baed0eee0d4ea4f5a1aa4d83e2e, type: 3}
   m_Name: SpongeEvidenceDatabaseSO
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceDatabaseSO
-  evidences: []
+  evidences:
+  - id: 
+    evidenceName: 
+    description: 
+    icon: {fileID: 0}
