@@ -153,6 +153,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: UI_BG_menu_2
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 38
+        width: 485
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9403b77788b7d864f887d6bfb746b093
+      internalID: -1822437403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -173,6 +195,7 @@ TextureImporter:
     nameFileIdTable:
       UI_BG_menu_0: -488603224
       UI_BG_menu_1: -1890080680
+      UI_BG_menu_2: -1822437403
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

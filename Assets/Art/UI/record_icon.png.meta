@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: record_icon_0
+      name: record_icon_highlight
       rect:
         serializedVersion: 2
         x: 3
@@ -132,12 +132,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: record_icon_1
+      name: record_icon_filld
       rect:
         serializedVersion: 2
         x: 149
         y: 3
-        width: 131
+        width: 132
         height: 132
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -154,7 +154,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: record_icon_2
+      name: record_icon_empty
       rect:
         serializedVersion: 2
         x: 284
@@ -191,9 +191,9 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":140.0,"y":160.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      record_icon_0: 1054497180
-      record_icon_1: 623375694
-      record_icon_2: -1424533599
+      record_icon_empty: -1424533599
+      record_icon_filld: 623375694
+      record_icon_highlight: 1054497180
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

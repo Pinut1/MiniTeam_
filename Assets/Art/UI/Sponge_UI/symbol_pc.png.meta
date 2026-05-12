@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: symbol_pc_0
+      name: symbol_pc_esc
       rect:
         serializedVersion: 2
         x: 0
@@ -132,7 +132,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_1
+      name: symbol_pc_f1
       rect:
         serializedVersion: 2
         x: 46
@@ -154,7 +154,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_2
+      name: symbol_pc_f2
       rect:
         serializedVersion: 2
         x: 92
@@ -176,7 +176,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_3
+      name: symbol_pc_f3
       rect:
         serializedVersion: 2
         x: 138
@@ -198,7 +198,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_4
+      name: symbol_pc_f4
       rect:
         serializedVersion: 2
         x: 184
@@ -220,7 +220,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_5
+      name: symbol_pc_f5
       rect:
         serializedVersion: 2
         x: 230
@@ -242,7 +242,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_6
+      name: symbol_pc_f6
       rect:
         serializedVersion: 2
         x: 276
@@ -264,7 +264,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_7
+      name: symbol_pc_f7
       rect:
         serializedVersion: 2
         x: 322
@@ -286,7 +286,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_8
+      name: symbol_pc_f8
       rect:
         serializedVersion: 2
         x: 368
@@ -308,7 +308,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_9
+      name: symbol_pc_f9
       rect:
         serializedVersion: 2
         x: 414
@@ -330,7 +330,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_10
+      name: symbol_pc_f10
       rect:
         serializedVersion: 2
         x: 0
@@ -352,7 +352,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_11
+      name: symbol_pc_f11
       rect:
         serializedVersion: 2
         x: 46
@@ -374,10 +374,10 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_12
+      name: symbol_pc_f12
       rect:
         serializedVersion: 2
-        x: 92
+        x: 91
         y: 276
         width: 46
         height: 46
@@ -396,7 +396,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_13
+      name: symbol_pc_tab
       rect:
         serializedVersion: 2
         x: 138
@@ -418,7 +418,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_14
+      name: symbol_pc_Lshift
       rect:
         serializedVersion: 2
         x: 184
@@ -440,7 +440,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_15
+      name: symbol_pc_Rshift
       rect:
         serializedVersion: 2
         x: 230
@@ -462,7 +462,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_16
+      name: symbol_pc_Lctrl
       rect:
         serializedVersion: 2
         x: 276
@@ -484,7 +484,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_17
+      name: symbol_pc_Rctrl
       rect:
         serializedVersion: 2
         x: 322
@@ -506,11 +506,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_18
+      name: symbol_pc_Lalt
       rect:
         serializedVersion: 2
         x: 368
-        y: 276
+        y: 277
         width: 46
         height: 46
       alignment: 0
@@ -528,7 +528,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_19
+      name: symbol_pc_Ralt
       rect:
         serializedVersion: 2
         x: 414
@@ -550,7 +550,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_20
+      name: symbol_pc_space
       rect:
         serializedVersion: 2
         x: 0
@@ -572,7 +572,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_21
+      name: symbol_pc_BS
       rect:
         serializedVersion: 2
         x: 46
@@ -594,10 +594,10 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_22
+      name: symbol_pc_enter
       rect:
         serializedVersion: 2
-        x: 92
+        x: 93
         y: 230
         width: 46
         height: 46
@@ -616,11 +616,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_23
+      name: symbol_pc_1
       rect:
         serializedVersion: 2
         x: 138
-        y: 230
+        y: 231
         width: 46
         height: 46
       alignment: 0
@@ -638,7 +638,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_24
+      name: symbol_pc_2
       rect:
         serializedVersion: 2
         x: 184
@@ -660,11 +660,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_25
+      name: symbol_pc_3
       rect:
         serializedVersion: 2
         x: 230
-        y: 230
+        y: 231
         width: 46
         height: 46
       alignment: 0
@@ -682,7 +682,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_26
+      name: symbol_pc_4
       rect:
         serializedVersion: 2
         x: 276
@@ -704,11 +704,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_27
+      name: symbol_pc_5
       rect:
         serializedVersion: 2
-        x: 322
-        y: 230
+        x: 323
+        y: 229
         width: 46
         height: 46
       alignment: 0
@@ -726,10 +726,10 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_28
+      name: symbol_pc_6
       rect:
         serializedVersion: 2
-        x: 368
+        x: 367
         y: 230
         width: 46
         height: 46
@@ -748,7 +748,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_29
+      name: symbol_pc_7
       rect:
         serializedVersion: 2
         x: 414
@@ -770,7 +770,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_30
+      name: symbol_pc_8
       rect:
         serializedVersion: 2
         x: 0
@@ -792,11 +792,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_31
+      name: symbol_pc_9
       rect:
         serializedVersion: 2
         x: 46
-        y: 184
+        y: 185
         width: 46
         height: 46
       alignment: 0
@@ -814,7 +814,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_32
+      name: symbol_pc_0
       rect:
         serializedVersion: 2
         x: 92
@@ -836,7 +836,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_33
+      name: symbol_pc_A
       rect:
         serializedVersion: 2
         x: 138
@@ -858,7 +858,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_34
+      name: symbol_pc_B
       rect:
         serializedVersion: 2
         x: 184
@@ -880,7 +880,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_35
+      name: symbol_pc_C
       rect:
         serializedVersion: 2
         x: 230
@@ -902,7 +902,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_36
+      name: symbol_pc_D
       rect:
         serializedVersion: 2
         x: 276
@@ -924,7 +924,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_37
+      name: symbol_pc_E
       rect:
         serializedVersion: 2
         x: 322
@@ -946,7 +946,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_38
+      name: symbol_pc_F
       rect:
         serializedVersion: 2
         x: 368
@@ -968,7 +968,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_39
+      name: symbol_pc_G
       rect:
         serializedVersion: 2
         x: 414
@@ -990,7 +990,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_40
+      name: symbol_pc_H
       rect:
         serializedVersion: 2
         x: 0
@@ -1012,7 +1012,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_41
+      name: symbol_pc_I
       rect:
         serializedVersion: 2
         x: 46
@@ -1034,7 +1034,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_42
+      name: symbol_pc_J
       rect:
         serializedVersion: 2
         x: 92
@@ -1056,11 +1056,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_43
+      name: symbol_pc_K
       rect:
         serializedVersion: 2
         x: 138
-        y: 138
+        y: 139
         width: 46
         height: 46
       alignment: 0
@@ -1078,7 +1078,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_44
+      name: symbol_pc_L
       rect:
         serializedVersion: 2
         x: 184
@@ -1100,7 +1100,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_45
+      name: symbol_pc_M
       rect:
         serializedVersion: 2
         x: 230
@@ -1122,7 +1122,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_46
+      name: symbol_pc_N
       rect:
         serializedVersion: 2
         x: 276
@@ -1144,10 +1144,10 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_47
+      name: symbol_pc_O
       rect:
         serializedVersion: 2
-        x: 322
+        x: 321
         y: 138
         width: 46
         height: 46
@@ -1166,7 +1166,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_48
+      name: symbol_pc_P
       rect:
         serializedVersion: 2
         x: 368
@@ -1188,7 +1188,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_49
+      name: symbol_pc_Q
       rect:
         serializedVersion: 2
         x: 414
@@ -1210,11 +1210,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_50
+      name: symbol_pc_R
       rect:
         serializedVersion: 2
         x: 0
-        y: 92
+        y: 91
         width: 46
         height: 46
       alignment: 0
@@ -1232,7 +1232,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_51
+      name: symbol_pc_S
       rect:
         serializedVersion: 2
         x: 46
@@ -1254,7 +1254,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_52
+      name: symbol_pc_T
       rect:
         serializedVersion: 2
         x: 92
@@ -1276,7 +1276,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_53
+      name: symbol_pc_U
       rect:
         serializedVersion: 2
         x: 138
@@ -1298,7 +1298,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_54
+      name: symbol_pc_V
       rect:
         serializedVersion: 2
         x: 184
@@ -1320,7 +1320,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_55
+      name: symbol_pc_W
       rect:
         serializedVersion: 2
         x: 230
@@ -1342,7 +1342,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_56
+      name: symbol_pc_X
       rect:
         serializedVersion: 2
         x: 276
@@ -1364,7 +1364,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_57
+      name: symbol_pc_Y
       rect:
         serializedVersion: 2
         x: 322
@@ -1386,7 +1386,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_58
+      name: symbol_pc_Z
       rect:
         serializedVersion: 2
         x: 368
@@ -1408,7 +1408,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_59
+      name: symbol_pc_Ins
       rect:
         serializedVersion: 2
         x: 414
@@ -1430,7 +1430,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_60
+      name: symbol_pc_Home
       rect:
         serializedVersion: 2
         x: 0
@@ -1452,7 +1452,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_61
+      name: symbol_pc_PgUp
       rect:
         serializedVersion: 2
         x: 46
@@ -1474,7 +1474,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_62
+      name: symbol_pc_Del
       rect:
         serializedVersion: 2
         x: 92
@@ -1496,7 +1496,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_63
+      name: symbol_pc_End
       rect:
         serializedVersion: 2
         x: 138
@@ -1518,7 +1518,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_64
+      name: symbol_pc_PgDn
       rect:
         serializedVersion: 2
         x: 184
@@ -1540,7 +1540,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_65
+      name: symbol_pc_up
       rect:
         serializedVersion: 2
         x: 230
@@ -1562,7 +1562,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_66
+      name: symbol_pc_down
       rect:
         serializedVersion: 2
         x: 276
@@ -1584,7 +1584,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_67
+      name: symbol_pc_left
       rect:
         serializedVersion: 2
         x: 322
@@ -1606,7 +1606,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_68
+      name: symbol_pc_right
       rect:
         serializedVersion: 2
         x: 368
@@ -1628,7 +1628,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: symbol_pc_69
+      name: symbol_pc_Num1
       rect:
         serializedVersion: 2
         x: 414
@@ -1863,74 +1863,15 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":10.0,"y":8.0},"gridSpriteSize":{"x":46.0,"y":46.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      symbol_pc_0: -178857325
-      symbol_pc_1: 1296244909
-      symbol_pc_10: 433615622
-      symbol_pc_11: 1102123580
-      symbol_pc_12: -2108873861
-      symbol_pc_13: 911993460
-      symbol_pc_14: -1471341672
-      symbol_pc_15: -1022235091
-      symbol_pc_16: -580837227
-      symbol_pc_17: 1766367875
-      symbol_pc_18: 1624055834
-      symbol_pc_19: 649275408
-      symbol_pc_2: -1147009551
-      symbol_pc_20: -331579443
-      symbol_pc_21: 648091706
-      symbol_pc_22: 841174259
-      symbol_pc_23: -2090533862
-      symbol_pc_24: -1065792867
-      symbol_pc_25: 1571345656
-      symbol_pc_26: -1840432102
-      symbol_pc_27: -803697008
-      symbol_pc_28: 914662959
-      symbol_pc_29: -36729280
-      symbol_pc_3: -1643888216
-      symbol_pc_30: -965810401
-      symbol_pc_31: 1962026119
-      symbol_pc_32: 1363347203
-      symbol_pc_33: 614337715
-      symbol_pc_34: -139050746
-      symbol_pc_35: -1308346451
-      symbol_pc_36: -2052771703
-      symbol_pc_37: -1045344550
-      symbol_pc_38: -1031229532
-      symbol_pc_39: 1437514769
-      symbol_pc_4: 1732628426
-      symbol_pc_40: 646174650
-      symbol_pc_41: 1867087837
-      symbol_pc_42: 128793114
-      symbol_pc_43: 71161451
-      symbol_pc_44: 1031376985
-      symbol_pc_45: -775528341
-      symbol_pc_46: -338568624
-      symbol_pc_47: 1663428363
-      symbol_pc_48: -1497125185
-      symbol_pc_49: -365241299
-      symbol_pc_5: -1026391350
-      symbol_pc_50: 290452621
-      symbol_pc_51: -590926524
-      symbol_pc_52: 110187893
-      symbol_pc_53: -755331378
-      symbol_pc_54: -805943506
-      symbol_pc_55: -1159887268
-      symbol_pc_56: 1538892825
-      symbol_pc_57: -1751702521
-      symbol_pc_58: 685370275
-      symbol_pc_59: 360008769
-      symbol_pc_6: -1562015412
-      symbol_pc_60: 1178622123
-      symbol_pc_61: 1039953076
-      symbol_pc_62: 1271350012
-      symbol_pc_63: -1996055908
-      symbol_pc_64: -923106479
-      symbol_pc_65: 884132265
-      symbol_pc_66: -1372301759
-      symbol_pc_67: 866970013
-      symbol_pc_68: 133484553
-      symbol_pc_69: -982435950
-      symbol_pc_7: -176223900
+      f: -1031229532
+      symbol_pc_0: 1363347203
+      symbol_pc_1: -2090533862
+      symbol_pc_2: -1065792867
+      symbol_pc_3: 1571345656
+      symbol_pc_4: -1840432102
+      symbol_pc_5: -803697008
+      symbol_pc_6: 914662959
+      symbol_pc_7: -36729280
       symbol_pc_70: -1075291505
       symbol_pc_71: -1033511455
       symbol_pc_72: 1788326372
@@ -1940,8 +1881,68 @@ TextureImporter:
       symbol_pc_76: -1955394225
       symbol_pc_77: 86884201
       symbol_pc_78: -1509896495
-      symbol_pc_8: 1955947133
-      symbol_pc_9: -335060398
+      symbol_pc_8: -965810401
+      symbol_pc_9: 1962026119
+      symbol_pc_A: 614337715
+      symbol_pc_B: -139050746
+      symbol_pc_BS: 648091706
+      symbol_pc_C: -1308346451
+      symbol_pc_D: -2052771703
+      symbol_pc_Del: 1271350012
+      symbol_pc_E: -1045344550
+      symbol_pc_End: -1996055908
+      symbol_pc_F: -1031229532
+      symbol_pc_G: 1437514769
+      symbol_pc_H: 646174650
+      symbol_pc_Home: 1178622123
+      symbol_pc_I: 1867087837
+      symbol_pc_Ins: 360008769
+      symbol_pc_J: 128793114
+      symbol_pc_K: 71161451
+      symbol_pc_L: 1031376985
+      symbol_pc_Lalt: 1624055834
+      symbol_pc_Lctrl: -580837227
+      symbol_pc_Lshift: -1471341672
+      symbol_pc_M: -775528341
+      symbol_pc_N: -338568624
+      symbol_pc_Num1: -982435950
+      symbol_pc_O: 1663428363
+      symbol_pc_P: -1497125185
+      symbol_pc_PgDn: -923106479
+      symbol_pc_PgUp: 1039953076
+      symbol_pc_Q: -365241299
+      symbol_pc_R: 290452621
+      symbol_pc_Ralt: 649275408
+      symbol_pc_Rctrl: 1766367875
+      symbol_pc_Rshift: -1022235091
+      symbol_pc_S: -590926524
+      symbol_pc_T: 110187893
+      symbol_pc_U: -755331378
+      symbol_pc_V: -805943506
+      symbol_pc_W: -1159887268
+      symbol_pc_X: 1538892825
+      symbol_pc_Y: -1751702521
+      symbol_pc_Z: 685370275
+      symbol_pc_down: -1372301759
+      symbol_pc_enter: 841174259
+      symbol_pc_esc: -178857325
+      symbol_pc_f1: 1296244909
+      symbol_pc_f10: 433615622
+      symbol_pc_f11: 1102123580
+      symbol_pc_f12: -2108873861
+      symbol_pc_f2: -1147009551
+      symbol_pc_f3: -1643888216
+      symbol_pc_f4: 1732628426
+      symbol_pc_f5: -1026391350
+      symbol_pc_f6: -1562015412
+      symbol_pc_f7: -176223900
+      symbol_pc_f8: 1955947133
+      symbol_pc_f9: -335060398
+      symbol_pc_left: 866970013
+      symbol_pc_right: 133484553
+      symbol_pc_space: -331579443
+      symbol_pc_tab: 911993460
+      symbol_pc_up: 884132265
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
