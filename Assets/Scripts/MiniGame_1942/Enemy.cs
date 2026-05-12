@@ -27,11 +27,22 @@ namespace MiniTeam.Shooting1942
         private float elapsed = 0f;
         private bool  isDead  = false;
 
+        private WaveManager waveManager;
+
         void Start()
         {
-            Camera cam = Camera.main;
-            float depth = Mathf.Abs(cam.transform.position.z);
-            destroyY = cam.ViewportToWorldPoint(new Vector3(0, 0, depth)).y - 1f;
+            waveManager = FindAnyObjectByType<WaveManager>();
+
+            if (waveManager != null)
+            {
+                destroyY = waveManager.DestroyBoundsY;
+            }
+            else
+            {
+                Camera cam = Camera.main;
+                float depth = Mathf.Abs(cam.transform.position.z);
+                destroyY = cam.ViewportToWorldPoint(new Vector3(0, 0, depth)).y - 1f;
+            }
 
             startX = transform.position.x;
 
@@ -61,6 +72,8 @@ namespace MiniTeam.Shooting1942
                     Vector3 pos = transform.position;
                     pos.y -= moveSpeed * Time.deltaTime;
                     pos.x  = startX + offsetX;
+                    if (waveManager != null)
+                        pos.x = Mathf.Clamp(pos.x, waveManager.SpawnMinX, waveManager.SpawnMaxX);
                     transform.position = pos;
                     break;
 

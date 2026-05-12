@@ -30,8 +30,15 @@ namespace MiniTeam.Shooting1942
         [Header("소환 위치")]
         public float spawnYOffset = 1f;
 
+        [Header("게임 영역 (GameView RectTransform 연결)")]
+        public RectTransform gameAreaRect;
+
         public bool IsBossSpawned  { get; private set; } = false;
         public bool IsBossDefeated { get; private set; } = false;
+
+        public float SpawnMinX     { get; private set; }
+        public float SpawnMaxX     { get; private set; }
+        public float DestroyBoundsY { get; private set; }
 
         private float spawnTopY, spawnMinX, spawnMaxX;
         private float currentInterval;
@@ -172,14 +179,32 @@ namespace MiniTeam.Shooting1942
 
         void CalculateSpawnBounds()
         {
-            Camera cam   = Camera.main;
-            float depth  = Mathf.Abs(cam.transform.position.z);
-            Vector3 topRight   = cam.ViewportToWorldPoint(new Vector3(1, 1, depth));
-            Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, depth));
+            Camera cam  = Camera.main;
+            float depth = Mathf.Abs(cam.transform.position.z);
 
-            spawnTopY = topRight.y + spawnYOffset;
-            spawnMinX = bottomLeft.x + 0.5f;
-            spawnMaxX = topRight.x   - 0.5f;
+            Vector3 worldBL, worldTR;
+
+            if (gameAreaRect != null)
+            {
+                Vector3[] corners = new Vector3[4];
+                gameAreaRect.GetWorldCorners(corners);
+                // Screen Space Overlay Canvas에서 GetWorldCorners는 실제 픽셀 좌표를 반환
+                worldBL = cam.ScreenToWorldPoint(new Vector3(corners[0].x, corners[0].y, depth));
+                worldTR = cam.ScreenToWorldPoint(new Vector3(corners[2].x, corners[2].y, depth));
+            }
+            else
+            {
+                worldBL = cam.ViewportToWorldPoint(new Vector3(0, 0, depth));
+                worldTR = cam.ViewportToWorldPoint(new Vector3(1, 1, depth));
+            }
+
+            spawnTopY      = worldTR.y + spawnYOffset;
+            spawnMinX      = worldBL.x + 0.5f;
+            spawnMaxX      = worldTR.x - 0.5f;
+            DestroyBoundsY = worldBL.y - 1f;
+
+            SpawnMinX = spawnMinX;
+            SpawnMaxX = spawnMaxX;
         }
     }
 }
