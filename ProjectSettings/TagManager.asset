@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - NPC
   layers:
   - Default
   - TransparentFX
@@ -46,6 +47,9 @@ TagManager:
     locked: 0
   - name: Students
     uniqueID: 4069936831
+    locked: 0
+  - name: NPC
+    uniqueID: 3373514453
     locked: 0
   - name: Player
     uniqueID: 1976330389
