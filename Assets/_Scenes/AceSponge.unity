@@ -4711,7 +4711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   requiredPressIndices: 03000000
   requiredEvidenceIds: []
-  requiredRetestimonyPressIndices: 03000000
+  requiredRetestimonyPressIndices: 0300000004000000
   requiredRetestimonyEvidenceIds: []
 --- !u!1 &1928270984
 GameObject:
