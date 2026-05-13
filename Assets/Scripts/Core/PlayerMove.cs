@@ -76,7 +76,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // 커서를 숨기고 중앙에 고정하는 함수
-    void LockCursor()
+    public void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -84,7 +84,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // 커서를 보이게 하고 자유롭게 움직이도록 푸는 함수
-    void UnlockCursor()
+    public void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

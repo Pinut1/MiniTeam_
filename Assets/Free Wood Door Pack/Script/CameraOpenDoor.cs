@@ -21,7 +21,6 @@ public class CameraOpenDoor : MonoBehaviour {
 					if (Input.GetKeyDown(KeyCode.E))
 					{
 						hit.transform.GetComponent<DoorScript.Door>().OpenDoor();
-						HubUIManager.Instance.WakeUp();
 					}
 
 			}else{

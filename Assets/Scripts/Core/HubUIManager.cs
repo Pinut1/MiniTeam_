@@ -1,6 +1,8 @@
+using MiniTeam.Core;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Video;
 
 public class HubUIManager : MonoBehaviour
@@ -12,7 +14,13 @@ public class HubUIManager : MonoBehaviour
     [Header("인게임 UI Panels")]
     [SerializeField] private GameObject warningUI;
 
+    [SerializeField] private Image Judangchi_initiate;
+    [SerializeField] private Image Judangchi_default;
 
+    [Header("Judangchi Animation Settings")]
+    [SerializeField] private float swapDuration = 0.5f; // 교체되는 데 걸리는 시간
+    [SerializeField] private float hiddenPosY = -1000f; // 화면 아래로 숨겨질 Y 좌표
+    [SerializeField] private float visiblePosY = 0f;    // 화면 중앙(원래 위치)의 Y 좌표
     private void Awake()
     {
         if (Instance == null)
@@ -20,6 +28,72 @@ public class HubUIManager : MonoBehaviour
             Instance = this;
         }
         else Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        Button judangchiBtn = Judangchi_initiate.GetComponent<Button>();
+        if (judangchiBtn != null)
+        {
+            judangchiBtn.onClick.AddListener(OnJudangchiClicked);
+        }
+        else
+        {
+            Debug.LogWarning("Judangchi 이미지에 button 컴포넌트가 없습니다. 클릭 이벤트 구독 실패.");
+        }
+    }
+
+    private void OnJudangchiClicked()
+    {
+        Judangchi_initiate.GetComponent<Button>().interactable = false;
+        StartCoroutine(SwapJudangchiRoutine());
+    }
+
+    private IEnumerator SwapJudangchiRoutine()
+    {
+        RectTransform jRect = Judangchi_initiate.rectTransform;
+        RectTransform jdRect = Judangchi_default.rectTransform;
+
+        Vector2 jStartPos = jRect.anchoredPosition;
+        Vector2 jTargetPos = new Vector2(jStartPos.x, hiddenPosY);
+
+        Vector2 jdStartPos = jdRect.anchoredPosition;
+        Vector2 jdTargetPos = new Vector2(jdStartPos.x, visiblePosY);
+
+        // 애니메이션 시간을 절반으로 나누어 가각 적용
+        float stepDuration = swapDuration / 2f;
+
+        // 1. 조그만 주당치 퇴장
+        float t = 0f;
+        while (t < stepDuration)
+        {
+            t += Time.deltaTime;
+            float normalizedTime = t / stepDuration;
+
+            float lerpT = Mathf.SmoothStep(0f, 1f, normalizedTime);
+
+            jRect.anchoredPosition = Vector2.Lerp(jStartPos, jTargetPos, lerpT);
+            yield return null;
+        }
+
+        // 확실한 위치 고정
+        jRect.anchoredPosition = jTargetPos;
+        
+        //(선택 사항)
+        yield return new WaitForSeconds(0.1f);
+
+        // 2. 큰 주당치 입장
+        t = 0f;
+        while (t < stepDuration)
+        {
+            t += Time.deltaTime;
+            float lerpT = Mathf.SmoothStep(0f, 1f, t / stepDuration);
+            jdRect.anchoredPosition = Vector2.Lerp(jdStartPos, jdTargetPos, lerpT);
+            yield return null;
+        }
+
+        jdRect.anchoredPosition = jdTargetPos;
+        MiniGameManager.Instance.DisablePlayerInput();
     }
 
     // 경고 UI 제어
@@ -31,7 +105,7 @@ public class HubUIManager : MonoBehaviour
         }
     }
     
-    public void WakeUp()
+    public void WakeUp(Action onComplete = null)
     {
         if (eyeEffect != null)
         {
@@ -39,11 +113,17 @@ public class HubUIManager : MonoBehaviour
             // 이게 없으면 OnRenderImage가 호출되지 않아 화면이 계속 암전되거나 변화가 없습니다.
             eyeEffect.enabled = true;
 
-            StartCoroutine(WakeUpRoutine());
+            // 코루틴에서 넘겨받은 onComplete를 전달
+            StartCoroutine(WakeUpRoutine(onComplete));
+        }
+        else
+        {
+            // 방어 코드 : 이펙트가 없으면 바로 처리
+            onComplete?.Invoke();
         }
     }
 
-    private IEnumerator WakeUpRoutine()
+    private IEnumerator WakeUpRoutine(Action onComplete)
     {
         // 초기화
         eyeEffect.openAmount = 0.001f;
@@ -89,5 +169,10 @@ public class HubUIManager : MonoBehaviour
 
         // 연출이 끝난 후 효과 스크립트 자체를 꺼서 성능 최적화
         eyeEffect.enabled = false;
+
+        // 연출이 완전히 끝난 후, 넘겨받은 onComplete를 실행
+        onComplete?.Invoke();
     }
+
+ 
 }

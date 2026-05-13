@@ -10,6 +10,8 @@ namespace MiniTeam.Core
         private string currentScene;
         private GameObject[] hubRootObjects;
 
+        private PlayerMove playerMove;
+
         public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
 
         void Awake()
@@ -22,7 +24,24 @@ namespace MiniTeam.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        private void Start()
+        {
+            playerMove = FindAnyObjectByType<PlayerMove>();
 
+
+            if (playerMove != null)
+            {
+                // 눈 깜빡임 연출이 진행되는 동안 플레이어가 움직이지 못하게 스크립트 OFF
+                DisablePlayerInput();
+                // 연출(WakeUp)을 실행, 다 끝나면 다음 메서드를 콜백.
+                HubUIManager.Instance.WakeUp(() =>EnablePlayerInput());
+            }
+            else
+            {
+                HubUIManager.Instance.WakeUp();
+            }
+           
+        }
         public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
@@ -66,6 +85,25 @@ namespace MiniTeam.Core
         public void OnMiniGameFail()
         {
             ExitMiniGame();
+        }
+
+        public void DisablePlayerInput()
+        {
+
+            if (playerMove != null)
+            {
+                playerMove.UnlockCursor();
+                playerMove.enabled = false;
+            }
+        }
+
+        public void EnablePlayerInput()
+        {
+            if (playerMove != null)
+            {
+                playerMove.LockCursor();
+                playerMove.enabled = true;
+            }
         }
     }
 }
