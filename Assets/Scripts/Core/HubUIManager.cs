@@ -81,6 +81,7 @@ public class HubUIManager : MonoBehaviour
         
         //(선택 사항)
         yield return new WaitForSeconds(0.1f);
+
         LetterBoxManager.Instance.ShowBars();
 
         // 2. 큰 주당치 입장
