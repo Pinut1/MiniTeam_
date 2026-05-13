@@ -15,7 +15,8 @@ MonoBehaviour:
   openingLines:
   - lineId: 
     speaker: 
-    txt: 
+    txt: "<color=#36C738>04\uC6D4 28\uC77C \uC624\uC804 9\uC2DC 50\uBD84 \uC9C0\uBC29\uC7AC\uD310\uC18C
+      \uC81C2\uBC95\uC815 \uC7AC\uD310 10\uBD84\uC804</color>"
     animationTrig: 
     sceneToLoad: 
     backgroundSpr: {fileID: 0}
