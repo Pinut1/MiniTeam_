@@ -1,31 +1,63 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using MiniTeam.Core;
 
 namespace MiniTeam.Pokemon
 {
-    // 담당: 차정민 + 황해인
     public class PokemonGameController : MonoBehaviour, IMiniGame
     {
-        void Start()
+        public static PokemonGameController Instance { get; private set; }
+
+        [Header("리스폰 위치")]
+        public Transform spawnPoint;
+
+        public bool HasItem            { get; private set; } = false;
+        public bool IsPokemonEventDone { get; private set; } = false;
+
+        private PlayerMapController player;
+
+        void Awake()
         {
-            // TODO: 디지몬 × 포켓몬 게임 초기화
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
         }
 
-        void Update()
+        void Start()
         {
-            // TODO: 게임 로직
+            SceneManager.SetActiveScene(gameObject.scene);
+            player = FindAnyObjectByType<PlayerMapController>();
+        }
+
+        public void RespawnPlayer()
+        {
+            if (player == null || spawnPoint == null) return;
+            player.transform.position = spawnPoint.position;
+        }
+
+        public void GiveItem()
+        {
+            HasItem = true;
+        }
+
+        public void SetPokemonEventDone()
+        {
+            IsPokemonEventDone = true;
         }
 
         public void OnGameClear()
         {
-            Debug.Log("[Pokemon] Game Clear!");
-            MiniGameManager.Instance.OnMiniGameClear();
+            if (MiniGameManager.Instance != null)
+                MiniGameManager.Instance.OnMiniGameClear();
+            else
+                Debug.Log("[Pokemon] Game Clear! (단독 테스트)");
         }
 
         public void OnGameFail()
         {
-            Debug.Log("[Pokemon] Game Fail!");
-            MiniGameManager.Instance.OnMiniGameFail();
+            if (MiniGameManager.Instance != null)
+                MiniGameManager.Instance.OnMiniGameFail();
+            else
+                Debug.Log("[Pokemon] Game Fail! (단독 테스트)");
         }
     }
 }
