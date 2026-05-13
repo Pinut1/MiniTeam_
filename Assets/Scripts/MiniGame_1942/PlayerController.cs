@@ -42,6 +42,31 @@ namespace MiniTeam.Shooting1942
                 Shoot();
                 nextFireTime = Time.time + currentFireRate;
             }
+
+            if (Input.GetKeyDown(KeyCode.Z) && ShootingUIManager.Instance != null && ShootingUIManager.Instance.IsSpecialReady)
+            {
+                if (ShootingUIManager.Instance.UseSpecial())
+                    FireBomb();
+            }
+        }
+
+        void FireBomb()
+        {
+            ShootingUIManager.SetBombActive(true);
+
+            foreach (var enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            {
+                if (enemy.explosionPrefab != null)
+                    Instantiate(enemy.explosionPrefab, enemy.transform.position, Quaternion.identity);
+                Destroy(enemy.gameObject);
+            }
+
+            foreach (var bullet in GameObject.FindGameObjectsWithTag("EnemyBullet"))
+                Destroy(bullet);
+
+            ShootingUIManager.SetBombActive(false);
+
+            AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerShoot);
         }
 
         void Move()

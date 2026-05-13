@@ -22,6 +22,9 @@ namespace MiniTeam.Shooting1942
         [Header("점수 텍스트")]
         public TextMeshProUGUI scoreText;
 
+        [Header("필살기 게이지")]
+        public Slider specialGaugeSlider;
+
         [Header("일시정지 패널")]
         public GameObject pausePanel;
 
@@ -31,6 +34,12 @@ namespace MiniTeam.Shooting1942
         public TextMeshProUGUI resultScoreText;
 
         private int score = 0;
+
+        private float specialGauge = 0f;
+        private const float MaxSpecialGauge = 100f;
+
+        public static bool IsBombActive { get; private set; }
+        public bool IsSpecialReady => specialGauge >= MaxSpecialGauge;
 
         void Awake()
         {
@@ -78,6 +87,26 @@ namespace MiniTeam.Shooting1942
         {
             if (wavePanel != null) wavePanel.SetActive(false);
         }
+
+        // ── 필살기 게이지 ─────────────────────────
+
+        public void AddSpecialGauge(float amount)
+        {
+            specialGauge = Mathf.Clamp(specialGauge + amount, 0f, MaxSpecialGauge);
+            if (specialGaugeSlider != null)
+                specialGaugeSlider.value = specialGauge / MaxSpecialGauge;
+        }
+
+        public bool UseSpecial()
+        {
+            if (!IsSpecialReady) return false;
+            specialGauge = 0f;
+            if (specialGaugeSlider != null)
+                specialGaugeSlider.value = 0f;
+            return true;
+        }
+
+        public static void SetBombActive(bool active) => IsBombActive = active;
 
         // ── 점수 ─────────────────────────────────
 

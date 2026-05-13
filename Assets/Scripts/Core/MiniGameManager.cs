@@ -40,6 +40,8 @@ namespace MiniTeam.Core
         {
             if (string.IsNullOrEmpty(currentScene)) return;
 
+            SoundManager.Instance?.StopBGM();
+
             var op = SceneManager.UnloadSceneAsync(currentScene);
             currentScene = null;
 
