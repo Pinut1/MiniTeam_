@@ -17,6 +17,7 @@ namespace MiniTeam.Shooting1942
 
         [Header("효과음")]
         public AudioClip sfxPlayerShoot;
+        public AudioClip sfxEnemyHit;
         public AudioClip sfxEnemyDie;
         public AudioClip sfxBossHit;
         public AudioClip sfxPlayerHit;

@@ -22,6 +22,9 @@ namespace MiniTeam.Shooting1942
         [Header("HP")]
         public int hp = 1;
 
+        [Header("이펙트")]
+        public GameObject explosionPrefab;
+
         private float destroyY;
         private float startX;
         private float elapsed = 0f;
@@ -97,13 +100,35 @@ namespace MiniTeam.Shooting1942
         {
             if (isDead) return;
             hp--;
+
             if (hp <= 0)
             {
                 isDead = true;
                 AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyDie);
                 ShootingUIManager.Instance?.AddScore(10);
+                if (!ShootingUIManager.IsBombActive)
+                    ShootingUIManager.Instance?.AddSpecialGauge(10f);
+
+                if (explosionPrefab != null)
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
                 Destroy(gameObject);
             }
+            else
+            {
+                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyHit);
+                StartCoroutine(HitFlash());
+            }
+        }
+
+        IEnumerator HitFlash()
+        {
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr == null) yield break;
+            Color original = sr.color;
+            sr.color = Color.white;
+            yield return new WaitForSeconds(0.08f);
+            sr.color = original;
         }
     }
 }
