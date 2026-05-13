@@ -79,6 +79,8 @@ public class SpongeDialogueManager : MonoBehaviour
         foreach (var line in trialScript.openingLines)
             lineMap[line.lineId] = line;
         // 추궁 대사 등록
+        foreach (var line in trialScript.beforeRetestimonyLines)
+            lineMap[line.lineId] = line;
         foreach (var line in trialScript.pressDialogueLines)
             lineMap[line.lineId] = line;
         foreach (var line in trialScript.evidenceDialogueLines)

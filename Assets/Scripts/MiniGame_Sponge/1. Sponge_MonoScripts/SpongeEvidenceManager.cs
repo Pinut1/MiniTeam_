@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -14,9 +15,19 @@ public class SpongeEvidenceManager : MonoBehaviour
     // 증거 목록 에셋
     [SerializeField] private SpongeEvidenceDatabaseSO database;
 
+    // 증거 상태가 바뀔 때 구독자들에게 알려주는 이벤트
+    public static event Action<string> OnEvidenceSelected; // 증거 선택됨
+    public static event Action OnEvidenceListChanged; // 목록 변경됨
+
     private void Awake()
     {
         Instance = this;
+    }
+
+    // 증거 선택 시 호출
+    public void SelectEivdence(string evidenceId)
+    {
+        OnEvidenceSelected?.Invoke(evidenceId);
     }
 
     // ── 증거 제시 ────────────────────────────────────────────
@@ -49,6 +60,8 @@ public class SpongeEvidenceManager : MonoBehaviour
             // 증거 제시 대사 상태로 전환
             SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.EvidenceSelect);
 
+            SpongeCrossExaminationManager.Instance.OnEvidenceResolved(true);
+
             // 성공 대사 출력
             // 대사가 끝나면 DialogueManager.OnSequenceEnd()가 자동으로 호출됨
             // → OnSequenceEnd()에서 conditionJustMet 체크 후 엔딩 or 심문 복귀
@@ -57,6 +70,8 @@ public class SpongeEvidenceManager : MonoBehaviour
         else
         {
             // ── 증거 제시 실패 ───────────────────────────────
+
+            SpongeCrossExaminationManager.Instance.OnEvidenceResolved(false);
 
             // 실패해도 심문 상태는 유지 (CrossExamination 상태 그대로)
             // 실패 고정 대사 출력

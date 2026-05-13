@@ -128,9 +128,9 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         SpongeDialogueManager.Instance.ShowLine(line.firstPressDialogueId);
     }
 
-    public void OnEivdenceResolved(bool sucess)
+    public void OnEvidenceResolved(bool success)
     {
-        if (sucess)
+        if (success)
             SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Pressing);
         else
             SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);

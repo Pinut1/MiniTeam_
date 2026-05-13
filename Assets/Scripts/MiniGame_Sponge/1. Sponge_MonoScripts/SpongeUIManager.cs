@@ -15,10 +15,12 @@ public class SpongeUIManager : MonoBehaviour
     
     [Header("증거 패널")]
     [SerializeField] private GameObject evidencePnl; // 증거 목록 전체를 감싸는 패널
+    [Header("증거 슬롯")]
+    // 씬에 이미 배치된 버튼들을 직접 참조 연결
+    [SerializeField] private SpongeEvidenceButtonUI[] evidenceSlots;
 
-    [SerializeField] private Transform evidenceBtnParent; // 증거 버튼들이 배치될 부모 오브젝트
-
-    [SerializeField] private GameObject evidenceBtnPrefab; // 증거 버튼 프리팹
+    [Header("증거 상세 이미지")]
+    [SerializeField] private Image holderImg;
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -32,6 +34,21 @@ public class SpongeUIManager : MonoBehaviour
     {
         evidencePnl.SetActive(false);
         // opitionsPnl.SetActive(true);
+    }
+
+    // ── 이벤트 구독 ──────────────────────────────────────────────
+    // OnEnable : 이 오브젝트가 활성화될 때 이벤트 구독
+    // 이벤트 기반으로 UI 갱신 — Update() 없이 상태가 바뀔 때만 호출됨
+    private void OnEnable()
+    {
+        SpongeEvidenceManager.OnEvidenceSelected += HandleEvidenceSelected;
+        SpongeEvidenceManager.OnEvidenceListChanged += RebuildEvidenceSlots;
+    }
+
+    private void OnDisable()
+    {
+        SpongeEvidenceManager.OnEvidenceSelected -= HandleEvidenceSelected;
+        SpongeEvidenceManager.OnEvidenceListChanged -= RebuildEvidenceSlots;
     }
 
     // ── 키 입력 처리 ─────────────────────────────────────────────
@@ -64,10 +81,12 @@ public class SpongeUIManager : MonoBehaviour
             // 대사중 클릭 -> 타이핑 스킵 or 다음 대사
             case SpongeGameState.GameState.Dialogue:
             case SpongeGameState.GameState.Pressing:
-            case SpongeGameState.GameState.EvidenceSelect: SpongeDialogueManager.Instance.OnScreenClick();
+            case SpongeGameState.GameState.EvidenceSelect: 
+                SpongeDialogueManager.Instance.OnScreenClick();
                 break;
             // 심문중 클릭 -> 다음 증언으로 이동
-            case SpongeGameState.GameState.CrossExamination: SpongeCrossExaminationManager.Instance.NextLine();
+            case SpongeGameState.GameState.CrossExamination: 
+                SpongeCrossExaminationManager.Instance.NextLine();
                 break;
         }
     }
@@ -87,32 +106,54 @@ public class SpongeUIManager : MonoBehaviour
         // 증거 선택 상태로 전환
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.EvidenceSelect);
 
-        // 이전에 생성된 버튼 전부 삭제 후 새로 생성
-        foreach (Transform child in evidenceBtnParent)
-            Destroy(child.gameObject);
+        RebuildEvidenceSlots();
+        evidencePnl.SetActive(true);
+    }
 
-        // EvidenceManager에서 전체 증거 목록 가져오기
+    /// <summary>
+    /// 씬에 배치된 슬롯 10개 상태 갱신
+    /// 데이터 있음 == Filled, 없으면 == Empty
+    /// </summary>
+    void RebuildEvidenceSlots()
+    {
         SpongeEvidenceData[] evidences = SpongeEvidenceManager.Instance.GetAllEvidences();
 
-        // 증거마다 버튼 하나씩 생성
-        foreach (var evidence in evidences)
+        for (int i = 0; i < evidenceSlots.Length; i++)
         {
-            // 프리팹으로 버튼 오브젝트 생성
-            GameObject btn = Instantiate(evidenceBtnPrefab, evidenceBtnParent);
-            // 버튼 증거이름 표시
-            btn.GetComponentInChildren<TMP_Text>().text = evidence.evidenceName;
-            // 버튼에 아이콘 이미지 설정
-            // 프리팹 안에 아이콘용 Image 컴포넌트가 있어야함!
-            Image iconImg = btn.transform.Find("Icon")?.GetComponent<Image>();
-            if (iconImg != null && evidence.icon != null)
-                iconImg.sprite = evidence.icon;
+            SpongeEvidenceData data = i < evidences.Length ? evidences[i] : null;
+            evidenceSlots[i].Setup(data);
 
-            // 버튼 클릭 시 해당 증거 제시
-            // 클로저 캡쳐 - 람다 안에서 evidence를 쓰면 루프 끝값으로 고정됨
-            string evidenceId = evidence.id;
-            btn.GetComponent<Button>().onClick.AddListener(() => SpongeEvidenceManager.Instance.PresentEvidence(evidenceId));
+            // 클릭 이벤트 연결
+            if (data != null)
+            {
+                string evidenceId = data.id;
+                evidenceSlots[i].GetComponent<Button>().onClick.RemoveAllListeners();
+                evidenceSlots[i].GetComponent<Button>().onClick.AddListener(() => SpongeEvidenceManager.Instance.PresentEvidence(evidenceId));
+            }
         }
-        evidencePnl.SetActive(true);
+    }
+
+
+    /// <summary>
+    /// 증거가 선택됐을 때 이벤트로 호출 (SpongeEvidenceManager.OnEvidenceSelected)
+    /// 선택된 버튼만 Highlight 상태로 변경, 나머지는 Filled로 복귀
+    /// </summary>
+    /// <param name="evidenceId"></param>
+    void HandleEvidenceSelected(string evidenceId)
+    {
+        foreach (var btn in evidenceSlots)
+            btn.SetHighlight(btn.EvidenceId == evidenceId);
+
+        SpongeEvidenceData data = SpongeEvidenceManager.Instance.GetById(evidenceId);
+        if (data != null && data.icon != null)
+        {
+            holderImg.sprite = data.icon;
+            holderImg.gameObject.SetActive(true);
+        }
+        else
+        {
+            holderImg.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -124,7 +165,7 @@ public class SpongeUIManager : MonoBehaviour
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
             SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
     }
-  
+
     /*
     // ── 옵션 패널 ────────────────────────────────────────────────
     /// <summary>
