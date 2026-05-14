@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using MiniTeam.Core;
 
 namespace MiniTeam.Shooting1942
@@ -17,6 +18,8 @@ namespace MiniTeam.Shooting1942
 
         void Start()
         {
+            SceneManager.SetActiveScene(gameObject.scene);
+
             if (spaceshipRewardObj != null)
                 spaceshipRewardObj.SetActive(false);
 
@@ -109,6 +112,16 @@ namespace MiniTeam.Shooting1942
                 string rapidLabel = debugPlayerCtrl.DebugRapidFire ? "공격력 증가 ON" : "공격력 증가 OFF";
                 if (GUILayout.Button(rapidLabel))
                     debugPlayerCtrl.DebugRapidFire = !debugPlayerCtrl.DebugRapidFire;
+            }
+
+            var ui = ShootingUIManager.Instance;
+            if (ui != null)
+            {
+                string gaugeLabel = ui.IsSpecialReady ? "필살기 게이지 FULL" : "필살기 게이지 충전";
+                GUI.enabled = !ui.IsSpecialReady;
+                if (GUILayout.Button(gaugeLabel))
+                    ui.AddSpecialGauge(100f);
+                GUI.enabled = true;
             }
 
             GUILayout.EndArea();

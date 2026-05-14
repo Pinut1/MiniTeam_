@@ -182,6 +182,8 @@ namespace MiniTeam.Shooting1942
             currentHp = Mathf.Clamp(currentHp - 1, 0, maxHp);
             AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxBossHit);
             ShootingUIManager.Instance?.UpdateBossHp(currentHp, maxHp);
+            ShootingUIManager.Instance?.AddSpecialGauge(3f);
+            StartCoroutine(BossHitFlash());
 
             if (currentHp <= 0)
             {
@@ -194,6 +196,15 @@ namespace MiniTeam.Shooting1942
 
             if (!isPhase2 && currentHp <= maxHp / 2)
                 StartCoroutine(EnterPhase2());
+        }
+
+        IEnumerator BossHitFlash()
+        {
+            if (sr == null) yield break;
+            Color current = sr.color;
+            sr.color = Color.white;
+            yield return new WaitForSeconds(0.08f);
+            sr.color = current;
         }
 
         public void ForcePhase2()
