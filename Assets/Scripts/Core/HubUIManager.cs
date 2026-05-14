@@ -18,9 +18,13 @@ public class HubUIManager : MonoBehaviour
     [SerializeField] private Image Judangchi_default;
 
     [Header("Judangchi Animation Settings")]
-    [SerializeField] private float swapDuration = 0.5f; // 교체되는 데 걸리는 시간
+    [SerializeField] private float swapDuration = 0.8f; // 교체되는 데 걸리는 시간
     [SerializeField] private float hiddenPosY = -1000f; // 화면 아래로 숨겨질 Y 좌표
     [SerializeField] private float visiblePosY = 0f;    // 화면 중앙(원래 위치)의 Y 좌표
+
+    [Header("대사 목록")]
+    public DialogueData judangchiIntroData;
+
     private void Awake()
     {
         if (Instance == null)
@@ -63,18 +67,11 @@ public class HubUIManager : MonoBehaviour
         // 애니메이션 시간을 절반으로 나누어 가각 적용
         float stepDuration = swapDuration / 2f;
 
+        // 0 . 플레이어 동작 비할성화
+         MiniGameManager.Instance.DisablePlayerInput();
+
         // 1. 조그만 주당치 퇴장
-        float t = 0f;
-        while (t < stepDuration)
-        {
-            t += Time.deltaTime;
-            float normalizedTime = t / stepDuration;
-
-            float lerpT = Mathf.SmoothStep(0f, 1f, normalizedTime);
-
-            jRect.anchoredPosition = Vector2.Lerp(jStartPos, jTargetPos, lerpT);
-            yield return null;
-        }
+        yield return StartCoroutine(MoveUIRoutine(Judangchi_initiate.rectTransform, false, stepDuration));
 
         // 확실한 위치 고정
         jRect.anchoredPosition = jTargetPos;
@@ -82,20 +79,42 @@ public class HubUIManager : MonoBehaviour
         //(선택 사항)
         yield return new WaitForSeconds(0.1f);
 
-        LetterBoxManager.Instance.ShowBars();
+        // 2. 시네마틱 레터박스 등장 및 대기
+        bool isLetterBoxDone = false;
+        LetterBoxManager.Instance.ShowBars(() => isLetterBoxDone = true);
 
-        // 2. 큰 주당치 입장
-        t = 0f;
-        while (t < stepDuration)
-        {
-            t += Time.deltaTime;
-            float lerpT = Mathf.SmoothStep(0f, 1f, t / stepDuration);
-            jdRect.anchoredPosition = Vector2.Lerp(jdStartPos, jdTargetPos, lerpT);
-            yield return null;
-        }
+        // 콜백이 실행되어 true가 될때까지 여기서 코루틴을 멈추고 기다림
+        yield return new WaitUntil(() => isLetterBoxDone);
 
-        jdRect.anchoredPosition = jdTargetPos;
-        MiniGameManager.Instance.DisablePlayerInput();
+        //(선택 사항)
+        yield return new WaitForSeconds(0.1f);
+
+        // 3. 큰 주당치 입장
+        yield return StartCoroutine(MoveUIRoutine(Judangchi_default.rectTransform, true, stepDuration));
+
+        yield return new WaitForSeconds(0.2f);
+
+        // 4. 주댕치 대사 시작 및 다음 플로우 연결
+
+        bool isDialogueDone = false;
+
+        // 대사를 다 읽으면 isDialogueDone을 true로 바꿈
+        JudangChiDialogueManager.Instance.StartDialogue(judangchiIntroData, () => isDialogueDone = true);
+        
+        // 대사를 다 읽고 isDialogueDone이 ture가 될때까지 대기
+        yield return new WaitUntil(() => isDialogueDone);
+
+        //TODO 대사 전부 끝난 뒤
+        // 큰 주댕치 퇴장
+        yield return StartCoroutine(MoveUIRoutine(Judangchi_default.rectTransform, false, stepDuration));
+
+        //시네마틱 레터박스 치우기
+        LetterBoxManager.Instance.HideBars();
+
+        //플레이어 조작 다시 활성화
+        MiniGameManager.Instance.EnablePlayerInput();
+
+ 
     }
 
     // 경고 UI 제어
@@ -125,6 +144,27 @@ public class HubUIManager : MonoBehaviour
         }
     }
 
+    // bool 변수로 주댕치 입장/퇴장을 제어하는 재사용 코루틴
+    private IEnumerator MoveUIRoutine(RectTransform rect, bool isEnter, float duration)
+    {
+        Vector2 startPos = rect.anchoredPosition;
+
+        // isEnter가 true면 visiblePosY, false면 hiddenPosY를 목표로 설정
+        float targetY = isEnter ? visiblePosY : hiddenPosY;
+        Vector2 targetPos = new Vector2(startPos.x, targetY);
+
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            // Mathf.SmoothStep 안에 바로 나눗셈을 넣어서 변수 선언을 줄였습니다.
+            float lerpT = Mathf.SmoothStep(0f, 1f, t / duration);
+            rect.anchoredPosition = Vector2.Lerp(startPos, targetPos, lerpT);
+            yield return null;
+        }
+
+        rect.anchoredPosition = targetPos;
+    }
     private IEnumerator WakeUpRoutine(Action onComplete)
     {
         // 초기화
