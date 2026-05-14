@@ -12,13 +12,14 @@ namespace MiniTeam.Pokemon
         public void SetControllable(bool value) => IsControllable = value;
 
         private Rigidbody2D rb;
-        private SpriteRenderer sr;
         private Animator anim;
+
+        // 마지막 이동 방향 기억 (정지 시 해당 방향 유지)
+        private Vector2 lastDir = Vector2.down;
 
         void Start()
         {
             rb   = GetComponent<Rigidbody2D>();
-            sr   = GetComponent<SpriteRenderer>();
             anim = GetComponent<Animator>();
 
             if (rb != null)
@@ -26,6 +27,8 @@ namespace MiniTeam.Pokemon
                 rb.gravityScale = 0f;
                 rb.freezeRotation = true;
             }
+
+            SetAnimDir(lastDir, false);
         }
 
         void Update()
@@ -33,19 +36,32 @@ namespace MiniTeam.Pokemon
             if (!IsControllable)
             {
                 if (rb != null) rb.linearVelocity = Vector2.zero;
-                if (anim != null) anim.SetBool("isWalking", false);
+                SetAnimDir(lastDir, false);
                 return;
             }
 
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
-            Vector2 dir = new Vector2(h, v).normalized;
+
+            // 포켓몬 스타일: 4방향 우선순위 (대각 입력 시 수평 우선)
+            Vector2 dir = Vector2.zero;
+            if (h != 0)      dir = new Vector2(h > 0 ? 1 : -1, 0);
+            else if (v != 0) dir = new Vector2(0, v > 0 ? 1 : -1);
 
             if (rb != null) rb.linearVelocity = dir * moveSpeed;
 
-            if (h != 0 && sr != null) sr.flipX = h < 0;
+            bool isMoving = dir != Vector2.zero;
+            if (isMoving) lastDir = dir;
 
-            if (anim != null) anim.SetBool("isWalking", dir.magnitude > 0.01f);
+            SetAnimDir(lastDir, isMoving);
+        }
+
+        private void SetAnimDir(Vector2 dir, bool isMoving)
+        {
+            if (anim == null) return;
+            anim.SetFloat("Pos_X", dir.x);
+            anim.SetFloat("Pos_Y", dir.y);
+            anim.SetBool("isMoving", isMoving);
         }
     }
 }
