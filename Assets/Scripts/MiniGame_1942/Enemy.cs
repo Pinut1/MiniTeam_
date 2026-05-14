@@ -22,16 +22,30 @@ namespace MiniTeam.Shooting1942
         [Header("HP")]
         public int hp = 1;
 
+        [Header("이펙트")]
+        public GameObject explosionPrefab;
+
         private float destroyY;
         private float startX;
         private float elapsed = 0f;
         private bool  isDead  = false;
 
+        private WaveManager waveManager;
+
         void Start()
         {
-            Camera cam = Camera.main;
-            float depth = Mathf.Abs(cam.transform.position.z);
-            destroyY = cam.ViewportToWorldPoint(new Vector3(0, 0, depth)).y - 1f;
+            waveManager = FindAnyObjectByType<WaveManager>();
+
+            if (waveManager != null)
+            {
+                destroyY = waveManager.DestroyBoundsY;
+            }
+            else
+            {
+                Camera cam = Camera.main;
+                float depth = Mathf.Abs(cam.transform.position.z);
+                destroyY = cam.ViewportToWorldPoint(new Vector3(0, 0, depth)).y - 1f;
+            }
 
             startX = transform.position.x;
 
@@ -61,6 +75,8 @@ namespace MiniTeam.Shooting1942
                     Vector3 pos = transform.position;
                     pos.y -= moveSpeed * Time.deltaTime;
                     pos.x  = startX + offsetX;
+                    if (waveManager != null)
+                        pos.x = Mathf.Clamp(pos.x, waveManager.SpawnMinX, waveManager.SpawnMaxX);
                     transform.position = pos;
                     break;
 
@@ -84,13 +100,35 @@ namespace MiniTeam.Shooting1942
         {
             if (isDead) return;
             hp--;
+
             if (hp <= 0)
             {
                 isDead = true;
                 AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyDie);
                 ShootingUIManager.Instance?.AddScore(10);
+                if (!ShootingUIManager.IsBombActive)
+                    ShootingUIManager.Instance?.AddSpecialGauge(10f);
+
+                if (explosionPrefab != null)
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
                 Destroy(gameObject);
             }
+            else
+            {
+                AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxEnemyHit);
+                StartCoroutine(HitFlash());
+            }
+        }
+
+        IEnumerator HitFlash()
+        {
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr == null) yield break;
+            Color original = sr.color;
+            sr.color = Color.white;
+            yield return new WaitForSeconds(0.08f);
+            sr.color = original;
         }
     }
 }
