@@ -13,5 +13,16 @@
   "npc_kuchipach_flee":   "쿠치파치가 도망쳤다!",
   "npc_kuchipach_give":   "쿠치파치: 잠깐! 이건 너한테 줄게. 이걸 가져가렴~!",
 
-  "escape_no_item": "오브제 없이는 탈출할 수 없다!"
+  "escape_no_item": "오브제 없이는 탈출할 수 없다!",
+
+  "battle_fight":           "포켓몬이 없어서 싸울 수 없다!",
+  "battle_pokemon":         "난 교체할 포켓몬이 없는데!",
+  "battle_pokemonball_1":   "몬스터볼을 던졌지만...",
+  "battle_pokemonball_2":   "효과가 없었다!",
+  "battle_strangecandy_1":  "테일이가 먹으라고 주는 거야?",
+  "battle_strangecandy_2":  "...아구몬이 다가왔다!",
+  "battle_digivice_1":      "디지바이스를 꺼냈다!",
+  "battle_digivice_2":      "아구몬이 포획됐다!",
+  "battle_defeat":          "눈앞이 깜깜해졌다...",
+  "battle_run":             "도망쳤다!"
 }

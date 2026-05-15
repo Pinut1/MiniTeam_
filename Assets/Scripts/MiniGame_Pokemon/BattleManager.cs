@@ -1,8 +1,8 @@
+using System.Collections;
 using UnityEngine;
 
 namespace MiniTeam.Pokemon
 {
-    // 배틀 4가지 선택지 로직 담당
     public class BattleManager : MonoBehaviour
     {
         public static BattleManager Instance { get; private set; }
@@ -14,6 +14,11 @@ namespace MiniTeam.Pokemon
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
         }
+
+        string L(string key) =>
+            DialogueDB.Instance != null ? DialogueDB.Instance.Get(key) : $"[{key}]";
+
+        // ── 배틀 시작/종료 ──────────────────────────
 
         public void StartBattle(TrainerTrigger trainer)
         {
@@ -29,50 +34,104 @@ namespace MiniTeam.Pokemon
             currentTrainer = null;
         }
 
-        // ── 선택지 ────────────────────────────────
+        // ── 메인 선택지 ──────────────────────────────
 
-        // 싸우다: 레벨차이로 즉사 → 시작지점 리스폰
+        // 1. 싸운다 → 포켓몬 없음 → 패배
         public void OnFight()
         {
-            BattleUIManager.Instance?.ShowMessage("레벨 차이가 너무 나서 쓰러졌다...");
-            Invoke(nameof(RespawnAndEnd), 1.5f);
+            BattleUIManager.Instance?.ShowMessage(L("battle_fight"));
+            StartCoroutine(DefeatRoutine());
         }
 
-        void RespawnAndEnd()
+        // 2. 가방 → 아이템 서브패널
+        public void OnBag()
         {
+            BattleUIManager.Instance?.ShowItemPanel();
+        }
+
+        // 6. 포켓몬 → 교체 불가 → 패배
+        public void OnPokemon()
+        {
+            BattleUIManager.Instance?.ShowMessage(L("battle_pokemon"));
+            StartCoroutine(DefeatRoutine());
+        }
+
+        // 5. 도망친다
+        public void OnRun()
+        {
+            BattleUIManager.Instance?.ShowMessage(L("battle_run"));
+            StartCoroutine(RunRoutine());
+        }
+
+        // ── 가방 아이템 선택 ─────────────────────────
+
+        // 2-1. 몬스터볼 → 사용 불가 → 패배
+        public void OnUsePokemonBall()
+        {
+            StartCoroutine(PokemonBallRoutine());
+        }
+
+        // 2-2. 이상한사탕 → 아구몬이 다가옴
+        public void OnUseStrangeCandy()
+        {
+            StartCoroutine(StrangeCandyRoutine());
+        }
+
+        // 2-3. 디지바이스 → 아구몬 포획 → 승리
+        public void OnUseDigivice()
+        {
+            StartCoroutine(DigiviceRoutine());
+        }
+
+        // ── 결과 코루틴 ──────────────────────────────
+
+        // 패배: 블랙아웃 → "눈앞이 깜깜해졌다" → 리스폰
+        IEnumerator DefeatRoutine()
+        {
+            yield return new WaitForSeconds(1.2f);
+            if (BattleUIManager.Instance != null)
+                yield return StartCoroutine(BattleUIManager.Instance.ShowBlackout(0.5f));
+            if (MapDialogueUI.Instance != null)
+                yield return StartCoroutine(MapDialogueUI.Instance.Show(L("battle_defeat")));
             PokemonGameController.Instance?.RespawnPlayer();
             EndBattle();
         }
 
-        // 가방: 텅 비어있음
-        public void OnBag()
+        IEnumerator RunRoutine()
         {
-            BattleUIManager.Instance?.ShowMessage("가방이 텅 비어있다.");
+            yield return new WaitForSeconds(0.8f);
+            EndBattle();
         }
 
-        // 포켓몬: 첫 번째 = 쿠치파치 컷씬, 이후 = 빈 목록
-        public void OnPokemon()
+        IEnumerator PokemonBallRoutine()
         {
-            var gc = PokemonGameController.Instance;
-            if (gc == null) return;
-
-            if (!gc.IsPokemonEventDone)
-            {
-                var trainer = currentTrainer;
-                EndBattle();
-                CutsceneManager.Instance?.PlayKuchipachScene(trainer);
-            }
-            else
-            {
-                BattleUIManager.Instance?.ShowMessage("포켓몬 목록이 텅 비어있다.");
-            }
+            BattleUIManager.Instance?.ShowMessage(L("battle_pokemonball_1"));
+            yield return new WaitForSeconds(1.2f);
+            BattleUIManager.Instance?.ShowMessage(L("battle_pokemonball_2"));
+            yield return StartCoroutine(DefeatRoutine());
         }
 
-        // 도망치다: 배틀 종료, 맵으로 복귀
-        public void OnRun()
+        IEnumerator StrangeCandyRoutine()
         {
-            BattleUIManager.Instance?.ShowMessage("도망쳤다!");
-            Invoke(nameof(EndBattle), 0.8f);
+            BattleUIManager.Instance?.ShowMessage(L("battle_strangecandy_1"));
+            yield return new WaitForSeconds(1.5f);
+            BattleUIManager.Instance?.ShowMessage(L("battle_strangecandy_2"));
+            yield return new WaitForSeconds(1.5f);
+            PokemonGameController.Instance?.SetPokemonEventDone();
+            currentTrainer?.SetDefeated();
+            EndBattle();
+        }
+
+        IEnumerator DigiviceRoutine()
+        {
+            BattleUIManager.Instance?.ShowMessage(L("battle_digivice_1"));
+            yield return new WaitForSeconds(1.2f);
+            BattleUIManager.Instance?.ShowMessage(L("battle_digivice_2"));
+            yield return new WaitForSeconds(1.5f);
+            PokemonGameController.Instance?.SetPokemonEventDone();
+            currentTrainer?.SetDefeated();
+            EndBattle();
+            PokemonGameController.Instance?.OnGameClear();
         }
     }
 }

@@ -47,6 +47,8 @@ namespace MiniTeam.Pokemon
 
         void Update()
         {
+            // 배틀 중이거나 대화창 표시 중이면 메뉴 차단
+            if (BattleUIManager.Instance != null && BattleUIManager.Instance.IsBattleActive) return;
             if (MapDialogueUI.Instance != null && MapDialogueUI.Instance.IsShowing) return;
 
             if (!isOpen)
@@ -147,6 +149,9 @@ namespace MiniTeam.Pokemon
             if (MapDialogueUI.Instance != null)
                 yield return StartCoroutine(MapDialogueUI.Instance.Show(text));
         }
+
+        // 배틀에서 가방 열 때 호출 (BattleUIManager에서 사용)
+        public void RefreshBagForBattle() => RefreshBag();
 
         void RefreshBag()
         {
