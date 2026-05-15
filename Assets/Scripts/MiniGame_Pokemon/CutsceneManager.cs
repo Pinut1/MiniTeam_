@@ -37,6 +37,17 @@ namespace MiniTeam.Pokemon
             StartCoroutine(KuchipachRoutine(trainer));
         }
 
+public IEnumerator ShowItemPickupDialogue(string message)
+        {
+            if (cutscenePanel != null) cutscenePanel.SetActive(true);
+            if (kuchipachImage != null) kuchipachImage.gameObject.SetActive(false);
+            yield return ShowDialogue(message);
+            yield return new WaitForSeconds(1.5f);
+            if (cutscenePanel != null) cutscenePanel.SetActive(false);
+            if (kuchipachImage != null) kuchipachImage.gameObject.SetActive(true);
+        }
+
+
         IEnumerator KuchipachRoutine(TrainerTrigger trainer)
         {
             if (cutscenePanel != null) cutscenePanel.SetActive(true);

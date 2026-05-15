@@ -1,0 +1,17 @@
+{
+  "menu_pokemon":   "포켓몬을 가지고 있지 않아!",
+  "menu_bag_empty": "가방이 비어있어.",
+  "menu_bag_has":   "소중한 물건이 들어있어!",
+  "menu_save":      "지금은 저장할 수 없어!",
+
+  "item_pokemonball":  "[ 포켓몬볼을 획득했다! ]",
+  "item_strangecandy": "[ 이상한사탕을 획득했다! ]",
+  "item_digivice":     "[ 디지바이스를 획득했다! ]",
+
+  "npc_kuchipach_appear": "쿠치파치가 나타났다!",
+  "npc_kuchipach_deny":   "쿠치파치: 오? 뭐야? 포켓몬 찾아? 난 포켓몬이 아니야~!",
+  "npc_kuchipach_flee":   "쿠치파치가 도망쳤다!",
+  "npc_kuchipach_give":   "쿠치파치: 잠깐! 이건 너한테 줄게. 이걸 가져가렴~!",
+
+  "escape_no_item": "오브제 없이는 탈출할 수 없다!"
+}

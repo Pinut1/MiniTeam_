@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using MiniTeam.Core;
@@ -11,7 +12,9 @@ namespace MiniTeam.Pokemon
         [Header("리스폰 위치")]
         public Transform spawnPoint;
 
-        public bool HasItem            { get; private set; } = false;
+        public bool HasItem { get; private set; } = false;
+
+        private readonly HashSet<MapItemType> collectedItems = new HashSet<MapItemType>();
         public bool IsPokemonEventDone { get; private set; } = false;
 
         private PlayerMapController player;
@@ -22,10 +25,11 @@ namespace MiniTeam.Pokemon
             Instance = this;
         }
 
-        void Start()
+void Start()
         {
             SceneManager.SetActiveScene(gameObject.scene);
             player = FindAnyObjectByType<PlayerMapController>();
+            DialogueDB.Instance?.Load("Pokemon");
         }
 
         public void RespawnPlayer()
@@ -34,10 +38,18 @@ namespace MiniTeam.Pokemon
             player.transform.position = spawnPoint.position;
         }
 
-        public void GiveItem()
+public void GiveItem()
         {
             HasItem = true;
         }
+
+        public void CollectItem(MapItemType type)
+        {
+            collectedItems.Add(type);
+            HasItem = true;
+        }
+
+        public bool HasCollected(MapItemType type) => collectedItems.Contains(type);
 
         public void SetPokemonEventDone()
         {
