@@ -48,14 +48,20 @@ TagManager:
   - name: Students
     uniqueID: 4069936831
     locked: 0
+  - name: BurnEffect
+    uniqueID: 3837094713
+    locked: 0
   - name: NPC
     uniqueID: 3373514453
     locked: 0
-  - name: Player
-    uniqueID: 1976330389
+  - name: BoomEffect
+    uniqueID: 2422926669
     locked: 0
   - name: Objects
     uniqueID: 972479335
+    locked: 0
+  - name: Player
+    uniqueID: 1976330389
     locked: 0
   m_RenderingLayers:
   - Default

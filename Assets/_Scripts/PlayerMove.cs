@@ -10,33 +10,34 @@ public class PlayerMove : MonoBehaviour
     public float runDistanceThreshold = 6.0f;
     public float stopDistance = 0.5f;
 
+    [Header("Flip Settings (Pivot Fix)")]
+    // 이 값을 0.1단위로 천천히 늘리면서 맞춰보세요. 
+    // 캐릭터가 오른쪽으로 튀면 값을 줄이고, 왼쪽으로 튀면 값을 늘려야 합니다.
+    public float flipOffset = 1.2f;
+
     [Header("Knockback Settings")]
     public float knockbackForceX = 5f;
     public float knockbackForceY = 3f;
     public float knockbackDuration = 0.5f;
 
-    [Header("Laser Settings")]
-    public GameObject laserObject;
-    public float maxLaserLength = 10f;
-    public float laserWidth = 0.1f;
-
-    private Animator anim;
-    private Rigidbody2D rb;
+    public Animator anim;
+    public Rigidbody2D rb;
     private bool isFacingRight = true;
     private bool isKnockbacked = false;
     private bool isInputAttacking = false;
 
+
     void Start()
     {
-        anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        if (laserObject != null) laserObject.SetActive(false);
+        // anim = GetComponentInChildren<Animator>();
+        // rb = GetComponentInChildren<Rigidbody2D>();
     }
 
     void Update()
     {
         if (isKnockbacked) return;
 
+        // 마우스 클릭(공격) 처리
         if (Input.GetMouseButton(0))
         {
             isInputAttacking = true;
@@ -46,14 +47,11 @@ public class PlayerMove : MonoBehaviour
             }
             if (anim != null) anim.SetBool("isAttacking", true);
             if (rb != null) rb.linearVelocity = Vector2.zero;
-
-            UpdateLaser();
         }
         else
         {
             isInputAttacking = false;
             if (anim != null) anim.SetBool("isAttacking", false);
-            if (laserObject != null) laserObject.SetActive(false);
         }
 
         bool isAnimatorInAttackState = anim != null && anim.GetCurrentAnimatorStateInfo(0).IsName("BackAttack");
@@ -67,64 +65,6 @@ public class PlayerMove : MonoBehaviour
         HandleMovement();
     }
 
-    void UpdateLaser()
-    {
-        if (laserObject == null) return;
-
-        laserObject.SetActive(true);
-
-        // 1. 마우스 월드 좌표 구하기
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = Mathf.Abs(Camera.main.transform.position.z - transform.position.z);
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
-
-        // 2. 마우스와 가장 가까운 NPC 찾기
-        GameObject[] npcs = GameObject.FindGameObjectsWithTag("NPC");
-        GameObject targetNPC = null;
-        float minMouseDistance = 2.0f; // 마우스 주변 2유닛 이내의 NPC만 타겟팅
-
-        foreach (GameObject npc in npcs)
-        {
-            float distToMouse = Vector2.Distance(mouseWorldPos, npc.transform.position);
-            if (distToMouse < minMouseDistance)
-            {
-                minMouseDistance = distToMouse;
-                targetNPC = npc;
-            }
-        }
-
-        // 3. 레이저 방향 및 길이 조절
-        if (targetNPC != null)
-        {
-            // 타겟 NPC 방향 벡터 계산
-            Vector2 dir = (targetNPC.transform.position - laserObject.transform.position);
-            float distToTarget = dir.magnitude;
-
-            // 각도 계산 ($$ \theta = \operatorname{atan2}(y, x) \times \frac{180}{\pi} $$)
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
-            // 캐릭터가 좌측을 보고 있을 때(Scale X = -1) 보정
-            if (transform.localScale.x < 0)
-            {
-                angle += 180f;
-            }
-
-            laserObject.transform.rotation = Quaternion.Euler(0, 0, angle);
-            laserObject.transform.localScale = new Vector3(distToTarget, laserWidth, 1f);
-        }
-        else
-        {
-            // 타겟이 없으면 마우스 방향으로 최대 길이만큼 발사
-            Vector2 dir = (mouseWorldPos - laserObject.transform.position);
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
-            if (transform.localScale.x < 0) angle += 180f;
-
-            laserObject.transform.rotation = Quaternion.Euler(0, 0, angle);
-            laserObject.transform.localScale = new Vector3(maxLaserLength, laserWidth, 1f);
-        }
-    }
-
     void HandleMovement()
     {
         Vector3 mouseScreenPos = Input.mousePosition;
@@ -132,6 +72,18 @@ public class PlayerMove : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         mouseWorldPos.z = 0f;
 
+        // --- [방향 전환 로직: 세로선 기준 즉시 전환] ---
+        // 이동 거리(stopDistance)와 상관없이 마우스가 캐릭터 왼쪽/오른쪽인지에 따라 즉시 Flip
+        if (mouseWorldPos.x > transform.position.x && !isFacingRight)
+        {
+            Flip();
+        }
+        else if (mouseWorldPos.x < transform.position.x && isFacingRight)
+        {
+            Flip();
+        }
+
+        // --- [이동 로직] ---
         float distanceX = Mathf.Abs(mouseWorldPos.x - transform.position.x);
         float moveInput = 0f;
         bool isMoving = false;
@@ -151,9 +103,6 @@ public class PlayerMove : MonoBehaviour
             rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
         }
 
-        if (moveInput > 0 && !isFacingRight) Flip();
-        else if (moveInput < 0 && isFacingRight) Flip();
-
         if (anim != null)
         {
             anim.SetBool("isIdle", !isMoving);
@@ -165,9 +114,26 @@ public class PlayerMove : MonoBehaviour
     void Flip()
     {
         isFacingRight = !isFacingRight;
+
+        // 1. 스케일 반전 (여기서 캐릭터가 휙 돌아갑니다)
         Vector3 currentScale = transform.localScale;
         currentScale.x *= -1;
         transform.localScale = currentScale;
+
+        // 2. 위치 보정 (중요: 방향 로직 수정)
+        // 왼쪽을 보게 될 때(isFacingRight=false) 캐릭터가 왼쪽으로 튀었다면 
+        // 부모의 위치를 오른쪽(+)으로 밀어줘야 합니다.
+        float offsetDir = isFacingRight ? -1f : 1f;
+
+        // Rigidbody를 사용 중이므로 rb.position을 직접 수정하는 것이 훨씬 정확하고 부드럽습니다.
+        if (rb != null)
+        {
+            rb.position += new Vector2(flipOffset * offsetDir, 0);
+        }
+        else
+        {
+            transform.position += new Vector3(flipOffset * offsetDir, 0, 0);
+        }
     }
 
     public void TriggerKnockback(Transform enemyTransform)
@@ -175,7 +141,6 @@ public class PlayerMove : MonoBehaviour
         if (isKnockbacked) return;
         isInputAttacking = false;
         if (anim != null) anim.SetBool("isAttacking", false);
-        if (laserObject != null) laserObject.SetActive(false);
 
         isKnockbacked = true;
         if (anim != null) anim.SetTrigger("doKnockback");
