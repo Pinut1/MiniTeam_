@@ -18,57 +18,98 @@ public class JudangChiController : MonoBehaviour
 
     }
 
+    // 최초 허브에서 주댕치-> 주댕치 대화 씬 진입 제어
+    #region FirstScene
+    public void PlaySequenceForFirstStage()
+    {
+        int currentStage = MiniGameManager.Instance.currentStage;
 
+        if (currentStage >= stageDialogues.Length) return;
+
+        StartCoroutine(FirstSequenceRoutine(stageDialogues[currentStage]));
+
+    }
+
+    private IEnumerator FirstSequenceRoutine(DialogueData dialogueData)
+    {
+        MiniGameManager.Instance.DisablePlayerInput();
+
+        // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.FirstCinemaEnter());
+
+        // 2. 대사 진행
+        bool isDialogueDone = false;
+        JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
+        yield return new WaitUntil(() => isDialogueDone);
+
+        // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.FirstCinemaExit(MiniGameManager.Instance.currentStage));
+
+        MiniGameManager.Instance.EnablePlayerInput();
+    }
+
+    #endregion
+
+    // 디지바이스를 얻은 이후 디지바이스 -> 주댕치 대화 씬 진입 제어
+    #region DigiviceScene
     public void PlaySequenceForCurrentStage()
     {
         int currentStage = MiniGameManager.Instance.currentStage;
 
         if (currentStage >= stageDialogues.Length) return;
 
-        StartCoroutine(SequenceRoutine(stageDialogues[currentStage]));
+        StartCoroutine(NomalSequenceRoutine(stageDialogues[currentStage]));
 
     }
 
-    private IEnumerator SequenceRoutine(DialogueData dialogueData)
+    private IEnumerator NomalSequenceRoutine(DialogueData dialogueData)
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
-        // 1. 작은 주당치 퇴장
-        yield return StartCoroutine(HubUIManager.Instance.HideBottomUI(MiniGameManager.Instance.currentStage));
+        // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaEnter());
 
-        // 2. 레터박스
-        bool isLetterBoxDone = false;
-        LetterBoxManager.Instance.ShowBars(() => isLetterBoxDone = true);
-        yield return new WaitUntil(() => isLetterBoxDone);
-        yield return new WaitForSeconds(0.1f);
-
-        // 3. 큰 주댕치 입장
-        yield return StartCoroutine(HubUIManager.Instance.ShowBigJudangchi());
-
-        // 4. 주댕치 대사 및 표정 변화
+        // 2. 대사 진행
         bool isDialogueDone = false;
-
         JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
-
         yield return new WaitUntil(() => isDialogueDone);
 
-        // 5. 큰 주댕치 퇴장
-        yield return StartCoroutine(HubUIManager.Instance.HideBigJudangchi());
-
-        // 6. 레터박스 치우기
-        bool isLetterBoxHidden = false;
-        LetterBoxManager.Instance.HideBars(() => isLetterBoxHidden = true);
-        yield return new WaitUntil(() => isLetterBoxHidden);
-
-        // ★ 7. 현재 스테이지가 1 이상이면 디지바이스 등장! (아니면 작은 주당치)
-        yield return StartCoroutine(HubUIManager.Instance.ShowBottomUI(MiniGameManager.Instance.currentStage));
+        // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
 
         MiniGameManager.Instance.EnablePlayerInput();
     }
+    #endregion
 
-    // Update is called once per frame
-    void Update()
+    // 게임 클리어 후 주댕치 대화 씬 바로 진입
+    #region AfterGameClear
+    internal void PlaySequenceForGameClear()
     {
-        
+        int currentStage = MiniGameManager.Instance.currentStage;
+
+        if (currentStage >= stageDialogues.Length) return;
+
+        StartCoroutine(GameClearSequenceRoutine(stageDialogues[currentStage]));
     }
+
+    private IEnumerator GameClearSequenceRoutine(DialogueData dialogueData)
+    {
+        MiniGameManager.Instance.DisablePlayerInput();
+
+        // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.StageClearOnCinema());
+
+        // 2. 대사 진행
+        bool isDialogueDone = false;
+        JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
+        yield return new WaitUntil(() => isDialogueDone);
+
+        // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
+        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+
+        MiniGameManager.Instance.EnablePlayerInput();
+    }
+    #endregion
+
+ 
 }

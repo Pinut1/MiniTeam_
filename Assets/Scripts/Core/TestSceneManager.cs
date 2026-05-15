@@ -31,7 +31,7 @@ public class TestSceneManager : MonoBehaviour
 
     private IEnumerator CountdownRoutine()
     {
-        int count = 3;
+        int count = 2;
         while (count >0)
         {
             countdownText.text = count.ToString() + " √ ";

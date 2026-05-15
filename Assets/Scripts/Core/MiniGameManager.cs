@@ -82,7 +82,7 @@ namespace MiniTeam.Core
             hubRootObjects = null;
 
             // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시.
-             JudangChiController.Instance?.PlaySequenceForCurrentStage();
+             JudangChiController.Instance?.PlaySequenceForGameClear();
         }
 
         public void OnMiniGameClear()

@@ -15,18 +15,21 @@ public class HubUIManager : MonoBehaviour
     [Header("인게임 UI Panels")]
     [SerializeField] private GameObject warningUI;
 
-    [Header("UI Animators (애니메이터 제어용)")]
-    [Tooltip("각 UI 객체에 달린 Animator를 연결해주세요")]
-    [SerializeField] private Animator judangchiSmallAnim;
-    [SerializeField] private Animator digiviceAnim;
-    [SerializeField] private Animator judangchiBigAnim;
+    [Header("시네마틱 통합 애니메이터 (부모 객체)")]
 
-    [Header("대화창용 큰 주댕치 (표정 변화용)")]
-    [SerializeField] private Image judangchiBigImage;
+    [SerializeField] private Animator cinemaAnimator;
+
+    [Header("하단 상호작용 객체 ")]
+    [SerializeField] private GameObject judangchiSmallObj; // Judanchi_초기
+    [SerializeField] private GameObject digiviceObj;       // 디지바이스 GameObject
+
+    [Header("대화창용 큰 주댕치 ")]
+    [SerializeField] private Image judangchiBigImage;      // Judanchi_기본의 Image 컴포넌트
 
     [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.5f; // 애니메이션 재생 대기 시간
 
+    #region UNITY LIFE CYCLE
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -35,87 +38,102 @@ public class HubUIManager : MonoBehaviour
 
     private void Start()
     {
-        // 작은 주댕치와 디지바이스의 버튼 컴포넌트에 클릭 이벤트를 연결합니다.
-        if (judangchiSmallAnim != null)
-            judangchiSmallAnim.GetComponent<Button>().onClick.AddListener(OnBottomUIClicked);
+        // 버튼 이벤트 연결 (GameObject에서 Button 컴포넌트 추출)
+        if (judangchiSmallObj != null)
+            judangchiSmallObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedJudangchi);
 
-        if (digiviceAnim != null)
-            digiviceAnim.GetComponent<Button>().onClick.AddListener(OnBottomUIClicked);
+        if (digiviceObj != null)
+            digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
-        // 초기 상태 세팅: 작은 주댕치는 켜고, 디지바이스는 끕니다.
-        judangchiSmallAnim.gameObject.SetActive(true);
-        if (digiviceAnim != null) digiviceAnim.gameObject.SetActive(false);
+        // 씬이 처음 로드되거나 복귀했을 때, 현재 스테이지에 맞춰 초기 UI를 띄워둡니다.
+        InitializeBottomUI(MiniGameManager.Instance.currentStage);
     }
 
-    // 하단 UI(주댕치 or 디지바이스)가 클릭되었을 때
-    private void OnBottomUIClicked()
+    #endregion
+    public void OnBottomUIClickedJudangchi()
     {
-        // 클릭 중복 방지를 위해 버튼 기능을 잠시 끕니다. (Controller에서 다시 켜줍니다)
-        judangchiSmallAnim.GetComponent<Button>().interactable = false;
-        if (digiviceAnim != null) digiviceAnim.GetComponent<Button>().interactable = false;
+      
+        // 클릭 중복 방지를 위해 버튼 기능을 잠시 끕니다.
+        judangchiSmallObj.GetComponent<Button>().interactable = false;
+       
+        // Controller에게 연출 시작을 보고
+        JudangChiController.Instance.PlaySequenceForFirstStage();
+    }
 
-        // 모든 연출의 지휘권은 Controller에게 넘깁니다!
+    public void OnBottomUIClickedDigivice()
+    {
+        if (digiviceObj != null) digiviceObj.GetComponent<Button>().interactable = false;
+        // Controller에게 연출 시작을 보고
         JudangChiController.Instance.PlaySequenceForCurrentStage();
     }
 
-    // ==========================================
-    // 공통 애니메이션 제어 코루틴
-    // ==========================================
-    private IEnumerator PlayUIAnimation(Animator targetAnim, string triggerName)
+   
+    public IEnumerator FirstCinemaEnter()
     {
-        if (targetAnim == null) yield break;
-
-        targetAnim.gameObject.SetActive(true);
-        targetAnim.SetTrigger(triggerName);
-
-        // 애니메이션이 재생되는 시간만큼 대기
+        // 하나의 트리거로 입장 연출(하단 퇴장 -> 레터박스 -> 큰 주댕치)을 한방에 재생!
+        cinemaAnimator.SetTrigger("FirstCinemaEnter");
         yield return new WaitForSeconds(animationDuration);
+    }
 
-        // 퇴장 연출이 끝났다면 오브젝트를 비활성화하여 깔끔하게 정리
-        if (triggerName == "Hide")
+    public IEnumerator FirstCinemaExit(int currentStage)
+    {
+        // 퇴장 연출을 재생하기 직전에, 다시 올라와야 할 하단 UI를 미리 세팅해줍니다.
+        InitializeBottomUI(currentStage);
+
+        // 하나의 트리거로 퇴장 연출(큰 주댕치 퇴장 -> 레터박스 치우기 -> 하단 입장)을 한방에 재생!
+        cinemaAnimator.SetTrigger("FirstCinemaExit");
+        yield return new WaitForSeconds(animationDuration);
+    }
+
+    public IEnumerator StageClearOnCinema()
+    {
+        cinemaAnimator.SetTrigger("StageClearOnCinema");
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    public IEnumerator PlayCinemaEnter()
+    {
+        cinemaAnimator.SetTrigger("CinemaEnter");
+        yield return new WaitForSeconds(animationDuration);
+    }
+
+    public IEnumerator PlayCinemaExit(int currentStage)
+    {
+        // 퇴장 연출을 재생하기 직전에, 다시 올라와야 할 하단 UI를 미리 세팅해줍니다.
+        InitializeBottomUI(currentStage);
+
+        // 하나의 트리거로 퇴장 연출(큰 주댕치 퇴장 -> 레터박스 치우기 -> 하단 입장)을 한방에 재생!
+        cinemaAnimator.SetTrigger("CinemaExit");
+        yield return new WaitForSeconds(animationDuration);
+    }
+
+    private void InitializeBottomUI(int stage)
+    {
+        if (stage >= 1)
         {
-            targetAnim.gameObject.SetActive(false);
+            judangchiSmallObj.SetActive(false);
+            if (digiviceObj != null)
+            {
+                digiviceObj.SetActive(true);
+                digiviceObj.GetComponent<Button>().interactable = true;
+            }
+        }
+        else
+        {
+            if (digiviceObj != null) digiviceObj.SetActive(false);
+            judangchiSmallObj.SetActive(true);
+            judangchiSmallObj.GetComponent<Button>().interactable = true;
         }
     }
 
-    // ==========================================
-    // Controller가 호출할 명시적인 UI 제어 메서드들
-    // ==========================================
 
-    // 현재 스테이지에 맞춰 알맞은 하단 UI를 등장시킵니다.
-    public IEnumerator ShowBottomUI(int currentStage)
-    {
-        Animator targetAnim = (currentStage >= 1) ? digiviceAnim : judangchiSmallAnim;
-        targetAnim.GetComponent<Button>().interactable = true; // 버튼 다시 활성화
-        yield return StartCoroutine(PlayUIAnimation(targetAnim, "Show"));
-    }
+   
 
-    // 현재 떠있는 하단 UI를 퇴장시킵니다.
-    public IEnumerator HideBottomUI(int currentStage)
-    {
-        Animator targetAnim = (currentStage >= 1) ? digiviceAnim : judangchiSmallAnim;
-        yield return StartCoroutine(PlayUIAnimation(targetAnim, "Hide"));
-    }
-
-    public IEnumerator ShowBigJudangchi() => PlayUIAnimation(judangchiBigAnim, "Show");
-    public IEnumerator HideBigJudangchi() => PlayUIAnimation(judangchiBigAnim, "Hide");
-
-    public void ChangeBigJudangchiExpression(Sprite newSprite)
-    {
-        if (newSprite != null)
-        {
-            judangchiBigImage.sprite = newSprite;
-        }
-    }
-
-    public void ToggleWarningUI(bool isActive)
-    {
-        if (warningUI != null) warningUI.SetActive(isActive);
-    }
 
     // ==========================================
-    // 눈 깜빡임 연출 (기존 로직 완벽 유지)
+    // 눈 깜빡임 연출 
     // ==========================================
+    #region EyeBlank
     public void WakeUp(Action onComplete = null)
     {
         if (eyeEffect != null)
@@ -169,4 +187,21 @@ public class HubUIManager : MonoBehaviour
         eyeEffect.enabled = false;
         onComplete?.Invoke();
     }
+    #endregion
+
+    #region ETC
+    // 표정 변경 함수 (유지)
+    public void ChangeBigJudangchiExpression(Sprite newSprite)
+    {
+        if (newSprite != null)
+        {
+            judangchiBigImage.sprite = newSprite;
+        }
+    }
+
+    public void ToggleWarningUI(bool isActive)
+    {
+        if (warningUI != null) warningUI.SetActive(isActive);
+    }
+    #endregion
 }
