@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   sentences:
   - text: "\uD504\uB864\uB85C\uADF8 \uB300\uC0AC"
-    expressionSprite: {fileID: 0}
+    expressionSprite: {fileID: 21300000, guid: 3512c65e1ac19654e894196bb7e2063c, type: 3}
   - text: "\uD504\uB864\uB85C\uADF8 \uB300\uC0AC 2 "
-    expressionSprite: {fileID: 0}
+    expressionSprite: {fileID: 21300000, guid: e625b3c334e5fd24196af4653f3c10bb, type: 3}
   nextInteractableIndex: 0

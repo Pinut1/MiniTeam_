@@ -46,7 +46,7 @@ public class HubUIManager : MonoBehaviour
             digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
         // 씬이 처음 로드되거나 복귀했을 때, 현재 스테이지에 맞춰 초기 UI를 띄워둡니다.
-        InitializeBottomUI(MiniGameManager.Instance.currentStage);
+        // InitializeBottomUI(MiniGameManager.Instance.currentStage);
     }
 
     #endregion
@@ -62,17 +62,19 @@ public class HubUIManager : MonoBehaviour
 
     public void OnBottomUIClickedDigivice()
     {
-        if (digiviceObj != null) digiviceObj.GetComponent<Button>().interactable = false;
+        digiviceObj.GetComponent<Button>().interactable = false;
         // Controller에게 연출 시작을 보고
         JudangChiController.Instance.PlaySequenceForCurrentStage();
     }
 
    
-    public IEnumerator FirstCinemaEnter()
+    public void FirstCinemaEnter()
     {
+        // Event Marker에 의해 작동하는 bool trigger를 초기화
+        isFirstCinemaEnterDone = false;
         // 하나의 트리거로 입장 연출(하단 퇴장 -> 레터박스 -> 큰 주댕치)을 한방에 재생!
         cinemaAnimator.SetTrigger("FirstCinemaEnter");
-        yield return new WaitForSeconds(animationDuration);
+      
     }
 
     public IEnumerator FirstCinemaExit(int currentStage)
@@ -82,19 +84,25 @@ public class HubUIManager : MonoBehaviour
 
         // 하나의 트리거로 퇴장 연출(큰 주댕치 퇴장 -> 레터박스 치우기 -> 하단 입장)을 한방에 재생!
         cinemaAnimator.SetTrigger("FirstCinemaExit");
-        yield return new WaitForSeconds(animationDuration);
+        yield return new WaitForSeconds(1.2f);
     }
 
-    public IEnumerator StageClearOnCinema()
+    public void StageClearOnCinema()
     {
+        InitializeBottomUI(1);
+        digiviceObj.GetComponent<Button>().interactable = false;
+
+        isNormalCinemaEnterDone = false;
         cinemaAnimator.SetTrigger("StageClearOnCinema");
-        yield return new WaitForSeconds(0.5f);
+      
     }
 
-    public IEnumerator PlayCinemaEnter()
+    public void PlayCinemaEnter()
     {
+        digiviceObj.GetComponent<Button>().interactable = false;
+        isNormalCinemaEnterDone = false;
         cinemaAnimator.SetTrigger("CinemaEnter");
-        yield return new WaitForSeconds(animationDuration);
+       
     }
 
     public IEnumerator PlayCinemaExit(int currentStage)
@@ -104,7 +112,8 @@ public class HubUIManager : MonoBehaviour
 
         // 하나의 트리거로 퇴장 연출(큰 주댕치 퇴장 -> 레터박스 치우기 -> 하단 입장)을 한방에 재생!
         cinemaAnimator.SetTrigger("CinemaExit");
-        yield return new WaitForSeconds(animationDuration);
+        yield return new WaitForSeconds(1.9f);
+        digiviceObj.GetComponent<Button>().interactable = true;
     }
 
     private void InitializeBottomUI(int stage)
@@ -115,7 +124,7 @@ public class HubUIManager : MonoBehaviour
             if (digiviceObj != null)
             {
                 digiviceObj.SetActive(true);
-                digiviceObj.GetComponent<Button>().interactable = true;
+               
             }
         }
         else
@@ -149,7 +158,18 @@ public class HubUIManager : MonoBehaviour
 
     private IEnumerator WakeUpRoutine(Action onComplete)
     {
-        eyeEffect.openAmount = 0.001f;
+
+
+        if (judangchiSmallObj.activeSelf)
+        {
+            judangchiSmallObj.SetActive(false);
+        }
+
+        else if (digiviceObj.activeSelf)
+        {
+            digiviceObj.SetActive(false);
+        }
+            eyeEffect.openAmount = 0.001f;
         eyeEffect.expand = 0.0f;
         float t = 0;
 
@@ -185,6 +205,7 @@ public class HubUIManager : MonoBehaviour
         }
 
         eyeEffect.enabled = false;
+        InitializeBottomUI(MiniGameManager.Instance.currentStage);
         onComplete?.Invoke();
     }
     #endregion
@@ -204,4 +225,20 @@ public class HubUIManager : MonoBehaviour
         if (warningUI != null) warningUI.SetActive(isActive);
     }
     #endregion
+
+
+    // Animator Event Marker 제어
+    public bool isFirstCinemaEnterDone { get; private set; } = false;
+    public void CompleteFirstCinemaEnter()
+    {
+        isFirstCinemaEnterDone = true;
+    }
+
+    public bool isNormalCinemaEnterDone { get; private set; } = false;
+    public void CompleteNormalCinemaEnter()
+    {
+        isNormalCinemaEnterDone = true;
+    }
+    
+
 }

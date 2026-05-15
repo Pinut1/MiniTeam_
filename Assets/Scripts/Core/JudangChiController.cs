@@ -34,8 +34,11 @@ public class JudangChiController : MonoBehaviour
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
+        HubUIManager.Instance.FirstCinemaEnter();
+
         // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
-        yield return StartCoroutine(HubUIManager.Instance.FirstCinemaEnter());
+        yield return new WaitUntil(() => HubUIManager.Instance.isFirstCinemaEnterDone);
+        yield return new WaitForSeconds(0.2f);
 
         // 2. 대사 진행
         bool isDialogueDone = false;
@@ -66,8 +69,10 @@ public class JudangChiController : MonoBehaviour
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
+        HubUIManager.Instance.PlayCinemaEnter();
         // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
-        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaEnter());
+        yield return new WaitUntil(() => HubUIManager.Instance.isNormalCinemaEnterDone);
+        yield return new WaitForSeconds(0.2f);
 
         // 2. 대사 진행
         bool isDialogueDone = false;
@@ -96,8 +101,10 @@ public class JudangChiController : MonoBehaviour
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
+        HubUIManager.Instance.StageClearOnCinema();
         // 1. 시네마틱 입장 (하단UI 내려감 + 레터박스 나옴 + 큰 주댕치 올라옴)
-        yield return StartCoroutine(HubUIManager.Instance.StageClearOnCinema());
+        yield return new WaitUntil(() => HubUIManager.Instance.isNormalCinemaEnterDone);
+        yield return new WaitForSeconds(0.2f);
 
         // 2. 대사 진행
         bool isDialogueDone = false;
