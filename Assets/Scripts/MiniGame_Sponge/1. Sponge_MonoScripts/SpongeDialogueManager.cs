@@ -18,8 +18,8 @@ public class SpongeDialogueManager : MonoBehaviour
 {
     public static SpongeDialogueManager Instance { get; private set; }
 
-    // 재판 대본 에셋
-    [SerializeField] private SpongeTrialScriptSO trialScript;
+    // 재판 대본 데이터
+    private SpongeTrialScriptData trialScript;
 
     [Header("화자 / 대사 텍스트")]
     [SerializeField] private GameObject dialogueNameImg; // 화자 이름 배경 이미지
@@ -57,7 +57,7 @@ public class SpongeDialogueManager : MonoBehaviour
 
     // ── 내부 변수 ────────────────────────────────────────────────
     //lineId → DialogueLine 딕셔너리
-    private Dictionary<string, SpongeDialogueLine> lineMap; // 빠르게 대사 찾기 위해 사용
+    private Dictionary<string, SpongeDialogueLine> lineMap = new Dictionary<string, SpongeDialogueLine>(); // 빠르게 대사 찾기 위해 사용
 
     // 타이핑 코루틴
     private Coroutine typingCoroutine;
@@ -75,6 +75,12 @@ public class SpongeDialogueManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        arrowLeftImg.gameObject.SetActive(false);
+        arrowRightImg.gameObject.SetActive(false);
+
+        TextAsset jsonAsset = Resources.Load<TextAsset>("SpongeData/SpongeTrialScript");
+        trialScript = JsonUtility.FromJson<SpongeTrialScriptData>(jsonAsset.text);
 
         // 대사 목록을 딕셔너리로 변환
         BuildLineMap();
@@ -142,7 +148,7 @@ public class SpongeDialogueManager : MonoBehaviour
     /// 증언 라인을 대사창에 즉시 표시
     /// </summary>
     /// <param name="testimony"></param>
-    public void ShowTestimonyLine(SpongeTestimonyLine testimony)
+    public void ShowTestimonyLine(SpongeTestimonyLine testimony, bool isFirst, bool isLast)
     {
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         isTyping = false;
@@ -152,8 +158,8 @@ public class SpongeDialogueManager : MonoBehaviour
         choicePnl.SetActive(false);
 
         arrowImg.gameObject.SetActive(false);
-        arrowLeftImg.gameObject.SetActive(true);
-        arrowRightImg.gameObject.SetActive(true);
+        arrowLeftImg.gameObject.SetActive(!isFirst);
+        arrowRightImg.gameObject.SetActive(!isLast);
     }
 
 
@@ -183,9 +189,11 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator TypeLine(SpongeDialogueLine line)
     {
-        // 1. 배경 교체, null이면 이전 배경 유지
-        if (line.backgroundSpr != null) backgroundImg.sprite = line.backgroundSpr;
-        if (line.deskSpr != null) deskImg.sprite = line.deskSpr;
+        // 1. 배경 교체, 비어있으면 이전 배경 유지
+        if (!string.IsNullOrEmpty(line.backgroundSpr))
+            backgroundImg.sprite = Resources.Load<Sprite>(line.backgroundSpr);
+        if (!string.IsNullOrEmpty(line.deskSpr))
+            deskImg.sprite = Resources.Load<Sprite>(line.deskSpr);
 
         // 2. 캐릭터 위치 활성화
         UpdateCharacter(line);

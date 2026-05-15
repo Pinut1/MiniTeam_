@@ -12,8 +12,8 @@ public class SpongeCrossExaminationManager : MonoBehaviour
 {
     public static SpongeCrossExaminationManager Instance { get; private set; }
 
-    // 재판 대본 에셋
-    [SerializeField] private SpongeTrialScriptSO trialScript;
+    // 재판 대본 데이터
+    private SpongeTrialScriptData trialScript;
 
     // 증언 배열 - TrialScriptSO.testimonyLines를 복사해서 사용
     private SpongeTestimonyLine[] lines;
@@ -28,7 +28,8 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        // TrialScriptSO에서 증언 배열 가져오기
+        TextAsset jsonAsset = Resources.Load<TextAsset>("SpongeData/SpongeTrialScript");
+        trialScript = JsonUtility.FromJson<SpongeTrialScriptData>(jsonAsset.text);
         lines = trialScript.testimonyLines;
     }
 
@@ -67,9 +68,9 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     /// </summary>
     public void ShowCurrentTestimony()
     {
-        // 증언 텍스트를 DialogueManager의 대사창에 표시
-        // speaker는 증인 이름. txt는 증언 내용
-        SpongeDialogueManager.Instance.ShowTestimonyLine(lines[currentIdx]);
+        bool isFirst = currentIdx == 0;
+        bool isLast = currentIdx == lines.Length - 1;
+        SpongeDialogueManager.Instance.ShowTestimonyLine(lines[currentIdx], isFirst, isLast);
     }
 
     // ── 다음 증언으로 ────────────────────────────────────────────

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// 대사 한 줄 데이터
@@ -15,9 +14,8 @@ public class SpongeDialogueLine
     [Header("Animator Trigger 이름 - 비우면 이전 유지")] public string animationTrig;
     [Header("씬전환")] public string sceneToLoad;
     [Header("배경 / 캐릭터 전환")]
-    public Sprite backgroundSpr; // 바꿀 배경, 비우면 이전 유지
-    public Sprite deskSpr;       // 바꿀 책상, 비우면 이전 유지
-    // public Sprite characterSpr; // 캐릭터 스프라이트 (Animator 구현 전까지 사용 예정)
+    public string backgroundSpr; // Resources 경로, 비우면 이전 유지
+    public string deskSpr;       // Resources 경로, 비우면 이전 유지
     [Space(5f)]
     public CharacterType characterType;
     public CharacterPosition characterPos;
