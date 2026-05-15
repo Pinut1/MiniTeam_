@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 심문 진행 담당
-/// 1. 증언 배열을 인덱스로 순회 (앞/뒤 이동, 마지막에서 처음으로 루프)
+/// 1. 증언 배열을 인덱스로 순회 (앞/뒤 이동, 양 끝에서 루프 없음)
 /// 2. Q키 추궁 처리 — 추궁 가능 여부 확인 후 대사 시작
 /// 3. 현재 증언 라인을 DialogueManager를 통해 대사창에 표시
 /// </summary>
@@ -74,32 +74,31 @@ public class SpongeCrossExaminationManager : MonoBehaviour
 
     // ── 다음 증언으로 ────────────────────────────────────────────
     /// <summary>
-    /// 클릭 시 다음 증언으로 이동
-    /// 마지막 증언에서 클릭하면 처음으로
-    /// UIManager에서 클릭 이벤트 수신 시 호출
+    /// 클릭/오른쪽 화살표 시 다음 증언으로 이동
+    /// 마지막 증언에서는 이동 X
+    /// UIManager에서 호출
     /// </summary>
     public void NextLine()
     {
-        // 마지막 증언이 아니므로 다음으로
         if (currentIdx < lines.Length - 1)
+        {
             currentIdx++;
-        else
-            currentIdx = 0; // 마지막에서 처음으로 루프
-        ShowCurrentTestimony();
+            ShowCurrentTestimony();
+        }
     }
     // ── 이전 증언으로 ────────────────────────────────────────────
     /// <summary>
-    /// 이전 증언으로 이동
-    /// 첫번째 증언에서는 더이상 이동X
+    /// 왼쪽 화살표 시 이전 증언으로 이동
+    /// 첫번째 증언에서는 이동 X
+    /// UIManager에서 호출
     /// </summary>
     public void PrevLine()
     {
-        // 첫번째 증언이 아닐때만 이동
         if (currentIdx > 0)
+        {
             currentIdx--;
-        else // 마지막 인덱스로 이동
-            currentIdx = lines.Length - 1;
-        ShowCurrentTestimony();
+            ShowCurrentTestimony();
+        }
     }
 
     // ── 추궁하기 (Q키) ───────────────────────────────────────────

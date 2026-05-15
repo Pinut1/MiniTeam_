@@ -384,7 +384,18 @@ public class SpongeDialogueManager : MonoBehaviour
             
             // 이전 이벤트 제거 -> 새 이벤트 연결
             choiceBtns[i].onClick.RemoveAllListeners();
-            choiceBtns[i].onClick.AddListener(() => ShowLine(line.choices[idx].nextLineId));
+            if (line.choices[idx].opensEvidencePanel)
+            {
+                choiceBtns[i].onClick.AddListener(() =>
+                {
+                    choicePnl.SetActive(false);
+                    SpongeUIManager.Instance.TryOpenEvidencePanel();
+                });
+            }
+            else
+            {
+                choiceBtns[i].onClick.AddListener(() => ShowLine(line.choices[idx].nextLineId));
+            }
         }
     }
 

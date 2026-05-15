@@ -62,6 +62,13 @@ public class SpongeUIManager : MonoBehaviour
             TryOpenEvidencePanel();
         if (Input.GetKeyDown(KeyCode.Q) && SpongeGameManager.Instance.CanPress())
             SpongeCrossExaminationManager.Instance.PressWitness();
+        if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.CrossExamination)
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                SpongeCrossExaminationManager.Instance.NextLine();
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+                SpongeCrossExaminationManager.Instance.PrevLine();
+        }
         if (Input.GetMouseButtonDown(0))
             HandleScreenClick();
 
@@ -93,9 +100,9 @@ public class SpongeUIManager : MonoBehaviour
 
     // ── 증거 패널 ────────────────────────────────────────────────
     /// <summary>
-    /// 증거 패널 열기 / TAB 입력 시 호출 / 증거 버튼 목록을 동적으로 생성
+    /// 증거 패널 열기 / TAB 입력 또는 선택지에서 호출
     /// </summary>
-    void TryOpenEvidencePanel()
+    public void TryOpenEvidencePanel()
     {
         if (evidencePnl.activeSelf)
         {
