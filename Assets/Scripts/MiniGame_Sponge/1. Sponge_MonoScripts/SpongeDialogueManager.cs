@@ -22,8 +22,9 @@ public class SpongeDialogueManager : MonoBehaviour
     [SerializeField] private SpongeTrialScriptSO trialScript;
 
     [Header("화자 / 대사 텍스트")]
-    [SerializeField] private TMP_Text speakerTxt; // 화자 이름 표시
-    [SerializeField] private TMP_Text dialogueTxt; // 실제 대사가 타이핑 되는 텍스트
+    [SerializeField] private GameObject dialogueNameImg; // 화자 이름 배경 이미지
+    [SerializeField] private TMP_Text speakerTxt;        // 화자 이름 표시
+    [SerializeField] private TMP_Text dialogueTxt;       // 실제 대사가 타이핑 되는 텍스트
 
     [Header("선택지 UI")]
     [SerializeField] private GameObject choicePnl;
@@ -31,13 +32,25 @@ public class SpongeDialogueManager : MonoBehaviour
 
     [Header("배경 / 캐릭터")]
     [SerializeField] private Image backgroundImg; // 배경
+    [SerializeField] private Image deskImg;       // 책상
     [Space(10f)]
-    [SerializeField] private Image characterPlayer; // 플레이어
-    [SerializeField] private Image characterPlankton; // 판사
-    [SerializeField] private Image characterSpongeBob; // 스폰지밥
+    [SerializeField] private Image characterSpongeBob;
+    [SerializeField] private Image characterPlayer;
     [SerializeField] private Image characterDdungi;
-    [SerializeField] private Image characterJingJingi; // 징징이
-    [SerializeField] private Image characterJipgeSajang; // 집게사장
+    [SerializeField] private Image characterJingJingi;
+    [SerializeField] private Image characterPlankton;
+    [SerializeField] private Image characterJipgeSajang;
+
+    [Header("캐릭터 위치")]
+    [SerializeField] private Vector2 posLeft;
+    [SerializeField] private Vector2 posCenter;
+    [SerializeField] private Vector2 posRight;
+
+    [Header("화살표")]
+    [SerializeField] private Image arrowImg;                // 대사 진행 화살표
+    [SerializeField] private Image arrowLeftImg;            // 심문 중 왼쪽 화살표
+    [SerializeField] private Image arrowRightImg;           // 심문 중 오른쪽 화살표
+    // [SerializeField] private Animator nextLineAnim;      // 애니메이션 구현 후 사용
 
     [Header("캐릭터 Animater")]
     //[SerializeField] private Animator characterAnim;
@@ -137,6 +150,10 @@ public class SpongeDialogueManager : MonoBehaviour
         speakerTxt.text = "집게사장";
         dialogueTxt.text = testimony.txt;
         choicePnl.SetActive(false);
+
+        arrowImg.gameObject.SetActive(false);
+        arrowLeftImg.gameObject.SetActive(true);
+        arrowRightImg.gameObject.SetActive(true);
     }
 
 
@@ -168,6 +185,7 @@ public class SpongeDialogueManager : MonoBehaviour
     {
         // 1. 배경 교체, null이면 이전 배경 유지
         if (line.backgroundSpr != null) backgroundImg.sprite = line.backgroundSpr;
+        if (line.deskSpr != null) deskImg.sprite = line.deskSpr;
 
         // 2. 캐릭터 위치 활성화
         UpdateCharacter(line);
@@ -182,9 +200,14 @@ public class SpongeDialogueManager : MonoBehaviour
 
         // 타이핑 시작
         isTyping = true;
-        speakerTxt.text = line.speaker;
+        bool hasSpeaker = !string.IsNullOrEmpty(line.speaker);
+        dialogueNameImg.SetActive(hasSpeaker);
+        speakerTxt.text = hasSpeaker ? line.speaker : "";
         dialogueTxt.text = ""; // 텍스트 초기화
-        choicePnl.SetActive(false); // 선택지 패널 숨기기
+        choicePnl.SetActive(false);               // 선택지 패널 숨기기
+        arrowImg.gameObject.SetActive(false);     // 대사 화살표 숨기기
+        arrowLeftImg.gameObject.SetActive(false); // 심문 화살표 숨기기
+        arrowRightImg.gameObject.SetActive(false);
 
         // RichText 태그 뭐 저시기 안보이게
         int i = 0;
@@ -209,6 +232,9 @@ public class SpongeDialogueManager : MonoBehaviour
             yield return new WaitForSeconds(0.04f);
         }
         isTyping = false;
+        arrowImg.gameObject.SetActive(true);
+        // // nextLineAnim?.Play("상태이름"); // 애니메이션 구현 후 사용
+
         // 타이핑 완료 -> 선택지 표시 또는 시퀀스 종료
         OnLineFinished(line);
     }
@@ -220,30 +246,46 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <param name="line"></param>
     void UpdateCharacter(SpongeDialogueLine line)
     {
-        // 모든 캐릭터 전체 숨기기
-        characterPlayer.gameObject.SetActive(false);
         characterSpongeBob.gameObject.SetActive(false);
+        characterPlayer.gameObject.SetActive(false);
         characterDdungi.gameObject.SetActive(false);
         characterJingJingi.gameObject.SetActive(false);
         characterPlankton.gameObject.SetActive(false);
         characterJipgeSajang.gameObject.SetActive(false);
 
-        // None이면 캐릭터 X - 배경만 표시
-        if (line.characterPos == SpongeDialogueLine.CharacterPosition.None) return;
-        
-        // 위치에 맞는 이미지 선택
-        Image target = line.characterPos switch
+        if (line.characterType == SpongeDialogueLine.CharacterType.None) return;
+
+        // 캐릭터 선택
+        Image target = line.characterType switch
         {
-            SpongeDialogueLine.CharacterPosition.SpongeBob => characterSpongeBob,
-            SpongeDialogueLine.CharacterPosition.Player => characterPlayer,
-            SpongeDialogueLine.CharacterPosition.Ddungi => characterDdungi,
-            SpongeDialogueLine.CharacterPosition.JingJingi => characterJingJingi,
-            SpongeDialogueLine.CharacterPosition.Plankton => characterPlankton,
-            SpongeDialogueLine.CharacterPosition.JipgeSajang => characterJipgeSajang,
+            SpongeDialogueLine.CharacterType.SpongeBob   => characterSpongeBob,
+            SpongeDialogueLine.CharacterType.Player      => characterPlayer,
+            SpongeDialogueLine.CharacterType.Ddungi      => characterDdungi,
+            SpongeDialogueLine.CharacterType.JingJingi   => characterJingJingi,
+            SpongeDialogueLine.CharacterType.Plankton    => characterPlankton,
+            SpongeDialogueLine.CharacterType.JipgeSajang => characterJipgeSajang,
             _ => null
         };
-        // 스프라이트 교체 없이 활성화만 - 스프라이트는 Animator가 제어
-        target?.gameObject.SetActive(true);
+
+        if (target == null) return;
+
+        // 위치 이동
+        target.rectTransform.anchoredPosition = line.characterPos switch
+        {
+            SpongeDialogueLine.CharacterPosition.Left   => posLeft,
+            SpongeDialogueLine.CharacterPosition.Center => posCenter,
+            SpongeDialogueLine.CharacterPosition.Right  => posRight,
+            _ => target.rectTransform.anchoredPosition
+        };
+
+        // // 스프라이트 (Animator 구현 전까지 사용)
+        // if (line.characterSpr != null) target.sprite = line.characterSpr;
+
+        // // 애니메이션 트리거 (Animator 구현 후 사용)
+        // if (!string.IsNullOrEmpty(line.animationTrig))
+        //     target.GetComponent<Animator>().SetTrigger(line.animationTrig);
+
+        target.gameObject.SetActive(true);
     }
 
     // ── 캐릭터 위치에 맞는 Animator에 트리거 ────────────────
@@ -282,6 +324,7 @@ public class SpongeDialogueManager : MonoBehaviour
             StopCoroutine(typingCoroutine);
             isTyping = false;
             dialogueTxt.text = currentLine.txt;
+            arrowImg.gameObject.SetActive(true);
             // 타이핑이 멈췄으면 대사가 끝났을 때의 처리 호출
             // 선택지 표시 여부 등을 확인하기 위함
             OnLineFinished(currentLine);
@@ -326,6 +369,7 @@ public class SpongeDialogueManager : MonoBehaviour
     void ShowChoice(SpongeDialogueLine line)
     {
         choicePnl.SetActive(true);
+        arrowImg.gameObject.SetActive(false);
 
         for (int i = 0; i < choiceBtns.Length; i++)
         {
@@ -351,6 +395,7 @@ public class SpongeDialogueManager : MonoBehaviour
     /// </summary>
     void OnSequenceEnd()
     {
+        arrowImg.gameObject.SetActive(false);
         switch (SpongeGameManager.Instance.CurrentState)
         {
             case SpongeGameState.GameState.Pressing:

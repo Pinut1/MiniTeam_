@@ -16,15 +16,23 @@ public class SpongeDialogueLine
     [Header("씬전환")] public string sceneToLoad;
     [Header("배경 / 캐릭터 전환")]
     public Sprite backgroundSpr; // 바꿀 배경, 비우면 이전 유지
-    // public Sprite charaterSpr; // 바꿀 캐릭터, 비우면 이전 유지
-    [Space(5f)] public CharacterPosition characterPos;
+    public Sprite deskSpr;       // 바꿀 책상, 비우면 이전 유지
+    // public Sprite characterSpr; // 캐릭터 스프라이트 (Animator 구현 전까지 사용 예정)
+    [Space(5f)]
+    public CharacterType characterType;
+    public CharacterPosition characterPos;
 
     [Header("선택지 - null이면 선택지 X")]
     public SpongeChoice[] choices;
     public string nextLineId; // 선택지 없을 때 다음 대사 ID
     
+    public enum CharacterType
+    {
+        None, SpongeBob, Player, Ddungi, JingJingi, Plankton, JipgeSajang
+    }
+
     public enum CharacterPosition
     {
-        None, SpongeBob, Ddungi, JingJingi, Plankton, JipgeSajang, Player
+        None, Center, Right, Left
     }
 }
