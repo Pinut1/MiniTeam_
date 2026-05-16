@@ -10,6 +10,10 @@ public class PlayerMove : MonoBehaviour
     public float mouseSensitivity = 2f;
     public Transform playerCamera;
 
+
+    [Header("Animation Settings")]
+    public Animator animator;
+
     private CharacterController controller;
     private float xRotation = 0f;
 
@@ -60,9 +64,11 @@ public class PlayerMove : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        xRotation = Mathf.Clamp(xRotation, -60f, 30f);
 
         playerCamera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -73,6 +79,16 @@ public class PlayerMove : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * moveSpeed * Time.deltaTime);
+
+        if (animator != null)
+        {
+            bool isMoving = move.magnitude > 0.1f;
+
+            animator.SetBool("isWalking", isMoving);
+        }
+
+       
+        
     }
 
     // 커서를 숨기고 중앙에 고정하는 함수

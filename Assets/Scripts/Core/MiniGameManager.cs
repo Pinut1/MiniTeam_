@@ -15,6 +15,8 @@ namespace MiniTeam.Core
         [Header("Game Progress")]
         public int currentStage = 0;
 
+  
+
         public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
 
         void Awake()
@@ -81,8 +83,11 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
+            playerMove.gameObject.transform.position = new Vector3(0, 1.5f, 0) ;
+
+
             // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시.
-             JudangChiController.Instance?.PlaySequenceForGameClear();
+            JudangChiController.Instance?.PlaySequenceForGameClear();
         }
 
         public void OnMiniGameClear()
