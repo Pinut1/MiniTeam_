@@ -17,11 +17,17 @@ namespace MiniTeam.Pokemon
         private RectTransform rt;
         private Vector2 visiblePos;
         private Vector2 hiddenPos;
+        private bool    posReady;
         private Coroutine current;
 
-        void Awake()
+        void Awake() => rt = GetComponent<RectTransform>();
+
+        // 비활성 오브젝트는 Awake가 호출되지 않을 수 있으므로 첫 사용 시점에 초기화
+        void EnsurePos()
         {
-            rt = GetComponent<RectTransform>();
+            if (posReady) return;
+            if (rt == null) rt = GetComponent<RectTransform>(); // 비활성 시작 대비
+            posReady   = true;
             visiblePos = rt.anchoredPosition;
             hiddenPos  = visiblePos + DirVector() * slideDist;
         }
@@ -37,15 +43,17 @@ namespace MiniTeam.Pokemon
 
         public void SlideIn(bool instant = false)
         {
+            EnsurePos();
             if (current != null) StopCoroutine(current);
             gameObject.SetActive(true);
             if (instant) { rt.anchoredPosition = visiblePos; return; }
-            rt.anchoredPosition = hiddenPos; // 항상 숨긴 위치에서 시작
+            rt.anchoredPosition = hiddenPos;
             current = StartCoroutine(Animate(hiddenPos, visiblePos));
         }
 
         public void SlideOut(bool instant = false, bool deactivateAfter = true)
         {
+            EnsurePos();
             if (current != null) StopCoroutine(current);
             if (instant)
             {
@@ -56,36 +64,23 @@ namespace MiniTeam.Pokemon
             current = StartCoroutine(Animate(rt.anchoredPosition, hiddenPos, deactivateAfter));
         }
 
-        // 코루틴 버전 (yield return 으로 완료 대기 가능)
+        // 코루틴 버전 — current를 통일해 중간에 SlideIn/Out 호출로도 취소 가능
         public IEnumerator SlideInRoutine()
         {
+            EnsurePos();
             if (current != null) StopCoroutine(current);
             gameObject.SetActive(true);
             rt.anchoredPosition = hiddenPos;
-            // 비활성 상태에서 StartCoroutine 실패 방지 — 직접 루프
-            float t = 0f;
-            while (t < 1f)
-            {
-                t += Time.deltaTime / duration;
-                rt.anchoredPosition = Vector2.Lerp(hiddenPos, visiblePos, Mathf.SmoothStep(0f, 1f, t));
-                yield return null;
-            }
-            rt.anchoredPosition = visiblePos;
+            current = StartCoroutine(Animate(hiddenPos, visiblePos));
+            yield return current;
         }
 
         public IEnumerator SlideOutRoutine(bool deactivateAfter = true)
         {
+            EnsurePos();
             if (current != null) StopCoroutine(current);
-            Vector2 from = rt.anchoredPosition;
-            float t = 0f;
-            while (t < 1f)
-            {
-                t += Time.deltaTime / duration;
-                rt.anchoredPosition = Vector2.Lerp(from, hiddenPos, Mathf.SmoothStep(0f, 1f, t));
-                yield return null;
-            }
-            rt.anchoredPosition = hiddenPos;
-            if (deactivateAfter) gameObject.SetActive(false);
+            current = StartCoroutine(Animate(rt.anchoredPosition, hiddenPos, deactivateAfter));
+            yield return current;
         }
 
         IEnumerator Animate(Vector2 from, Vector2 to, bool deactivateAfter = false)

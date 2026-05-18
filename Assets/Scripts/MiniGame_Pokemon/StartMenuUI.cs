@@ -23,6 +23,9 @@ namespace MiniTeam.Pokemon
         public TextMeshProUGUI slot2Text; // 이상한사탕
         public TextMeshProUGUI slot3Text; // 디지바이스
 
+        [Header("가방 커서")]
+        public RectTransform bagCursor;
+
         // 메뉴 항목 인덱스 상수
         const int MENU_POKEMON = 0;
         const int MENU_BAG     = 1;
@@ -32,6 +35,7 @@ namespace MiniTeam.Pokemon
         private bool isOpen;
         private bool isBagOpen;
         private int  currentIndex;
+        private int  bagIndex;
 
         void Awake()
         {
@@ -58,10 +62,16 @@ namespace MiniTeam.Pokemon
                 return;
             }
 
-            // 가방 열려있으면 X로만 닫기
+            // 가방 열려있으면 커서 네비게이션
             if (isBagOpen)
             {
-                if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.UpArrow))
+                    MoveBagCursor(-1);
+                else if (Input.GetKeyDown(KeyCode.DownArrow))
+                    MoveBagCursor(1);
+                else if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Return))
+                    SelectBagItem();
+                else if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
                     CloseBag();
                 return;
             }
@@ -129,9 +139,45 @@ namespace MiniTeam.Pokemon
         void OpenBag()
         {
             isBagOpen = true;
+            bagIndex  = 0;
             if (menuPanel != null) menuPanel.SetActive(false);
             if (bagPanel  != null) bagPanel.SetActive(true);
             RefreshBag();
+            UpdateBagCursor();
+        }
+
+        void MoveBagCursor(int dir)
+        {
+            var slots = GetActiveBagSlots();
+            if (slots.Count == 0) return;
+            bagIndex = Mathf.Clamp(bagIndex + dir, 0, slots.Count - 1);
+            UpdateBagCursor(slots);
+        }
+
+        void UpdateBagCursor(System.Collections.Generic.List<RectTransform> slots = null)
+        {
+            if (bagCursor == null) return;
+            if (slots == null) slots = GetActiveBagSlots();
+            if (slots.Count == 0) { bagCursor.gameObject.SetActive(false); return; }
+            bagCursor.gameObject.SetActive(true);
+            bagIndex = Mathf.Clamp(bagIndex, 0, slots.Count - 1);
+            var pos = bagCursor.position;
+            pos.y = slots[bagIndex].position.y;
+            bagCursor.position = pos;
+        }
+
+        System.Collections.Generic.List<RectTransform> GetActiveBagSlots()
+        {
+            var list = new System.Collections.Generic.List<RectTransform>();
+            if (slot1Text != null && slot1Text.gameObject.activeSelf) list.Add(slot1Text.rectTransform);
+            if (slot2Text != null && slot2Text.gameObject.activeSelf) list.Add(slot2Text.rectTransform);
+            if (slot3Text != null && slot3Text.gameObject.activeSelf) list.Add(slot3Text.rectTransform);
+            return list;
+        }
+
+        void SelectBagItem()
+        {
+            StartCoroutine(ShowMenuDialogue("menu_bag_has"));
         }
 
         void CloseBag()
@@ -156,17 +202,18 @@ namespace MiniTeam.Pokemon
         void RefreshBag()
         {
             var gc = PokemonGameController.Instance;
-            SetSlot(slot1Text, MapItemType.PokemonBall,  "포켓몬볼    X 1", gc);
-            SetSlot(slot2Text, MapItemType.StrangeCandy, "이상한사탕  X 1", gc);
-            SetSlot(slot3Text, MapItemType.Digivice,     "디지바이스  X 1", gc);
+            SetSlot(slot1Text, MapItemType.PokemonBall,  "포켓몬볼    X 1", "포켓몬볼    X 0", gc);
+            SetSlot(slot2Text, MapItemType.StrangeCandy, "이상한사탕  X 1", "이상한사탕  X 0", gc);
+            SetSlot(slot3Text, MapItemType.Digivice,     "디지바이스  X 1", "디지바이스  X 0", gc);
         }
 
-        void SetSlot(TextMeshProUGUI tmp, MapItemType type, string label, PokemonGameController gc)
+        void SetSlot(TextMeshProUGUI tmp, MapItemType type, string label, string label0, PokemonGameController gc)
         {
             if (tmp == null) return;
-            bool has = gc != null && gc.HasCollected(type);
+            bool has  = gc != null && gc.HasCollected(type);
+            bool used = gc != null && gc.HasUsed(type);
             tmp.gameObject.SetActive(has);
-            if (has) tmp.text = label;
+            if (has) tmp.text = used ? label0 : label;
         }
     }
 }

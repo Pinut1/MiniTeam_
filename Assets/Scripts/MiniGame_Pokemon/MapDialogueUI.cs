@@ -39,7 +39,11 @@ namespace MiniTeam.Pokemon
         public IEnumerator Show(string message)
         {
             IsShowing = true;
-            if (panel != null) panel.SetActive(true);
+            if (panel != null)
+            {
+                panel.transform.SetAsLastSibling(); // 블랙아웃 위에 표시되도록 항상 최상위로
+                panel.SetActive(true);
+            }
             if (dialogueText != null) dialogueText.text = message;
             if (confirmIndicator != null) confirmIndicator.SetActive(false);
 

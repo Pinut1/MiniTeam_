@@ -7,8 +7,12 @@ namespace MiniTeam.Pokemon
     public class TrainerTrigger : MonoBehaviour
     {
         [Header("트레이너 정보")]
-        public string trainerName = "아구몬";
+        public string trainerName = "테일이";
         public Sprite trainerBattleSprite;
+
+        [Header("배틀 포켓몬")]
+        public string     pokemonName   = "아구몬";
+        public GameObject pokemonPrefab; // 애니메이션 프리팹
 
         private bool isDefeated = false;
         public bool IsDefeated => isDefeated;
@@ -26,5 +30,8 @@ namespace MiniTeam.Pokemon
             isDefeated = true;
             gameObject.SetActive(false);
         }
+
+        // 배틀이 패배/도망으로 끝났을 때 (승리 시엔 SetDefeated 호출)
+        public virtual void OnBattleEnd() { }
     }
 }

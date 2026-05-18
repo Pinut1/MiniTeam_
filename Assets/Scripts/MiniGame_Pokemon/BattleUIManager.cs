@@ -16,6 +16,11 @@ namespace MiniTeam.Pokemon
         public UIPanelSlider statusPanelLeft;
         public UIPanelSlider statusPanelRight;
         public UIPanelSlider commandPanel;
+        public UIPanelSlider enemySlider; // 트레이너 스프라이트 슬라이드 아웃용
+
+        [Header("포켓몬 소환")]
+        public RectTransform pokemonSpawnPoint;
+        public Vector3       pokemonScale = new Vector3(3f, 3f, 1f);
 
         [Header("트레이너 정보")]
         public Image           trainerImage;
@@ -52,7 +57,13 @@ namespace MiniTeam.Pokemon
         // 아이템 패널 상태
         private bool isItemActive;
         private int  itemIndex;
-        private int  activeItemCount; // 현재 보유 아이템 수 (뒤로 포함)
+        private int  activeItemCount;
+
+        // 메시지 입력 대기 상태
+        private bool waitingConfirm;
+
+        // 소환된 포켓몬 프리팹 인스턴스
+        private GameObject spawnedPokemon;
 
         void Awake()
         {
@@ -69,11 +80,13 @@ namespace MiniTeam.Pokemon
 
         void Update()
         {
-            if (isItemActive)
+            if (waitingConfirm)
             {
-                NavigateItem();
+                if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                    waitingConfirm = false;
                 return;
             }
+            if (isItemActive) { NavigateItem(); return; }
             if (isCommandActive) NavigateCommand();
         }
 
@@ -146,30 +159,22 @@ namespace MiniTeam.Pokemon
 
         void SelectItem()
         {
-            // itemRects 순서: 보유 아이템들(PokemonBall→StrangeCandy→Digivice 순) + 뒤로
-            // BattleManager에서 보유 아이템 기준으로 활성화된 것들만 itemRects에 넣어야 함
-            // 마지막 인덱스 = 뒤로
-            if (itemIndex == activeItemCount - 1)
-            {
-                HideItemPanel();
-                return;
-            }
             isItemActive = false;
 
             var gc = PokemonGameController.Instance;
-            // 활성화된 아이템 순서대로 매핑
+            // ShowItemPanel과 동일한 조건 (보유 + 미사용)으로 슬롯 매핑
             int slot = 0;
-            if (gc != null && gc.HasCollected(MapItemType.PokemonBall))
+            if (gc != null && gc.HasCollected(MapItemType.PokemonBall) && !gc.HasUsed(MapItemType.PokemonBall))
             {
                 if (itemIndex == slot) { BattleManager.Instance?.OnUsePokemonBall(); return; }
                 slot++;
             }
-            if (gc != null && gc.HasCollected(MapItemType.StrangeCandy))
+            if (gc != null && gc.HasCollected(MapItemType.StrangeCandy) && !gc.HasUsed(MapItemType.StrangeCandy))
             {
                 if (itemIndex == slot) { BattleManager.Instance?.OnUseStrangeCandy(); return; }
                 slot++;
             }
-            if (gc != null && gc.HasCollected(MapItemType.Digivice))
+            if (gc != null && gc.HasCollected(MapItemType.Digivice) && !gc.HasUsed(MapItemType.Digivice))
             {
                 if (itemIndex == slot) { BattleManager.Instance?.OnUseDigivice(); return; }
             }
@@ -187,35 +192,79 @@ namespace MiniTeam.Pokemon
 
         // ── 배틀 표시/숨김 ────────────────────────────
 
-        public void ShowBattle(string trainerName, Sprite trainerSprite)
+        public void ShowBattle(TrainerTrigger trainer)
         {
             IsBattleActive = true;
             if (battlePanel != null) battlePanel.SetActive(true);
 
+            // 처음엔 트레이너(테일이) 스프라이트 표시
+            if (trainerImage != null)     trainerImage.sprite   = trainer.trainerBattleSprite;
+            if (trainerNameText != null)  trainerNameText.text  = trainer.pokemonName;
+            if (trainerLevelText != null) trainerLevelText.text = "Lv. ???";
+            if (playerNameText != null)   playerNameText.text   = "신태일";
+            if (playerLevelText != null)  playerLevelText.text  = "Lv. 1";
+            if (messageText != null)      messageText.text      = $"{trainer.trainerName}이(가) 아구몬을 내보냈다!";
+
+            // Enemy 슬라이더를 visible 위치로 즉시 리셋 (이전 배틀에서 비활성화됐을 수 있음)
+            if (enemySlider != null) enemySlider.SlideIn(instant: true);
+
+            StartCoroutine(BattleOpenRoutine(trainer));
+        }
+
+        // 하위 호환 (trainerName/Sprite만 있을 경우)
+        public void ShowBattle(string trainerName, Sprite trainerSprite)
+        {
+            IsBattleActive = true;
+            if (battlePanel != null) battlePanel.SetActive(true);
             if (trainerImage != null)     trainerImage.sprite   = trainerSprite;
             if (trainerNameText != null)  trainerNameText.text  = trainerName;
             if (trainerLevelText != null) trainerLevelText.text = "Lv. ???";
             if (playerNameText != null)   playerNameText.text   = "신태일";
             if (playerLevelText != null)  playerLevelText.text  = "Lv. 1";
             if (messageText != null)      messageText.text      = $"야생의 {trainerName}(이)가 나타났다!";
-
-            StartCoroutine(BattleOpenRoutine());
+            StartCoroutine(BattleOpenRoutine(null));
         }
 
-        IEnumerator BattleOpenRoutine()
+        IEnumerator BattleOpenRoutine(TrainerTrigger trainer)
         {
             isCommandActive = false;
             commandIndex = 0;
 
-            // HP바 슬라이드 인
             if (statusPanelLeft  != null) statusPanelLeft.SlideIn();
             if (statusPanelRight != null) statusPanelRight.SlideIn();
 
             yield return new WaitForSeconds(0.5f);
 
-            // 배틀 시작 대사 → Z/Enter로 닫은 후 커맨드 패널 등장
-            if (MapDialogueUI.Instance != null && messageText != null)
-                yield return StartCoroutine(MapDialogueUI.Instance.Show(messageText.text));
+            // 트레이너 배틀: 트레이너 스프라이트 슬라이드 아웃 → 포켓몬 프리팹 소환
+            if (trainer != null && trainer.pokemonPrefab != null)
+            {
+                // "테일이가 아구몬을 내보냈다!" 대기
+                yield return StartCoroutine(ShowMessageAndWait(messageText.text));
+
+                // 트레이너 스프라이트 슬라이드 아웃 (비활성화 없이 off-screen 유지)
+                if (enemySlider != null)
+                    yield return StartCoroutine(enemySlider.SlideOutRoutine(deactivateAfter: false));
+
+                // 포켓몬 UI 프리팹 소환 (Battle_Panel 자식으로)
+                if (pokemonSpawnPoint != null)
+                {
+                    spawnedPokemon = Instantiate(trainer.pokemonPrefab, battlePanel.transform);
+                    var rt = spawnedPokemon.GetComponent<RectTransform>();
+                    if (rt != null)
+                    {
+                        rt.anchoredPosition = pokemonSpawnPoint.anchoredPosition;
+                        rt.sizeDelta        = pokemonSpawnPoint.sizeDelta;
+                        rt.localScale       = pokemonScale;
+                    }
+                }
+
+                if (messageText != null) messageText.text = $"상대방의 {trainer.pokemonName}!";
+                yield return StartCoroutine(ShowMessageAndWait(messageText.text));
+            }
+            else
+            {
+                yield return StartCoroutine(ShowMessageAndWait(messageText.text));
+            }
 
             if (commandPanel != null)
                 yield return StartCoroutine(commandPanel.SlideInRoutine());
@@ -229,10 +278,27 @@ namespace MiniTeam.Pokemon
             IsBattleActive  = false;
             isCommandActive = false;
             isItemActive    = false;
+            waitingConfirm  = false;
             if (battlePanel != null) battlePanel.SetActive(false);
-            // 배틀 가방 패널도 닫기
+            HideBlackout();
+            if (spawnedPokemon != null) { Destroy(spawnedPokemon); spawnedPokemon = null; }
             var bagPanel = StartMenuUI.Instance?.bagPanel;
             if (bagPanel != null) bagPanel.SetActive(false);
+        }
+
+        // 텍스트를 세팅하고 Z/Space/Enter 입력을 기다림 (대화창은 계속 표시 상태)
+        public IEnumerator ShowMessageAndWait(string message)
+        {
+            isCommandActive = false;
+            isItemActive    = false;
+            if (messageText  != null) messageText.text = message;
+            if (itemPanel    != null) itemPanel.SetActive(false);
+            if (commandPanel != null && commandPanel.gameObject.activeInHierarchy)
+                commandPanel.SlideOut();
+
+            yield return new WaitForSeconds(0.3f); // 입력 씹힘 방지
+            waitingConfirm = true;
+            yield return new WaitUntil(() => !waitingConfirm);
         }
 
         public void ShowMessage(string message)
@@ -241,7 +307,8 @@ namespace MiniTeam.Pokemon
             isItemActive    = false;
             if (messageText != null) messageText.text = message;
             if (itemPanel   != null) itemPanel.SetActive(false);
-            if (commandPanel != null) commandPanel.SlideOut();
+            if (commandPanel != null && commandPanel.gameObject.activeInHierarchy)
+                commandPanel.SlideOut();
         }
 
         public void ShowCommandPanel()
@@ -274,23 +341,15 @@ namespace MiniTeam.Pokemon
 
             itemIndex = 0;
 
-            // 보유 아이템 수 계산 (+ 뒤로 1개)
+            // itemRects를 보유 아이템 슬롯으로 동적 설정
             var gc = PokemonGameController.Instance;
-            activeItemCount = 1;
-            if (gc != null)
-            {
-                if (gc.HasCollected(MapItemType.PokemonBall))  activeItemCount++;
-                if (gc.HasCollected(MapItemType.StrangeCandy)) activeItemCount++;
-                if (gc.HasCollected(MapItemType.Digivice))     activeItemCount++;
-            }
-
-            // itemRects를 가방 슬롯으로 동적 설정
             var rects = new System.Collections.Generic.List<RectTransform>();
             if (gc != null)
             {
-                if (gc.HasCollected(MapItemType.PokemonBall)  && sui.slot1Text != null) rects.Add(sui.slot1Text.GetComponent<RectTransform>());
-                if (gc.HasCollected(MapItemType.StrangeCandy) && sui.slot2Text != null) rects.Add(sui.slot2Text.GetComponent<RectTransform>());
-                if (gc.HasCollected(MapItemType.Digivice)     && sui.slot3Text != null) rects.Add(sui.slot3Text.GetComponent<RectTransform>());
+                // 보유하고 아직 사용 안 한 아이템만 커서 대상
+                if (gc.HasCollected(MapItemType.PokemonBall)  && !gc.HasUsed(MapItemType.PokemonBall)  && sui.slot1Text != null) rects.Add(sui.slot1Text.GetComponent<RectTransform>());
+                if (gc.HasCollected(MapItemType.StrangeCandy) && !gc.HasUsed(MapItemType.StrangeCandy) && sui.slot2Text != null) rects.Add(sui.slot2Text.GetComponent<RectTransform>());
+                if (gc.HasCollected(MapItemType.Digivice)     && !gc.HasUsed(MapItemType.Digivice)     && sui.slot3Text != null) rects.Add(sui.slot3Text.GetComponent<RectTransform>());
             }
 
             // 아이템 없으면 패널 열지 않고 메시지 처리
@@ -303,6 +362,9 @@ namespace MiniTeam.Pokemon
             }
 
             itemRects = rects.ToArray();
+            activeItemCount = rects.Count;
+            if (itemCursor == null)
+                Debug.LogWarning("[BattleUIManager] itemCursor가 연결되지 않아 커서를 표시할 수 없습니다.");
             isItemActive = true;
             UpdateItemCursor();
         }
@@ -315,11 +377,26 @@ namespace MiniTeam.Pokemon
             ShowCommandPanel();
         }
 
+        public void ShowBlackoutNow()
+        {
+            if (blackoutPanel == null) return;
+            blackoutPanel.SetActive(true);
+            // 맵 대화창(Map_Dialogue_Panel)이 blackout 위에 렌더링되도록 최상위로 이동
+            if (MapDialogueUI.Instance?.panel != null)
+                MapDialogueUI.Instance.panel.transform.SetAsLastSibling();
+        }
+
+        public void HideBlackout()
+        {
+            if (blackoutPanel != null) blackoutPanel.SetActive(false);
+        }
+
+        // 짧은 연출용 (블랙아웃만 단독 사용할 때)
         public IEnumerator ShowBlackout(float duration)
         {
-            if (blackoutPanel != null) blackoutPanel.SetActive(true);
+            ShowBlackoutNow();
             yield return new WaitForSeconds(duration);
-            if (blackoutPanel != null) blackoutPanel.SetActive(false);
+            HideBlackout();
         }
     }
 }

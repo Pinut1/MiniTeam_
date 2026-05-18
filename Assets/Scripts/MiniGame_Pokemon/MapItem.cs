@@ -12,6 +12,7 @@ namespace MiniTeam.Pokemon
         public MapItemType itemType = MapItemType.PokemonBall;
 
         private bool picked = false;
+        private bool playerNearby = false;
 
         void Awake()
         {
@@ -21,11 +22,28 @@ namespace MiniTeam.Pokemon
         void OnTriggerEnter2D(Collider2D other)
         {
             if (picked || !other.CompareTag("Player")) return;
-            picked = true;
-            StartCoroutine(PickupRoutine());
+            playerNearby = true;
         }
 
-IEnumerator PickupRoutine()
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if (!other.CompareTag("Player")) return;
+            playerNearby = false;
+        }
+
+        void Update()
+        {
+            if (picked || !playerNearby) return;
+            if (BattleUIManager.Instance != null && BattleUIManager.Instance.IsBattleActive) return;
+            if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Return))
+            {
+                picked = true;
+                playerNearby = false;
+                StartCoroutine(PickupRoutine());
+            }
+        }
+
+        IEnumerator PickupRoutine()
         {
             var player = FindAnyObjectByType<PlayerMapController>();
             player?.SetControllable(false);

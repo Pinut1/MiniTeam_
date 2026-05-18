@@ -24,11 +24,15 @@ namespace MiniTeam.Pokemon
         {
             currentTrainer = trainer;
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
-            BattleUIManager.Instance?.ShowBattle(trainer.trainerName, trainer.trainerBattleSprite);
+            BattleUIManager.Instance?.ShowBattle(trainer);
         }
 
         public void EndBattle()
         {
+            // 승리가 아닌 경우(패배/도망) 트레이너 상태 리셋 → 재도전 가능
+            if (currentTrainer != null && !currentTrainer.IsDefeated)
+                currentTrainer.OnBattleEnd();
+
             BattleUIManager.Instance?.HideBattle();
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(true);
             currentTrainer = null;
@@ -85,12 +89,11 @@ namespace MiniTeam.Pokemon
 
         // ── 결과 코루틴 ──────────────────────────────
 
-        // 패배: 블랙아웃 → "눈앞이 깜깜해졌다" → 리스폰
+        // 패배: 블랙아웃 → Map_Dialogue_Panel이 최상위로 올라와 "눈앞이 깜깜해졌다" 표시 → 리스폰
         IEnumerator DefeatRoutine()
         {
             yield return new WaitForSeconds(1.2f);
-            if (BattleUIManager.Instance != null)
-                yield return StartCoroutine(BattleUIManager.Instance.ShowBlackout(0.5f));
+            BattleUIManager.Instance?.ShowBlackoutNow();
             if (MapDialogueUI.Instance != null)
                 yield return StartCoroutine(MapDialogueUI.Instance.Show(L("battle_defeat")));
             PokemonGameController.Instance?.RespawnPlayer();
@@ -108,7 +111,9 @@ namespace MiniTeam.Pokemon
             BattleUIManager.Instance?.ShowMessage(L("battle_pokemonball_1"));
             yield return new WaitForSeconds(1.2f);
             BattleUIManager.Instance?.ShowMessage(L("battle_pokemonball_2"));
-            yield return StartCoroutine(DefeatRoutine());
+            yield return new WaitForSeconds(1.2f);
+            PokemonGameController.Instance?.UseItem(MapItemType.PokemonBall);
+            BattleUIManager.Instance?.ShowCommandPanel();
         }
 
         IEnumerator StrangeCandyRoutine()
@@ -117,9 +122,8 @@ namespace MiniTeam.Pokemon
             yield return new WaitForSeconds(1.5f);
             BattleUIManager.Instance?.ShowMessage(L("battle_strangecandy_2"));
             yield return new WaitForSeconds(1.5f);
-            PokemonGameController.Instance?.SetPokemonEventDone();
-            currentTrainer?.SetDefeated();
-            EndBattle();
+            PokemonGameController.Instance?.UseItem(MapItemType.StrangeCandy);
+            BattleUIManager.Instance?.ShowCommandPanel();
         }
 
         IEnumerator DigiviceRoutine()
@@ -128,6 +132,7 @@ namespace MiniTeam.Pokemon
             yield return new WaitForSeconds(1.2f);
             BattleUIManager.Instance?.ShowMessage(L("battle_digivice_2"));
             yield return new WaitForSeconds(1.5f);
+            PokemonGameController.Instance?.UseItem(MapItemType.Digivice);
             PokemonGameController.Instance?.SetPokemonEventDone();
             currentTrainer?.SetDefeated();
             EndBattle();

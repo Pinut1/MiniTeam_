@@ -15,6 +15,7 @@ namespace MiniTeam.Pokemon
         public bool HasItem { get; private set; } = false;
 
         private readonly HashSet<MapItemType> collectedItems = new HashSet<MapItemType>();
+        private readonly HashSet<MapItemType> usedItems     = new HashSet<MapItemType>();
         public bool IsPokemonEventDone { get; private set; } = false;
 
         private PlayerMapController player;
@@ -50,6 +51,8 @@ public void GiveItem()
         }
 
         public bool HasCollected(MapItemType type) => collectedItems.Contains(type);
+        public bool HasUsed(MapItemType type)      => usedItems.Contains(type);
+        public void UseItem(MapItemType type)       => usedItems.Add(type);
 
         public void SetPokemonEventDone()
         {
