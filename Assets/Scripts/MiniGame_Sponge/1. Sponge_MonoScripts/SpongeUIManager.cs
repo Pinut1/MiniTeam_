@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +21,18 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private SpongeEvidenceButtonUI[] evidenceSlots;
 
     [Header("증거 상세 이미지")]
-    [SerializeField] private Image holderImg;
+    [SerializeField] private GameObject holderBurger;
+    [SerializeField] private GameObject holderBread;
+    [SerializeField] private GameObject holderRecorder;
+    [SerializeField] private GameObject holderPoster;
+    [SerializeField] private GameObject holderReceipt;
+    [SerializeField] private GameObject holderStatement;
+
+    private Dictionary<string, GameObject> holderMap;
+
+    [Header("메뉴 이미지")]
+    [SerializeField] private GameObject menuDefault;
+    [SerializeField] private GameObject menuCrossExam;
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -28,6 +40,15 @@ public class SpongeUIManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        holderMap = new Dictionary<string, GameObject>
+        {
+            { "burger",    holderBurger    },
+            { "bread",     holderBread     },
+            { "recorder",  holderRecorder  },
+            { "poster",    holderPoster    },
+            { "receipt",   holderReceipt   },
+            { "statement", holderStatement }
+        };
     }
 
     private void Start()
@@ -43,12 +64,22 @@ public class SpongeUIManager : MonoBehaviour
     {
         SpongeEvidenceManager.OnEvidenceSelected += HandleEvidenceSelected;
         SpongeEvidenceManager.OnEvidenceListChanged += RebuildEvidenceSlots;
+        SpongeGameManager.OnStateChanged += HandleStateChanged;
     }
 
     private void OnDisable()
     {
         SpongeEvidenceManager.OnEvidenceSelected -= HandleEvidenceSelected;
         SpongeEvidenceManager.OnEvidenceListChanged -= RebuildEvidenceSlots;
+        SpongeGameManager.OnStateChanged -= HandleStateChanged;
+    }
+
+    // ── 상태 변화 처리 ───────────────────────────────────────────
+    void HandleStateChanged(SpongeGameState.GameState newState)
+    {
+        bool isCrossExam = newState == SpongeGameState.GameState.CrossExamination;
+        if (menuDefault != null)  menuDefault.SetActive(!isCrossExam);
+        if (menuCrossExam != null) menuCrossExam.SetActive(isCrossExam);
     }
 
     // ── 키 입력 처리 ─────────────────────────────────────────────
@@ -88,12 +119,17 @@ public class SpongeUIManager : MonoBehaviour
             // 대사중 클릭 -> 타이핑 스킵 or 다음 대사
             case SpongeGameState.GameState.Dialogue:
             case SpongeGameState.GameState.Pressing:
-            case SpongeGameState.GameState.EvidenceSelect: 
+            case SpongeGameState.GameState.EvidenceSelect:
+            // 증언 낭독 중 클릭 -> 타이핑 스킵 or 다음 증언
+            case SpongeGameState.GameState.Testifying:
                 SpongeDialogueManager.Instance.OnScreenClick();
                 break;
-            // 심문중 클릭 -> 다음 증언으로 이동
-            case SpongeGameState.GameState.CrossExamination: 
-                SpongeCrossExaminationManager.Instance.NextLine();
+            // 심문중 클릭 -> 타이핑 중이면 스킵, 아니면 다음 증언으로 이동
+            case SpongeGameState.GameState.CrossExamination:
+                if (SpongeDialogueManager.Instance.IsTyping)
+                    SpongeDialogueManager.Instance.SkipCrossExamTyping();
+                else
+                    SpongeCrossExaminationManager.Instance.NextLine();
                 break;
         }
     }
@@ -151,16 +187,11 @@ public class SpongeUIManager : MonoBehaviour
         foreach (var btn in evidenceSlots)
             btn.SetHighlight(btn.EvidenceId == evidenceId);
 
-        SpongeEvidenceData data = SpongeEvidenceManager.Instance.GetById(evidenceId);
-        if (data != null && data.icon != null)
-        {
-            holderImg.sprite = data.icon;
-            holderImg.gameObject.SetActive(true);
-        }
-        else
-        {
-            holderImg.gameObject.SetActive(false);
-        }
+        foreach (var holder in holderMap.Values)
+            if (holder != null) holder.SetActive(false);
+
+        if (holderMap.TryGetValue(evidenceId, out var target) && target != null)
+            target.SetActive(true);
     }
 
     /// <summary>

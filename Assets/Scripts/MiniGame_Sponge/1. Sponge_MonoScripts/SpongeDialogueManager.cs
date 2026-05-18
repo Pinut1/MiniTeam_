@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -45,12 +44,16 @@ public class SpongeDialogueManager : MonoBehaviour
     [SerializeField] private Vector2 posLeft;
     [SerializeField] private Vector2 posCenter;
     [SerializeField] private Vector2 posRight;
+    [SerializeField] private Vector2 posJudgeCenter;
 
     [Header("화살표")]
     [SerializeField] private Image arrowImg;                // 대사 진행 화살표
     [SerializeField] private Image arrowLeftImg;            // 심문 중 왼쪽 화살표
     [SerializeField] private Image arrowRightImg;           // 심문 중 오른쪽 화살표
     // [SerializeField] private Animator nextLineAnim;      // 애니메이션 구현 후 사용
+
+    [Header("심문 텍스트 색상")]
+    [SerializeField] private Color testimonyColor = new Color32(54, 199, 56, 255);
 
     [Header("캐릭터 Animater")]
     //[SerializeField] private Animator characterAnim;
@@ -65,6 +68,13 @@ public class SpongeDialogueManager : MonoBehaviour
     private bool isTyping;
     // 현재 표시 중인 대사 데이터 - 타이핑 스킵 시 전체 텍스트를 즉시 표시하기 위해 보관
     private SpongeDialogueLine currentLine;
+    // 증언 낭독/심문 중 스킵 시 전체 텍스트 표시용
+    private string currentTestimonyText;
+    // 심문 중 스킵 시 화살표 복원용
+    private bool currentTestimonyIsFirst;
+    private bool currentTestimonyIsLast;
+
+    public bool IsTyping => isTyping;
 
     private void Awake()
     {
@@ -132,12 +142,6 @@ public class SpongeDialogueManager : MonoBehaviour
         }
         currentLine = line;
 
-        // 씬 전환이 필요한 경우 - 씬 먼저 로드 후 대사
-        if (!string.IsNullOrEmpty(line.sceneToLoad))
-        {
-            StartCoroutine(LoadSceneAndShowLine(line));
-            return;
-        }
         // 이전 타이핑 코루틴이 있으면 중단
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         typingCoroutine = StartCoroutine(TypeLine(line));
@@ -145,40 +149,110 @@ public class SpongeDialogueManager : MonoBehaviour
 
    
     /// <summary>
-    /// 증언 라인을 대사창에 즉시 표시
+    /// 심문(CrossExamination) 상태에서 증언 라인을 타이핑으로 표시
     /// </summary>
-    /// <param name="testimony"></param>
     public void ShowTestimonyLine(SpongeTestimonyLine testimony, bool isFirst, bool isLast)
     {
+        currentTestimonyText = testimony.txt;
+        currentTestimonyIsFirst = isFirst;
+        currentTestimonyIsLast = isLast;
+
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-        isTyping = false;
+        typingCoroutine = StartCoroutine(TypeTestimonyLineCrossExam(testimony, isFirst, isLast));
+    }
 
+    IEnumerator TypeTestimonyLineCrossExam(SpongeTestimonyLine testimony, bool isFirst, bool isLast)
+    {
+        isTyping = true;
+        dialogueNameImg.SetActive(true);
         speakerTxt.text = "집게사장";
-        dialogueTxt.text = testimony.txt;
+        dialogueTxt.text = "";
+        dialogueTxt.color = testimonyColor;
         choicePnl.SetActive(false);
-
         arrowImg.gameObject.SetActive(false);
+        arrowLeftImg.gameObject.SetActive(false);
+        arrowRightImg.gameObject.SetActive(false);
+
+        int i = 0;
+        string fullTxt = testimony.txt;
+        while (i < fullTxt.Length)
+        {
+            if (fullTxt[i] == '<')
+            {
+                int closeIdx = fullTxt.IndexOf('>', i);
+                if (closeIdx != -1)
+                {
+                    dialogueTxt.text += fullTxt.Substring(i, closeIdx - i + 1);
+                    i = closeIdx + 1;
+                    continue;
+                }
+            }
+            dialogueTxt.text += fullTxt[i];
+            i++;
+            yield return new WaitForSeconds(0.04f);
+        }
+        isTyping = false;
         arrowLeftImg.gameObject.SetActive(!isFirst);
         arrowRightImg.gameObject.SetActive(!isLast);
     }
 
-
-    // ── 씬 전환 후 대사 표시 ─────────────────────────────────
     /// <summary>
-    /// 씬을 먼저 비동기로 로드한 후 대사 표시 코루틴
+    /// 심문 중 타이핑 스킵 - UIManager에서 CrossExamination 클릭 시 호출
     /// </summary>
-    /// <param name="line"></param>
-    /// <returns></returns>
-    IEnumerator LoadSceneAndShowLine(SpongeDialogueLine line)
+    public void SkipCrossExamTyping()
     {
-        // 씬 비동기 로드 - 로드 완료까지 기다림
-        AsyncOperation op = SceneManager.LoadSceneAsync(line.sceneToLoad);
-        yield return op;
-
-        // 씬 로드 완료 후 타이핑 시작
-        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-        typingCoroutine = StartCoroutine(TypeLine(line));
+        if (!isTyping) return;
+        StopCoroutine(typingCoroutine);
+        isTyping = false;
+        dialogueTxt.text = currentTestimonyText;
+        arrowLeftImg.gameObject.SetActive(!currentTestimonyIsFirst);
+        arrowRightImg.gameObject.SetActive(!currentTestimonyIsLast);
     }
+
+    /// <summary>
+    /// 증언 낭독(Testifying) 상태 진입점 - 타이핑으로 표시, 좌우 화살표 없음
+    /// </summary>
+    public void ShowTestimonyAsDialogue(SpongeTestimonyLine testimony)
+    {
+        currentTestimonyText = testimony.txt;
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        typingCoroutine = StartCoroutine(TypeTestimonyLine(testimony));
+    }
+
+    IEnumerator TypeTestimonyLine(SpongeTestimonyLine testimony)
+    {
+        isTyping = true;
+        dialogueNameImg.SetActive(true);
+        speakerTxt.text = "집게사장";
+        dialogueTxt.text = "";
+        dialogueTxt.color = Color.white;
+        choicePnl.SetActive(false);
+        arrowImg.gameObject.SetActive(false);
+        arrowLeftImg.gameObject.SetActive(false);
+        arrowRightImg.gameObject.SetActive(false);
+
+        int i = 0;
+        string fullTxt = testimony.txt;
+        while (i < fullTxt.Length)
+        {
+            if (fullTxt[i] == '<')
+            {
+                int closeIdx = fullTxt.IndexOf('>', i);
+                if (closeIdx != -1)
+                {
+                    dialogueTxt.text += fullTxt.Substring(i, closeIdx - i + 1);
+                    i = closeIdx + 1;
+                    continue;
+                }
+            }
+            dialogueTxt.text += fullTxt[i];
+            i++;
+            yield return new WaitForSeconds(0.04f);
+        }
+        isTyping = false;
+        arrowRightImg.gameObject.SetActive(true);
+    }
+
 
     // ── 타이핑 연출 ──────────────────────────────────────────
     /// <summary>
@@ -211,6 +285,15 @@ public class SpongeDialogueManager : MonoBehaviour
         bool hasSpeaker = !string.IsNullOrEmpty(line.speaker);
         dialogueNameImg.SetActive(hasSpeaker);
         speakerTxt.text = hasSpeaker ? line.speaker : "";
+        dialogueTxt.color = Color.white; // 심문 색상 리셋
+        if (!string.IsNullOrEmpty(line.alignment))
+            dialogueTxt.alignment = line.alignment switch
+            {
+                "Left"   => TextAlignmentOptions.Left,
+                "Center" => TextAlignmentOptions.Center,
+                "Right"  => TextAlignmentOptions.Right,
+                _        => dialogueTxt.alignment
+            };
         dialogueTxt.text = ""; // 텍스트 초기화
         choicePnl.SetActive(false);               // 선택지 패널 숨기기
         arrowImg.gameObject.SetActive(false);     // 대사 화살표 숨기기
@@ -280,9 +363,10 @@ public class SpongeDialogueManager : MonoBehaviour
         // 위치 이동
         target.rectTransform.anchoredPosition = line.characterPos switch
         {
-            SpongeDialogueLine.CharacterPosition.Left   => posLeft,
-            SpongeDialogueLine.CharacterPosition.Center => posCenter,
-            SpongeDialogueLine.CharacterPosition.Right  => posRight,
+            SpongeDialogueLine.CharacterPosition.Left        => posLeft,
+            SpongeDialogueLine.CharacterPosition.Center      => posCenter,
+            SpongeDialogueLine.CharacterPosition.Right       => posRight,
+            SpongeDialogueLine.CharacterPosition.JudgeCenter => posJudgeCenter,
             _ => target.rectTransform.anchoredPosition
         };
 
@@ -326,26 +410,43 @@ public class SpongeDialogueManager : MonoBehaviour
     /// </summary>
     public void OnScreenClick()
     {
+        bool isTestifying = SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.Testifying;
+
         // 글자가 타이핑 중이라면 즉시 완성
         if (isTyping)
         {
             StopCoroutine(typingCoroutine);
             isTyping = false;
-            dialogueTxt.text = currentLine.txt;
-            arrowImg.gameObject.SetActive(true);
-            // 타이핑이 멈췄으면 대사가 끝났을 때의 처리 호출
-            // 선택지 표시 여부 등을 확인하기 위함
-            OnLineFinished(currentLine);
+
+            if (isTestifying)
+            {
+                // 증언 낭독 스킵 - 오른쪽 화살표만 표시
+                dialogueTxt.text = currentTestimonyText;
+                arrowRightImg.gameObject.SetActive(true);
+            }
+            else
+            {
+                dialogueTxt.text = currentLine.txt;
+                arrowImg.gameObject.SetActive(true);
+                OnLineFinished(currentLine);
+            }
             return;
         }
-        
+
         // 선택지가 떠 있을 경우 클릭으로 넘기기 X
         if (choicePnl.activeSelf) return;
-        
+
+        // 증언 낭독 중 클릭 → CrossExaminationManager에서 다음 증언으로
+        if (isTestifying)
+        {
+            SpongeCrossExaminationManager.Instance.AdvanceTestifying();
+            return;
+        }
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
-         // 다음 대사가 없다면 시퀀스 종료
+        // 다음 대사가 없다면 시퀀스 종료
         else
             OnSequenceEnd();
     }
@@ -364,9 +465,7 @@ public class SpongeDialogueManager : MonoBehaviour
             ShowChoice(line);
             return;
         }
-        // 없으면 종료
-        if (string.IsNullOrEmpty(line.nextLineId))
-            OnSequenceEnd();
+        // nextLineId 없어도 여기서 종료하지 않음 - 클릭 후 OnScreenClick()에서 OnSequenceEnd() 호출
     }
 
     // ── 선택지 표시 ──────────────────────────────────────────

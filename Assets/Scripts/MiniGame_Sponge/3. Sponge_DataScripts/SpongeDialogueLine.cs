@@ -12,7 +12,7 @@ public class SpongeDialogueLine
     [Header("실제 대사 사용 - RichText 태그 사용 가능")] [TextArea(2, 5)] public string txt; // RichTxt 태그 사용 가능 : <color=red></color>
 
     [Header("Animator Trigger 이름 - 비우면 이전 유지")] public string animationTrig;
-    [Header("씬전환")] public string sceneToLoad;
+    [Header("텍스트 정렬 - 비우면 이전 유지 / Left, Center, Right")] public string alignment;
     [Header("배경 / 캐릭터 전환")]
     public string backgroundSpr; // Resources 경로, 비우면 이전 유지
     public string deskSpr;       // Resources 경로, 비우면 이전 유지
@@ -31,6 +31,6 @@ public class SpongeDialogueLine
 
     public enum CharacterPosition
     {
-        None, Center, Right, Left
+        None, Center, Right, Left, JudgeCenter
     }
 }

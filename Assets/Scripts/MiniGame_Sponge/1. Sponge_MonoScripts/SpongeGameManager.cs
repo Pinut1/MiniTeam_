@@ -38,6 +38,8 @@ public class SpongeGameManager : MonoBehaviour
     /// 게임 상태 전환 - 모든 상태 전환은 반드시 이 메서드를 통해서 해야함
     /// </summary>
     /// <param name="newState"></param>
+    public static event System.Action<GameState> OnStateChanged;
+
     public void ChangeState(GameState newState)
     {
         // 현재 상태와 같으면 전환 X
@@ -45,6 +47,7 @@ public class SpongeGameManager : MonoBehaviour
 
         currentState = newState;
         Debug.Log($"[GameManager] 상태 전환 -> {newState}");
+        OnStateChanged?.Invoke(newState);
     }
 
     // 현재 상태에서 입력을 완전히 차단해야 하는지

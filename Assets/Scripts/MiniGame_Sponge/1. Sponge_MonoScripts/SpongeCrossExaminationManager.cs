@@ -36,18 +36,14 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     // ── 심문 시작 ────────────────────────────────────────────
     /// <summary>
     /// 오프닝 대사가 끝나면 DialogueManager.OnSequenceEnd()에서 호출
-    /// 인덱스를 0으로 초기화하고 첫 번째 증언 표시
+    /// 증언 낭독(Testifying)으로 시작 → 전부 읽으면 심문(CrossExamination)으로 전환
     /// </summary>
     public void StartCrossExamination()
     {
-        // 인덱스 초기화 - 항상 첫번째 증언부터 시작
         currentIdx = 0;
-        // 첫번쩨 심문부터 시작
         SpongeGameManager.Instance.SetRound(1);
-        // 심문 상태로 전환 - Q/TAB 키 활성화
-        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-        // 첫번쩨 증언 표시
-        ShowCurrentTestimony();
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
+        ShowCurrentTestimonyAsDialogue();
     }
 
     public void StartRetestimony()
@@ -56,8 +52,37 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         lines = trialScript.retestimonyLines;
 
         SpongeGameManager.Instance.SetRound(2);
-        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-        ShowCurrentTestimony();
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
+        ShowCurrentTestimonyAsDialogue();
+    }
+
+    // ── 증언 낭독 (Testifying) ───────────────────────────────
+    /// <summary>
+    /// 현재 증언을 일반 대사처럼 타이핑으로 표시
+    /// </summary>
+    public void ShowCurrentTestimonyAsDialogue()
+    {
+        SpongeDialogueManager.Instance.ShowTestimonyAsDialogue(lines[currentIdx]);
+    }
+
+    /// <summary>
+    /// 클릭 시 다음 증언 낭독으로 이동, 마지막이면 심문 상태로 전환
+    /// DialogueManager.OnScreenClick()에서 Testifying 상태일 때 호출
+    /// </summary>
+    public void AdvanceTestifying()
+    {
+        if (currentIdx < lines.Length - 1)
+        {
+            currentIdx++;
+            ShowCurrentTestimonyAsDialogue();
+        }
+        else
+        {
+            // 전부 낭독 완료 → 심문 시작 (인덱스 0으로 되돌림)
+            currentIdx = 0;
+            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+            ShowCurrentTestimony();
+        }
     }
 
     // ── 현재 증언 표시 ───────────────────────────────────────────
