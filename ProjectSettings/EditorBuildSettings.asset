@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/TestMiniScene.unity
     guid: ce4dd9caed5e31f48ab35ca00e0adbb0
+  - enabled: 1
+    path: Assets/_Scenes/EndingCut_Test.unity
+    guid: de794ff4a7c7e634480a52f321d8a575
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

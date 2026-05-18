@@ -11,6 +11,10 @@ public class JudangChiController : MonoBehaviour
     [Tooltip("인덱스 0: 게임 시작시, 1: 1스테이지 클리어 후...")]
     public DialogueData[] stageDialogues;
 
+    private int dialogueIndex = 0;
+
+
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -58,10 +62,11 @@ public class JudangChiController : MonoBehaviour
     public void PlaySequenceForCurrentStage()
     {
         int currentStage = MiniGameManager.Instance.currentStage;
-
         if (currentStage >= stageDialogues.Length) return;
 
+       
         StartCoroutine(NomalSequenceRoutine(stageDialogues[currentStage]));
+        
 
     }
 
@@ -78,13 +83,14 @@ public class JudangChiController : MonoBehaviour
         bool isDialogueDone = false;
         JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
-
-        // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
+        
         yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
-
         MiniGameManager.Instance.EnablePlayerInput();
+
     }
     #endregion
+
+
 
     // 게임 클리어 후 주댕치 대화 씬 바로 진입
     #region AfterGameClear
@@ -93,6 +99,9 @@ public class JudangChiController : MonoBehaviour
         int currentStage = MiniGameManager.Instance.currentStage;
 
         if (currentStage >= stageDialogues.Length) return;
+
+
+        
 
         StartCoroutine(GameClearSequenceRoutine(stageDialogues[currentStage]));
     }
@@ -110,13 +119,38 @@ public class JudangChiController : MonoBehaviour
         bool isDialogueDone = false;
         JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
+        bool isFinalStage = MiniGameManager.Instance.currentStage == 5;
+        Debug.Log($"{isFinalStage}");
 
-        // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
-        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
-
-        MiniGameManager.Instance.EnablePlayerInput();
+        if (isFinalStage)
+        {
+            // 마지막 대사였다면 평소처럼 퇴장하지 않고, 엔딩 시퀀스로 진입합니다.
+            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(PlayEndingSequence());
+        }
+        else
+        {
+            // 평소라면 얌전히 퇴장하고 플레이어에게 조작권을 돌려줍니다.
+            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+            MiniGameManager.Instance.EnablePlayerInput();
+        }
     }
     #endregion
 
- 
+
+
+    private IEnumerator PlayEndingSequence()
+    {
+        // (선택) 여기서 화면을 천천히 까맣게 페이드아웃 시키는 UI 연출을 넣으면 맛있습니다.
+        //  yield return StartCoroutine(HubUIManager.Instance.PlayFadeOut());
+
+        Debug.Log("모든 스테이지 클리어! 엔딩 씬으로 진입합니다.");
+
+        yield return new WaitForSeconds(1f);
+
+        // 씬 전환이라는 무거운 작업은 Controller가 직접 하지 않고 Manager에게 '위임'합니다.
+        MiniGameManager.Instance.LoadEndingScene();
+    }
+
 }

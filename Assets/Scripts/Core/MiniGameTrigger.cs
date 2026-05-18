@@ -7,7 +7,11 @@ public class MiniGameTrigger : MonoBehaviour
     [SerializeField] private string targetSceneName = "MiniGame_1";
     private bool isTriggered = false;
 
-    // 플레이어의 Collider가 이 문의 Trigger Collider에 닿았을 때 실행
+    private void OnEnable()
+    {
+        isTriggered = false;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (isTriggered)

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,7 +14,7 @@ namespace MiniTeam.Core
         private PlayerMove playerMove;
 
         [Header("Game Progress")]
-        public int currentStage = 0;
+        public int currentStage = 1;
 
   
 
@@ -83,7 +84,7 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
-            playerMove.gameObject.transform.position = new Vector3(0, 1.5f, 0) ;
+            playerMove.gameObject.transform.position = new Vector3(0, 0f, 0) ;
 
 
             // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시.
@@ -119,5 +120,12 @@ namespace MiniTeam.Core
                 playerMove.enabled = true;
             }
         }
+
+        internal void LoadEndingScene()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
+        }
+
+
     }
 }
