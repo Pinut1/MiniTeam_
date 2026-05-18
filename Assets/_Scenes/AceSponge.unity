@@ -3329,6 +3329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeDialogueManager
   textBoxPanel: {fileID: 1671165486}
+  textBoxUIImg: {fileID: 1671165488}
   dialogueNameImg: {fileID: 60828417}
   speakerTxt: {fileID: 93361577}
   dialogueTxt: {fileID: 232298602}

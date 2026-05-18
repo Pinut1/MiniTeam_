@@ -22,6 +22,7 @@ public class SpongeDialogueManager : MonoBehaviour
 
     [Header("화자 / 대사 텍스트")]
     [SerializeField] private GameObject textBoxPanel;    // 대사창 전체 패널
+    [SerializeField] private Image textBoxUIImg;         // 대사창 배경 이미지 (txt null이면 비활성)
     [SerializeField] private GameObject dialogueNameImg; // 화자 이름 배경 이미지
     [SerializeField] private TMP_Text speakerTxt;        // 화자 이름 표시
     [SerializeField] private TMP_Text dialogueTxt;       // 실제 대사가 타이핑 되는 텍스트
@@ -311,6 +312,16 @@ public class SpongeDialogueManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
         */
+
+        // txt null 또는 빈 문자열이면 대사창 이미지 비활성화하고 타이핑 생략
+        bool hasTxt = !string.IsNullOrEmpty(line.txt);
+        if (textBoxUIImg != null) textBoxUIImg.gameObject.SetActive(hasTxt);
+        if (!hasTxt)
+        {
+            arrowImg.gameObject.SetActive(true);
+            OnLineFinished(line);
+            yield break;
+        }
 
         // 타이핑 시작
         isTyping = true;

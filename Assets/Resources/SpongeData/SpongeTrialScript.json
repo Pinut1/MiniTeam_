@@ -535,6 +535,19 @@
     },
     {
       "lineId": "opening_42",
+      "speaker": "",
+      "txt": "",
+      "animationTrig": "",
+      "backgroundSpr": "Sponge_BG/BG_Witness",
+      "deskSpr": "Sponge_Table/JipgeSajang",
+      "characterType": 6,
+      "characterPos": 1,
+      "choices": [],
+      "nextLineId": "opening_43",
+      "alignment": ""
+    },
+    {
+      "lineId": "opening_43",
       "speaker": "징징이",
       "txt": "증인.\n이름과 직업은?",
       "animationTrig": "",
@@ -543,11 +556,11 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "opening_43",
+      "nextLineId": "opening_44",
       "alignment": ""
     },
     {
-      "lineId": "opening_43",
+      "lineId": "opening_44",
       "speaker": "집게사장",
       "txt": "전 집게사장입니다.\n집게리아의 사장이죠.",
       "animationTrig": "",
@@ -556,11 +569,11 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "opening_44",
+      "nextLineId": "opening_45",
       "alignment": ""
     },
     {
-      "lineId": "opening_44",
+      "lineId": "opening_45",
       "speaker": "플랑크톤",
       "txt": "증인.\n<증언>을 해 주십시오.",
       "animationTrig": "",
