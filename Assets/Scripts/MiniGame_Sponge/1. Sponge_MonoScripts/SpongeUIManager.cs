@@ -77,6 +77,12 @@ public class SpongeUIManager : MonoBehaviour
     // ── 상태 변화 처리 ───────────────────────────────────────────
     void HandleStateChanged(SpongeGameState.GameState newState)
     {
+        if (newState == SpongeGameState.GameState.Resolution)
+        {
+            if (menuDefault != null)  menuDefault.SetActive(false);
+            if (menuCrossExam != null) menuCrossExam.SetActive(false);
+            return;
+        }
         bool isCrossExam = newState == SpongeGameState.GameState.CrossExamination;
         if (menuDefault != null)  menuDefault.SetActive(!isCrossExam);
         if (menuCrossExam != null) menuCrossExam.SetActive(isCrossExam);
@@ -93,6 +99,11 @@ public class SpongeUIManager : MonoBehaviour
             TryOpenEvidencePanel();
         if (Input.GetKeyDown(KeyCode.Q) && SpongeGameManager.Instance.CanPress())
             SpongeCrossExaminationManager.Instance.PressWitness();
+        if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.Testifying)
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
+                HandleScreenClick();
+        }
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.CrossExamination)
         {
             if (Input.GetKeyDown(KeyCode.RightArrow))

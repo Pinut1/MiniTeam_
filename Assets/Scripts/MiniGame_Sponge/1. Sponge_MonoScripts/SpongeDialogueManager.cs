@@ -21,6 +21,7 @@ public class SpongeDialogueManager : MonoBehaviour
     private SpongeTrialScriptData trialScript;
 
     [Header("화자 / 대사 텍스트")]
+    [SerializeField] private GameObject textBoxPanel;    // 대사창 전체 패널
     [SerializeField] private GameObject dialogueNameImg; // 화자 이름 배경 이미지
     [SerializeField] private TMP_Text speakerTxt;        // 화자 이름 표시
     [SerializeField] private TMP_Text dialogueTxt;       // 실제 대사가 타이핑 되는 텍스트
@@ -52,6 +53,14 @@ public class SpongeDialogueManager : MonoBehaviour
     [SerializeField] private Image arrowRightImg;           // 심문 중 오른쪽 화살표
     // [SerializeField] private Animator nextLineAnim;      // 애니메이션 구현 후 사용
 
+    [Header("증언 고정 배경/캐릭터")]
+    [SerializeField] private Sprite testimonyBgSprite;
+    [SerializeField] private Sprite testimonyDeskSprite;
+    [SerializeField] private Image testimonyCharImage;
+
+    [Header("엔딩 연출")]
+    [SerializeField] private GameObject endingTextObj;
+
     [Header("심문 텍스트 색상")]
     [SerializeField] private Color testimonyColor = new Color32(54, 199, 56, 255);
 
@@ -66,6 +75,8 @@ public class SpongeDialogueManager : MonoBehaviour
     private Coroutine typingCoroutine;
     // 타이핑 여부 판단 - 타이핑 스킵 여부 판단용
     private bool isTyping;
+    // 엔딩 시퀀스 진행 여부
+    private bool isEnding = false;
     // 현재 표시 중인 대사 데이터 - 타이핑 스킵 시 전체 텍스트를 즉시 표시하기 위해 보관
     private SpongeDialogueLine currentLine;
     // 증언 낭독/심문 중 스킵 시 전체 텍스트 표시용
@@ -163,6 +174,7 @@ public class SpongeDialogueManager : MonoBehaviour
 
     IEnumerator TypeTestimonyLineCrossExam(SpongeTestimonyLine testimony, bool isFirst, bool isLast)
     {
+        ApplyTestimonyVisuals();
         isTyping = true;
         dialogueNameImg.SetActive(true);
         speakerTxt.text = "집게사장";
@@ -221,6 +233,7 @@ public class SpongeDialogueManager : MonoBehaviour
 
     IEnumerator TypeTestimonyLine(SpongeTestimonyLine testimony)
     {
+        ApplyTestimonyVisuals();
         isTyping = true;
         dialogueNameImg.SetActive(true);
         speakerTxt.text = "집게사장";
@@ -263,20 +276,39 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator TypeLine(SpongeDialogueLine line)
     {
+        // 오프닝 중간 페이드 (opening_28 진입 시 한 번)
+        bool needsFade = line.lineId == "opening_28" && SpongeFadeManager.Instance != null;
+        if (needsFade)
+        {
+            if (textBoxPanel != null) textBoxPanel.SetActive(false);
+            yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
+        }
+
         // 1. 배경 교체, 비어있으면 이전 배경 유지
         if (!string.IsNullOrEmpty(line.backgroundSpr))
             backgroundImg.sprite = Resources.Load<Sprite>(line.backgroundSpr);
-        if (!string.IsNullOrEmpty(line.deskSpr))
+        if (line.deskSpr == "None")
+            deskImg.gameObject.SetActive(false);
+        else if (!string.IsNullOrEmpty(line.deskSpr))
+        {
             deskImg.sprite = Resources.Load<Sprite>(line.deskSpr);
+            deskImg.gameObject.SetActive(true);
+        }
 
         // 2. 캐릭터 위치 활성화
         UpdateCharacter(line);
+
+        if (needsFade)
+        {
+            yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
+            if (textBoxPanel != null) textBoxPanel.SetActive(true);
+        }
 
         // 3. 해당 위치 Animator에 트리거
         /*if (!string.IsNullOrEmpty(line.animationTrig))
         {
             TriggerAnimation(line);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
         }
         */
 
@@ -378,6 +410,29 @@ public class SpongeDialogueManager : MonoBehaviour
         //     target.GetComponent<Animator>().SetTrigger(line.animationTrig);
 
         target.gameObject.SetActive(true);
+    }
+
+    // ── 증언 고정 배경/캐릭터 적용 ──────────────────────────
+    void ApplyTestimonyVisuals()
+    {
+        if (testimonyBgSprite != null) backgroundImg.sprite = testimonyBgSprite;
+
+        if (testimonyDeskSprite != null)
+        {
+            deskImg.sprite = testimonyDeskSprite;
+            deskImg.gameObject.SetActive(true);
+        }
+        else
+            deskImg.gameObject.SetActive(false);
+
+        characterSpongeBob.gameObject.SetActive(false);
+        characterPlayer.gameObject.SetActive(false);
+        characterDdungi.gameObject.SetActive(false);
+        characterJingJingi.gameObject.SetActive(false);
+        characterPlankton.gameObject.SetActive(false);
+        characterJipgeSajang.gameObject.SetActive(false);
+
+        if (testimonyCharImage != null) testimonyCharImage.gameObject.SetActive(true);
     }
 
     // ── 캐릭터 위치에 맞는 Animator에 트리거 ────────────────
@@ -518,26 +573,54 @@ public class SpongeDialogueManager : MonoBehaviour
         {
             case SpongeGameState.GameState.Pressing:
             case SpongeGameState.GameState.EvidenceSelect:
-                // 추궁/증거 대사가 끝난 경우
-                SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
                 if (SpongeGameManager.Instance.ConsumeConditionMet())
                 {
                     // 첫번째 심문 조건 충족
                     if (SpongeGameManager.Instance.CurrentRound == 1)
+                    {
+                        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
                         Instance.ShowLine("before_retestimony_01");
-                    // 두번째 심문 조건 충족 -> 엔딩 대사 시작,ShowLine()을 직접 호출하면 재귀가 되므로 Instance를 통해 호출
+                    }
+                    // 두번째 심문 조건 충족 -> 엔딩 대사 시작 (Dialogue 상태에서 클릭이 정상 동작하도록)
                     else
-                        Instance.ShowLine("ending_01");
+                    {
+                        isEnding = true;
+                        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Dialogue);
+                        StartCoroutine(StartEndingWithFade());
+                    }
                 }
                 else
+                {
                     // 조건 미충족 -> 다음 증언으로 넘어감
+                    SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
                     SpongeCrossExaminationManager.Instance.NextLine();
+                }
                 break;
 
             case SpongeGameState.GameState.Dialogue:
-                if (SpongeGameManager.Instance.CurrentRound == 1)
+                if (isEnding)
+                {
+                    // 엔딩 대사 시퀀스 완료 -> ENDTxt 제외 전부 비활성화
+                    isEnding = false;
+                    backgroundImg.gameObject.SetActive(false);
+                    deskImg.gameObject.SetActive(false);
+                    characterSpongeBob.gameObject.SetActive(false);
+                    characterPlayer.gameObject.SetActive(false);
+                    characterDdungi.gameObject.SetActive(false);
+                    characterJingJingi.gameObject.SetActive(false);
+                    characterPlankton.gameObject.SetActive(false);
+                    characterJipgeSajang.gameObject.SetActive(false);
+                    dialogueNameImg.SetActive(false);
+                    dialogueTxt.gameObject.SetActive(false);
+                    speakerTxt.gameObject.SetActive(false);
+                    choicePnl.SetActive(false);
+                    arrowLeftImg.gameObject.SetActive(false);
+                    arrowRightImg.gameObject.SetActive(false);
+                    if (endingTextObj != null) endingTextObj.SetActive(true);
+                    SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Resolution);
+                }
+                else if (SpongeGameManager.Instance.CurrentRound == 1)
                     // 오프닝 대사 끝 -> 심문 시작
                     SpongeCrossExaminationManager.Instance.StartCrossExamination();
                 else
@@ -545,5 +628,19 @@ public class SpongeDialogueManager : MonoBehaviour
                     SpongeCrossExaminationManager.Instance.StartRetestimony();
                 break;
         }
+    }
+
+    public void SetTextBox(bool active)
+    {
+        if (textBoxPanel != null) textBoxPanel.SetActive(active);
+    }
+
+    IEnumerator StartEndingWithFade()
+    {
+        SetTextBox(false);
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
+        Instance.ShowLine("ending_01");
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
+        SetTextBox(true);
     }
 }

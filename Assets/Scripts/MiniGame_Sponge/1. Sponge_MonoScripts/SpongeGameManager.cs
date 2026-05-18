@@ -52,7 +52,9 @@ public class SpongeGameManager : MonoBehaviour
 
     // 현재 상태에서 입력을 완전히 차단해야 하는지
     // Resolution(게임 클리어) 상태에서만 true
-    public bool IsInputBlocked() => currentState == GameState.Resolution;
+    public bool IsInputBlocked() =>
+        currentState == GameState.Resolution ||
+        (SpongeFadeManager.Instance != null && SpongeFadeManager.Instance.IsFading);
 
     // Q키(추궁하기)를 누를 수 있는 상태인지
     // CrossExamination(심문) 상태에서만 true

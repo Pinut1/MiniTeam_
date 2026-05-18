@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 /// <summary>
 /// 심문 진행 담당
@@ -42,18 +43,25 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     {
         currentIdx = 0;
         SpongeGameManager.Instance.SetRound(1);
-        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
-        ShowCurrentTestimonyAsDialogue();
+        StartCoroutine(TestimonyFadeSequence());
     }
 
     public void StartRetestimony()
     {
         currentIdx = 0;
         lines = trialScript.retestimonyLines;
-
         SpongeGameManager.Instance.SetRound(2);
+        StartCoroutine(TestimonyFadeSequence());
+    }
+
+    IEnumerator TestimonyFadeSequence()
+    {
+        SpongeDialogueManager.Instance.SetTextBox(false);
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
         ShowCurrentTestimonyAsDialogue();
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
+        SpongeDialogueManager.Instance.SetTextBox(true);
     }
 
     // ── 증언 낭독 (Testifying) ───────────────────────────────
@@ -80,8 +88,7 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         {
             // 전부 낭독 완료 → 심문 시작 (인덱스 0으로 되돌림)
             currentIdx = 0;
-            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-            ShowCurrentTestimony();
+            StartCoroutine(CrossExamFadeSequence());
         }
     }
 
@@ -151,6 +158,16 @@ public class SpongeCrossExaminationManager : MonoBehaviour
             SpongeGameManager.Instance.RegisterPress(currentIdx);
         // 추궁 대사 시작 - 대사 끝난 뒤 OnSequenceEnd()에서 조건 체크
         SpongeDialogueManager.Instance.ShowLine(line.firstPressDialogueId);
+    }
+
+    IEnumerator CrossExamFadeSequence()
+    {
+        SpongeDialogueManager.Instance.SetTextBox(false);
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+        ShowCurrentTestimony();
+        yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
+        SpongeDialogueManager.Instance.SetTextBox(true);
     }
 
     public void OnEvidenceResolved(bool success)
