@@ -121,6 +121,7 @@ namespace MiniTeam.Shooting1942
             Vector3 spawnPos = new Vector3(randomX, spawnTopY, 0f);
 
             int idx        = Random.Range(0, enemyPrefabs.Length);
+            if (enemyPrefabs[idx] == null) return;
             GameObject obj = Instantiate(enemyPrefabs[idx], spawnPos, Quaternion.identity);
 
             Enemy enemy = obj.GetComponent<Enemy>();
@@ -128,11 +129,30 @@ namespace MiniTeam.Shooting1942
 
             enemy.moveSpeed = currentWave == 1 ? wave1Speed : wave2Speed;
 
-            float shootRatio = currentWave == 1 ? wave1ShootRatio : wave2ShootRatio;
-            enemy.canShoot = Random.value < shootRatio;
+            // HP 랜덤 (3~5)
+            enemy.hp = Random.Range(3, 6);
+
+            // 슈팅 타입 랜덤 (Wave1: None 포함, Wave2: 반드시 쏨)
+            if (currentWave == 1)
+            {
+                float r = Random.value;
+                enemy.shootType = r < 0.35f ? Enemy.ShootType.None
+                                : r < 0.65f ? Enemy.ShootType.Single
+                                : r < 0.85f ? Enemy.ShootType.Burst
+                                :             Enemy.ShootType.Spread;
+            }
+            else
+            {
+                float r = Random.value;
+                enemy.shootType = r < 0.4f ? Enemy.ShootType.Single
+                                : r < 0.7f ? Enemy.ShootType.Burst
+                                :             Enemy.ShootType.Spread;
+            }
 
             if (currentWave == 2 && Random.value > 0.5f)
-                enemy.movementType = Enemy.MovementType.Sine;
+                enemy.movementType = Random.value > 0.5f
+                    ? Enemy.MovementType.Sine
+                    : Enemy.MovementType.SineReverse;
         }
 
         // ── 보스 ─────────────────────────────────
