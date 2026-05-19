@@ -11,40 +11,48 @@ public class PlayerMove : MonoBehaviour
     public float stopDistance = 0.5f;
 
     [Header("Flip Settings (Pivot Fix)")]
-    // 이 값을 0.1단위로 천천히 늘리면서 맞춰보세요. 
-    // 캐릭터가 오른쪽으로 튀면 값을 줄이고, 왼쪽으로 튀면 값을 늘려야 합니다.
     public float flipOffset = 1.2f;
 
     [Header("Knockback Settings")]
+    public float knockbackDuration = 0.5f;
     public float knockbackForceX = 5f;
     public float knockbackForceY = 3f;
-    public float knockbackDuration = 0.5f;
 
     public Animator anim;
     public Rigidbody2D rb;
     private bool isFacingRight = true;
-    private bool isKnockbacked = false;
     private bool isInputAttacking = false;
 
+    // 마우스 눈치보기 플래그
+    private bool waitForMouseMovement = false;
+    private Vector3 lastMousePos;
 
     void Start()
     {
-        // anim = GetComponentInChildren<Animator>();
-        // rb = GetComponentInChildren<Rigidbody2D>();
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        if (isKnockbacked) return;
+        if (waitForMouseMovement)
+        {
+            if (Vector3.Distance(Input.mousePosition, lastMousePos) > 10f)
+            {
+                waitForMouseMovement = false;
+            }
+            else
+            {
+                if (rb != null) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                if (anim != null) anim.SetBool("isIdle", true);
+                return;
+            }
+        }
 
-        // 마우스 클릭(공격) 처리
         if (Input.GetMouseButton(0))
         {
             isInputAttacking = true;
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (anim != null) anim.SetTrigger("DoBackAttack");
-            }
+            if (Input.GetMouseButtonDown(0) && anim != null) anim.SetTrigger("DoBackAttack");
             if (anim != null) anim.SetBool("isAttacking", true);
             if (rb != null) rb.linearVelocity = Vector2.zero;
         }
@@ -55,7 +63,6 @@ public class PlayerMove : MonoBehaviour
         }
 
         bool isAnimatorInAttackState = anim != null && anim.GetCurrentAnimatorStateInfo(0).IsName("BackAttack");
-
         if (isInputAttacking || isAnimatorInAttackState)
         {
             if (rb != null) rb.linearVelocity = Vector2.zero;
@@ -72,18 +79,9 @@ public class PlayerMove : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         mouseWorldPos.z = 0f;
 
-        // --- [방향 전환 로직: 세로선 기준 즉시 전환] ---
-        // 이동 거리(stopDistance)와 상관없이 마우스가 캐릭터 왼쪽/오른쪽인지에 따라 즉시 Flip
-        if (mouseWorldPos.x > transform.position.x && !isFacingRight)
-        {
-            Flip();
-        }
-        else if (mouseWorldPos.x < transform.position.x && isFacingRight)
-        {
-            Flip();
-        }
+        if (mouseWorldPos.x > transform.position.x && !isFacingRight) Flip();
+        else if (mouseWorldPos.x < transform.position.x && isFacingRight) Flip();
 
-        // --- [이동 로직] ---
         float distanceX = Mathf.Abs(mouseWorldPos.x - transform.position.x);
         float moveInput = 0f;
         bool isMoving = false;
@@ -94,14 +92,11 @@ public class PlayerMove : MonoBehaviour
         {
             isMoving = true;
             moveInput = (mouseWorldPos.x > transform.position.x) ? 1f : -1f;
-            currentSpeed = (distanceX >= runDistanceThreshold) ? runSpeed : walkSpeed;
             isRunning = (distanceX >= runDistanceThreshold);
+            currentSpeed = isRunning ? runSpeed : walkSpeed;
         }
 
-        if (rb != null)
-        {
-            rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
-        }
+        if (rb != null) rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
 
         if (anim != null)
         {
@@ -114,45 +109,59 @@ public class PlayerMove : MonoBehaviour
     void Flip()
     {
         isFacingRight = !isFacingRight;
-
-        // 1. 스케일 반전 (여기서 캐릭터가 휙 돌아갑니다)
         Vector3 currentScale = transform.localScale;
         currentScale.x *= -1;
         transform.localScale = currentScale;
-
-        // 2. 위치 보정 (중요: 방향 로직 수정)
-        // 왼쪽을 보게 될 때(isFacingRight=false) 캐릭터가 왼쪽으로 튀었다면 
-        // 부모의 위치를 오른쪽(+)으로 밀어줘야 합니다.
         float offsetDir = isFacingRight ? -1f : 1f;
 
-        // Rigidbody를 사용 중이므로 rb.position을 직접 수정하는 것이 훨씬 정확하고 부드럽습니다.
-        if (rb != null)
+        if (rb != null) rb.position += new Vector2(flipOffset * offsetDir, 0);
+    }
+
+    public void ForceWakeUpInputInit()
+    {
+        waitForMouseMovement = true;
+        lastMousePos = Input.mousePosition;
+        isInputAttacking = false;
+
+        if (anim != null)
         {
-            rb.position += new Vector2(flipOffset * offsetDir, 0);
+            // ★ [최종 필살기] 기절 애니메이션이 완전히 끝난 지금! 
+            // 멍때리고 있는 애니메이터를 강제로 0초부터 'Idle'로 꽂아버려 버그를 날립니다.
+            anim.Play("Idle", 0, 0f);
+
+            anim.ResetTrigger("isKnockback");
+            anim.ResetTrigger("DoBackAttack");
+
+            anim.SetBool("isIdle", true);
+            anim.SetBool("isWalk", false);
+            anim.SetBool("isRun", false);
+            anim.SetBool("isAttacking", false);
         }
-        else
-        {
-            transform.position += new Vector3(flipOffset * offsetDir, 0, 0);
-        }
+
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z - transform.position.z);
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+
+        if (mouseWorldPos.x > transform.position.x && !isFacingRight) Flip();
+        else if (mouseWorldPos.x < transform.position.x && isFacingRight) Flip();
     }
 
     public void TriggerKnockback(Transform enemyTransform)
     {
-        if (isKnockbacked) return;
-        isInputAttacking = false;
-        if (anim != null) anim.SetBool("isAttacking", false);
+        ForceWakeUpInputInit();
 
-        isKnockbacked = true;
         if (anim != null) anim.SetTrigger("doKnockback");
-
         if (rb != null)
         {
-            rb.linearVelocity = Vector2.zero;
             float pushDirection = (enemyTransform.position.x > transform.position.x) ? -1f : 1f;
             rb.AddForce(new Vector2(pushDirection * knockbackForceX, knockbackForceY), ForceMode2D.Impulse);
         }
-        Invoke("EndKnockback", knockbackDuration);
+        Invoke("OnBattleKnockbackEnd", knockbackDuration);
     }
 
-    void EndKnockback() { isKnockbacked = false; }
+    void OnBattleKnockbackEnd()
+    {
+    }
 }

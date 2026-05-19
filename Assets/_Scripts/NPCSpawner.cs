@@ -1,64 +1,62 @@
 using UnityEngine;
+using System.Collections;
 
 public class NpcSpawner : MonoBehaviour
 {
-    [Header("NPC 종류 설정 (프리팹)")]
-    public GameObject[] npcPrefabs;
+    [Header("프리팹 설정")]
+    public GameObject[] boyPrefabs;
+    public GameObject[] girlPrefabs;
 
-    [Header("스폰 수량 설정")]
-    public int minNpcCount = 3;
-    public int maxNpcCount = 7;
-
-    [Header("스폰 위치 설정 (X축 - 좌우 거리)")]
+    [Header("스폰 위치 범위")]
     public float minX = -10f;
     public float maxX = 10f;
-
-    [Header("스폰 위치 설정 (Y축 - 상하 높이)")]
-    [Tooltip("플레이어의 가로선(발바닥) Y좌표를 입력하세요.")]
     public float minY = -1f;
-    [Tooltip("NPC가 올라갈 수 있는 가장 위쪽 Y좌표를 입력하세요.")]
     public float maxY = 2f;
+
+    [Header("수량 설정")]
+    public int minGirlCount = 3;
+    public int maxGirlCount = 5;
 
     void Start()
     {
-        SpawnRandomNPCs();
+        SpawnAll();
     }
 
-    void SpawnRandomNPCs()
+    void SpawnAll()
     {
-        if (npcPrefabs == null || npcPrefabs.Length == 0)
-        {
-            Debug.LogWarning("스폰할 NPC 프리팹이 등록되지 않았습니다!");
-            return;
-        }
-
-        int spawnCount = Random.Range(minNpcCount, maxNpcCount + 1);
+        int spawnCount = Random.Range(minGirlCount, maxGirlCount + 1);
 
         for (int i = 0; i < spawnCount; i++)
         {
-            int randomIndex = Random.Range(0, npcPrefabs.Length);
-            GameObject selectedPrefab = npcPrefabs[randomIndex];
+            Vector3 spawnPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), transform.position.z);
+            GameObject girl = Instantiate(girlPrefabs[Random.Range(0, girlPrefabs.Length)], spawnPos, Quaternion.identity, transform);
 
-            // X와 Y 모두 지정해둔 최소/최대 범위 안에서 랜덤으로 뽑습니다.
-            float randomX = Random.Range(minX, maxX);
-            float randomY = Random.Range(minY, maxY);
+            // 남학생 생성 로직을 즉시 실행
+            StartCoroutine(ManagePair(girl.transform));
+        }
+    }
 
-            // 최종 스폰 위치 지정
-            Vector3 spawnPosition = new Vector3(randomX, randomY, transform.position.z);
+    private IEnumerator ManagePair(Transform girl)
+    {
+        // 1. 첫 생성은 즉시 (딜레이 없음)
+        GameObject boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], girl.position + new Vector3(1.5f, 0, 0), Quaternion.identity);
+        boy.tag = "NPC";
 
-            // 1. [추가된 부분] Instantiate의 4번째 값으로 'transform'을 넣어주면,
-            // 생성된 NPC들이 이 NPC_Spawner 오브젝트의 자식으로 깔끔하게 들어갑니다.
-            GameObject spawnedNpc = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity, transform);
-
-            // 2. [추가된 부분] 50% 확률로 NPC가 왼쪽 또는 오른쪽을 바라보게 만듭니다.
-            bool faceRight = Random.value > 0.5f;
-            if (!faceRight)
+        // 2. 이후 남학생이 죽었을 때만 3초 딜레이 후 재생성
+        while (girl != null)
+        {
+            if (boy == null)
             {
-                // 스케일의 X값을 -1로 곱해서 좌우 반전시킵니다.
-                Vector3 scale = spawnedNpc.transform.localScale;
-                scale.x *= -1;
-                spawnedNpc.transform.localScale = scale;
+                yield return new WaitForSeconds(3f);
+
+                if (girl != null)
+                {
+                    Vector3 spawnPos = girl.position + new Vector3(1.5f, 0, 0);
+                    boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], spawnPos, Quaternion.identity);
+                    boy.tag = "NPC";
+                }
             }
+            yield return new WaitForSeconds(1f);
         }
     }
 }
