@@ -12,8 +12,13 @@ public class SpongeEvidenceManager : MonoBehaviour
 {
     public static SpongeEvidenceManager Instance { get; private set; }
 
-    // 증거 목록 에셋
-    [SerializeField] private SpongeEvidenceDatabaseSO database;
+    private SpongeEvidenceData[] evidences;
+
+    [Serializable]
+    private class EvidenceDatabaseWrapper
+    {
+        public SpongeEvidenceData[] evidences;
+    }
 
     // 증거 상태가 바뀔 때 구독자들에게 알려주는 이벤트
     public static event Action<string> OnEvidenceSelected; // 증거 선택됨
@@ -24,6 +29,13 @@ public class SpongeEvidenceManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        LoadDatabase();
+    }
+
+    private void LoadDatabase()
+    {
+        var json = Resources.Load<TextAsset>("SpongeData/SpongeEvidenceDatabase");
+        evidences = JsonUtility.FromJson<EvidenceDatabaseWrapper>(json.text).evidences;
     }
 
     // 증거 슬롯 첫 클릭 시 호출 — 하이라이트 + 상세 이미지 표시
@@ -99,9 +111,7 @@ public class SpongeEvidenceManager : MonoBehaviour
     /// <returns></returns>
     public SpongeEvidenceData GetById(string id)
     {
-        // Array.Find = 배열에서 조건에 맞는 첫 번째 요소 반환
-        // 없으면 null 반환
-        return System.Array.Find(database.evidences, e => e.id == id);
+        return System.Array.Find(evidences, e => e.id == id);
     }
 
     // 전체 증거 목록 반환
@@ -112,6 +122,6 @@ public class SpongeEvidenceManager : MonoBehaviour
     /// <returns></returns>
     public SpongeEvidenceData[] GetAllEvidences()
     {
-        return database.evidences;
+        return evidences;
     }
 }
