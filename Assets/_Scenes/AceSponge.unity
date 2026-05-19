@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 21637007}
   - component: {fileID: 21637006}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ChoiceTxt 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1152,8 +1152,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 1139658425}
   borderImg: {fileID: 190261352}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -1504,8 +1502,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -78, y: 189}
-  m_SizeDelta: {x: 500, y: 60}
+  m_AnchoredPosition: {x: 171, y: 189}
+  m_SizeDelta: {x: 1000, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &287413763
 MonoBehaviour:
@@ -1943,8 +1941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 0}
   borderImg: {fileID: 364708674}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -2038,8 +2034,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 0}
   borderImg: {fileID: 536612397}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -2134,8 +2128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 111755189}
   borderImg: {fileID: 605458888}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -3449,8 +3441,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 781375629}
   borderImg: {fileID: 878056554}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -3848,8 +3838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 198949232}
   borderImg: {fileID: 1027930320}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -4159,8 +4147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 1967025280}
   borderImg: {fileID: 1081743433}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -4624,8 +4610,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -83, y: 27}
-  m_SizeDelta: {x: 600, y: 200}
+  m_AnchoredPosition: {x: 248, y: 30}
+  m_SizeDelta: {x: 1200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1257227656
 MonoBehaviour:
@@ -4647,8 +4633,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC0AC\uAC74 \uB2F9\uC77C \uC624\uD6C4 1\uC2DC\uBD80\uD130\n6\uC2DC\uAE4C\uC9C0,
-    \uC0AC\uAC74 \uD604\uC7A5\uC778\n\uC544\uD30C\uD2B8\uB294 \uC815\uC804\uC774\uC5C8\uB2E4."
+  m_text: "\uC81C\uAC00 \uC5B4\uB835\uAC8C \uAD6C\uD55C \uBE75\uC744 \uB6B1\uC774\uC5D0\uAC8C
+    \uC8FC\uACE0 \uC2F6\uC5B4\uC11C \n\uAC00\uAC8C\uB85C \uC640 \uBE75\uC744 \uBA39\uC5B4\uBCF4\uB77C\uACE0
+    \uD588\uC5B4\uC694!\\\"\n\uB77C\uACE0 \uB179\uC74C \uB418\uC5B4\uC788\uB2E4."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7c2ed6c92fb971f488e45b8ec70484ab, type: 2}
   m_sharedMaterial: {fileID: 5447027760114713804, guid: 7c2ed6c92fb971f488e45b8ec70484ab, type: 2}
@@ -4682,7 +4669,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4847,7 +4834,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25b4f4779340dbe469299f08bd280309, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  database: {fileID: 11400000, guid: eeb9e19899ca9f44594bc30feb88d1cf, type: 2}
 --- !u!1 &1298193812
 GameObject:
   m_ObjectHideFlags: 0
@@ -5218,8 +5204,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 820963693}
   borderImg: {fileID: 1560346037}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -5594,6 +5578,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   evidencePnl: {fileID: 61692980}
+  evidenceNameTxt: {fileID: 287413763}
+  evidenceDescriptionTxt: {fileID: 1257227656}
   evidenceSlots:
   - {fileID: 878056556}
   - {fileID: 605458890}
@@ -5776,8 +5762,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 0}
   borderImg: {fileID: 1723888373}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -6279,8 +6263,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd408bd6aa2769b439fc53c3b9cfca90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeEvidenceButtonUI
-  nameTxt: {fileID: 287413763}
-  descriptionTxt: {fileID: 1257227656}
   iconImg: {fileID: 0}
   borderImg: {fileID: 1807174010}
   emptySprite: {fileID: -1424533599, guid: 076ba13235660cd4aa89b30944df49c1, type: 3}
@@ -6585,7 +6567,7 @@ GameObject:
   - component: {fileID: 1862626127}
   - component: {fileID: 1862626126}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ChoiceTxt 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
