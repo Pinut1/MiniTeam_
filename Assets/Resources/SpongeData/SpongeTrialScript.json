@@ -1547,15 +1547,15 @@
       "deskSpr": "None",
       "characterType": 2,
       "characterPos": 1,
-      "choices": 
+      "choices":
       [
         {
-          "txt": "해 본다",
-          "nextDialogueId": "re_press_choice_00"
-        }, 
+          "choiceTxt": "해 본다",
+          "nextLineId": "re_press_choice_00"
+        },
         {
-          "txt": "그만 둔다",
-          "nextDialogueId": "re_press_choice_01"
+          "choiceTxt": "그만 둔다",
+          "nextLineId": "re_press_choice_01"
         }
     ],
       "nextLineId": "",
@@ -1614,7 +1614,7 @@
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_05",
+      "lineId": "re_press_choice_00_04",
       "speaker": "나",
       "txt": "비, \"비열\"......?",
       "animationTrig": "",
@@ -1623,11 +1623,11 @@
       "characterType": 2,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "re_press_choice_00_06",
+      "nextLineId": "re_press_choice_00_05",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_06",
+      "lineId": "re_press_choice_00_05",
       "speaker": "징징이",
       "txt": "사소한 걸 붙잡고 늘어져\n증인을 동요시키는 짓......",
       "animationTrig": "",
@@ -1636,11 +1636,11 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "re_press_choice_00_07",
+      "nextLineId": "re_press_choice_00_06",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_07",
+      "lineId": "re_press_choice_00_06",
       "speaker": "징징이",
       "txt": "그런 짓이 비열하지 않다면\n대체 뭐란 말인가!",
       "animationTrig": "",
@@ -1649,11 +1649,11 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "re_press_choice_00_08",
+      "nextLineId": "re_press_choice_00_07",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_08",
+      "lineId": "re_press_choice_00_07",
       "speaker": "",
       "txt": "",
       "animationTrig": "",
@@ -1662,11 +1662,11 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "re_press_choice_00_09",
+      "nextLineId": "re_press_choice_00_08",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_09",
+      "lineId": "re_press_choice_00_08",
       "speaker": "스폰지밥",
       "txt": "(......정말\n비겁하다!......)",
       "animationTrig": "",
@@ -1675,11 +1675,11 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "re_press_choice_00_10",
+      "nextLineId": "re_press_choice_00_09",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_10",
+      "lineId": "re_press_choice_00_09",
       "speaker": "",
       "txt": "",
       "animationTrig": "",
@@ -1688,15 +1688,28 @@
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
+      "nextLineId": "re_press_choice_00_10",
+      "alignment": ""
+    },
+    {
+      "lineId": "re_press_choice_00_10",
+      "speaker": "플랑크톤",
+      "txt": "정숙하시오. 정숙!",
+      "animationTrig": "",
+      "backgroundSpr": "Sponge_BG/BG_Judge",
+      "deskSpr": "Sponge_Table/Plankton",
+      "characterType": 5,
+      "characterPos": 4,
+      "choices": [],
       "nextLineId": "re_press_choice_00_11",
       "alignment": ""
     },
     {
       "lineId": "re_press_choice_00_11",
       "speaker": "플랑크톤",
-      "txt": "정숙하시오. 정숙!",
+      "txt": "변호인......\n앞으로는 조심해 주십시오.",
       "animationTrig": "",
-      "backgroundSpr": "Sponge_BG/BG_Judge",
+      "backgroundSpr": "",
       "deskSpr": "Sponge_Table/Plankton",
       "characterType": 5,
       "characterPos": 4,
@@ -1706,19 +1719,6 @@
     },
     {
       "lineId": "re_press_choice_00_12",
-      "speaker": "플랑크톤",
-      "txt": "변호인......\n앞으로는 조심해 주십시오.",
-      "animationTrig": "",
-      "backgroundSpr": "",
-      "deskSpr": "Sponge_Table/Plankton",
-      "characterType": 5,
-      "characterPos": 4,
-      "choices": [],
-      "nextLineId": "re_press_choice_00_13",
-      "alignment": ""
-    },
-    {
-      "lineId": "re_press_choice_00_13",
       "speaker": "나",
       "txt": "(이런......순식간에\n비열한 놈이 되어 버렸다......)",
       "animationTrig": "",
@@ -1895,15 +1895,15 @@
       "deskSpr": "",
       "characterType": 2,
       "characterPos": 1,
-      "choices": 
+      "choices":
       [
         {
-          "txt": "증거가 있다",
-          "nextDialogueId": "re_press_choice_02_00"
-        }, 
+          "choiceTxt": "증거가 있다",
+          "nextLineId": "re_press_choice_02_00"
+        },
         {
-          "txt": "증거가 없다",
-          "nextDialogueId": "re_press_choice_03_00"
+          "choiceTxt": "증거가 없다",
+          "nextLineId": "re_press_choice_03_00"
         }
       ],
       "nextLineId": "",
@@ -2323,8 +2323,8 @@
       "animationTrig": "",
       "backgroundSpr": "Sponge_BG/BG_Player",
       "deskSpr": "None",
-      "characterType": 5,
-      "characterPos": 4,
+      "characterType": 2,
+      "characterPos": 1,
       "choices": [],
       "nextLineId": "",
       "alignment": ""
