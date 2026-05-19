@@ -77,8 +77,6 @@ crashlytics-build.properties
 # Large files managed via Git LFS (psd, wav, mp3, fbx)
 # Do NOT add these to git directly — use git lfs track
 *.psd
-*.wav
-*.mp3
 *.fbx
 
 # OS
