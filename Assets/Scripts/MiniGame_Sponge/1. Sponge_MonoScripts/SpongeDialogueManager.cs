@@ -520,6 +520,10 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
 
+        // 이 라인에 증거 획득이 연결돼 있으면 클릭 시 unlock
+        if (!string.IsNullOrEmpty(currentLine.grantEvidenceId))
+            SpongeEvidenceManager.Instance.UnlockEvidence(currentLine.grantEvidenceId);
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
@@ -670,6 +674,33 @@ public class SpongeDialogueManager : MonoBehaviour
     public void SetTextBox(bool active)
     {
         if (textBoxPanel != null) textBoxPanel.SetActive(active);
+    }
+
+    // ── 개발자 스킵 ──────────────────────────────────────────
+    public void StopTyping()
+    {
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        isTyping = false;
+        IsInDialogueSequence = false;
+    }
+
+    public void SkipOpening()
+    {
+        StopTyping();
+        foreach (var line in trialScript.openingLines)
+            if (!string.IsNullOrEmpty(line.grantEvidenceId))
+                SpongeEvidenceManager.Instance.UnlockEvidence(line.grantEvidenceId);
+        SpongeGameManager.Instance.SkipAllRequiredConditions();
+        SpongeCrossExaminationManager.Instance.StartCrossExamination();
+    }
+
+    public void SkipBeforeRetestimony()
+    {
+        StopTyping();
+        foreach (var line in trialScript.beforeRetestimonyLines)
+            if (!string.IsNullOrEmpty(line.grantEvidenceId))
+                SpongeEvidenceManager.Instance.UnlockEvidence(line.grantEvidenceId);
+        SpongeCrossExaminationManager.Instance.StartRetestimony();
     }
 
     IEnumerator StartEndingWithFade()

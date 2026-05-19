@@ -674,7 +674,7 @@
     {
       "lineId": "before_retestimony_03",
       "speaker": "나",
-      "txt": "(스폰지밥 가방 속\n구겨진 종이가 있다...!)",
+      "txt": "(스폰지밥 가방 속\n녹음기가 있다...!)",
       "animationTrig": "",
       "backgroundSpr": "",
       "deskSpr": "",
@@ -682,7 +682,8 @@
       "characterPos": 1,
       "choices": [],
       "nextLineId": "before_retestimony_04",
-      "alignment": ""
+      "alignment": "",
+      "grantEvidenceId": "recorder"
     },
     {
       "lineId": "before_retestimony_04",
@@ -860,7 +861,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "press_00_08",
-      "alignment": ""
+      "alignment": "",
+      "grantEvidenceId": "receipt"
     },
     {
       "lineId": "press_00_08",
@@ -1380,7 +1382,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "re_press_01_03",
-      "alignment": ""
+      "alignment": "",
+      "grantEvidenceId": "bankstatement"
     },
     {
       "lineId": "re_press_01_03",
@@ -1731,7 +1734,7 @@
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_01_01",
+      "lineId": "re_press_choice_01",
       "speaker": "나",
       "txt": "(일단 심문을\n더 진행해보자...!)",
       "animationTrig": "",
@@ -2474,7 +2477,7 @@
       "nextLineId": "evidence_00_11"
     },
     {
-      "lineId": "evidence_00_12",
+      "lineId": "evidence_00_11",
       "speaker": "징징이",
       "txt": "은행 업무가 꼭 ATM기기\n이용은 아니지않나",
       "animationTrig": "",
@@ -2483,10 +2486,10 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_00_13"
+      "nextLineId": "evidence_00_12"
     },
     {
-      "lineId": "evidence_00_13",
+      "lineId": "evidence_00_12",
       "speaker": "스폰지밥",
       "txt": "재판장님.\n오늘이 몇요일인가요?",
       "animationTrig": "",
@@ -2495,10 +2498,10 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "evidence_00_14"
+      "nextLineId": "evidence_00_13"
     },
     {
-      "lineId": "evidence_00_14",
+      "lineId": "evidence_00_13",
       "speaker": "플랑크톤",
       "txt": "오늘이... 월요일이군요?",
       "animationTrig": "",
@@ -2507,10 +2510,10 @@
       "characterType": 5,
       "characterPos": 4,
       "choices": [],
-      "nextLineId": "evidence_00_15"
+      "nextLineId": "evidence_00_14"
     },
     {
-      "lineId": "evidence_00_15",
+      "lineId": "evidence_00_14",
       "speaker": "스폰지밥",
       "txt": "그렇담 이틀 전인 26일.\n그날은 몇요일이죠?",
       "animationTrig": "",
@@ -2519,10 +2522,10 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "evidence_00_16"
+      "nextLineId": "evidence_00_15"
     },
     {
-      "lineId": "evidence_00_16",
+      "lineId": "evidence_00_15",
       "speaker": "플랑크톤",
       "txt": "...토요일이겠죠?\n변호인. 갑자기 왜 이런 질문을...",
       "animationTrig": "",
@@ -2531,10 +2534,10 @@
       "characterType": 5,
       "characterPos": 4,
       "choices": [],
-      "nextLineId": "evidence_00_17"
+      "nextLineId": "evidence_00_16"
     },
     {
-      "lineId": "evidence_00_17",
+      "lineId": "evidence_00_16",
       "speaker": "플랑크톤",
       "txt": "?! 그렇군요! 은행은 토요일에\n창구 업무가 불가능합니다!",
       "animationTrig": "",
@@ -2543,10 +2546,10 @@
       "characterType": 5,
       "characterPos": 4,
       "choices": [],
-      "nextLineId": "evidence_00_18"
+      "nextLineId": "evidence_00_17"
     },
     {
-      "lineId": "evidence_00_18",
+      "lineId": "evidence_00_17",
       "speaker": "징징이",
       "txt": "크, 크윽...!\n이런 말도 안되는......!",
       "animationTrig": "",
@@ -2555,10 +2558,10 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_00_19"
+      "nextLineId": "evidence_00_18"
     },
     {
-      "lineId": "evidence_00_19",
+      "lineId": "evidence_00_18",
       "speaker": "나",
       "txt": "(스폰지밥...\n이제 긴장은 다 풀렸나보군.)",
       "animationTrig": "",
@@ -2567,10 +2570,10 @@
       "characterType": 2,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_00_20"
+      "nextLineId": "evidence_00_19"
     },
     {
-      "lineId": "evidence_00_20",
+      "lineId": "evidence_00_19",
       "speaker": "스폰지밥",
       "txt": "피해자이자 증인 집게사장.\n사건 당시에 어디에 있었습니까?!",
       "animationTrig": "",
@@ -2579,10 +2582,10 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "evidence_00_21"
+      "nextLineId": "evidence_00_20"
     },
     {
-      "lineId": "evidence_00_22",
+      "lineId": "evidence_00_20",
       "speaker": "집게사장",
       "txt": "그, 그게...",
       "animationTrig": "",
@@ -2591,10 +2594,10 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_00_23"
+      "nextLineId": "evidence_00_21"
     },
     {
-      "lineId": "evidence_00_23",
+      "lineId": "evidence_00_21",
       "speaker": "집게사장",
       "txt": "사, 사실은...\n그러니까...",
       "animationTrig": "",
@@ -2603,10 +2606,10 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_00_24"
+      "nextLineId": "evidence_00_22"
     },
     {
-      "lineId": "evidence_00_24",
+      "lineId": "evidence_00_22",
       "speaker": "집게사장",
       "txt": "가게 뒷편에 나가서 쉬고 있었습니다...",
       "animationTrig": "",
@@ -2615,10 +2618,10 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_00_25"
+      "nextLineId": "evidence_00_23"
     },
     {
-      "lineId": "evidence_00_25",
+      "lineId": "evidence_00_23",
       "speaker": "플랑크톤",
       "txt": "왜 처음부터 이 사실을\n말하지 않았죠?",
       "animationTrig": "",
@@ -2627,10 +2630,10 @@
       "characterType": 5,
       "characterPos": 4,
       "choices": [],
-      "nextLineId": "evidence_00_26"
+      "nextLineId": "evidence_00_24"
     },
     {
-      "lineId": "evidence_00_26",
+      "lineId": "evidence_00_24",
       "speaker": "집게사장",
       "txt": "죄,죄송합니다...",
       "animationTrig": "",
@@ -2639,10 +2642,10 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_00_27"
+      "nextLineId": "evidence_00_25"
     },
     {
-      "lineId": "evidence_00_28",
+      "lineId": "evidence_00_25",
       "speaker": "나",
       "txt": "(좋았어. 은행에 가지\n않았다는 걸밝혀냈다)",
       "animationTrig": "",
@@ -2770,7 +2773,7 @@
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_09",
+      "lineId": "evidence_01_08",
       "speaker": "플랑크톤",
       "txt": "정숙하시오. 정숙.",
       "animationTrig": "",
@@ -2779,11 +2782,11 @@
       "characterType": 5,
       "characterPos": 4,
       "choices": [],
-      "nextLineId": "evidence_01_10",
+      "nextLineId": "evidence_01_09",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_11",
+      "lineId": "evidence_01_09",
       "speaker": "스폰지밥",
       "txt": "뚱이는 친구를 만나기 위해\n집게리아에 갔습니다.",
       "animationTrig": "",
@@ -2792,11 +2795,11 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "evidence_01_12",
+      "nextLineId": "evidence_01_10",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_12",
+      "lineId": "evidence_01_10",
       "speaker": "스폰지밥",
       "txt": "그런데 어째서 몰래 들어갔다고\n거짓 증언을 한겁니까!!",
       "animationTrig": "",
@@ -2805,11 +2808,11 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "evidence_01_13",
+      "nextLineId": "evidence_01_11",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_13",
+      "lineId": "evidence_01_11",
       "speaker": "집게사장",
       "txt": "......뭐, 뭐야...\n이게...",
       "animationTrig": "",
@@ -2818,11 +2821,11 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_01_14",
+      "nextLineId": "evidence_01_12",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_14",
+      "lineId": "evidence_01_12",
       "speaker": "집게사장",
       "txt": "저, 전 몰랐습니다!",
       "animationTrig": "",
@@ -2831,11 +2834,11 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_01_15",
+      "nextLineId": "evidence_01_13",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_15",
+      "lineId": "evidence_01_13",
       "speaker": "집게사장",
       "txt": "그저 저 검사가 하라는대로\n했을 뿐이죠......!",
       "animationTrig": "",
@@ -2844,11 +2847,11 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_01_16",
+      "nextLineId": "evidence_01_14",
       "alignment": ""
     },
     {
-      "lineId": "evidence_01_16",
+      "lineId": "evidence_01_14",
       "speaker": "징징이",
       "txt": "...?!\n저 멍청이가...!!!!",
       "animationTrig": "",

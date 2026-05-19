@@ -22,7 +22,8 @@ public class SpongeDialogueLine
 
     [Header("선택지 - null이면 선택지 X")]
     public SpongeChoice[] choices;
-    public string nextLineId; // 선택지 없을 때 다음 대사 ID
+    public string nextLineId;      // 선택지 없을 때 다음 대사 ID
+    public string grantEvidenceId; // 이 대사 클릭 후 획득할 증거 ID (없으면 빈 문자열)
     
     public enum CharacterType
     {

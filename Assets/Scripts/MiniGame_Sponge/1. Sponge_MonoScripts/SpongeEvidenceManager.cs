@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -13,6 +14,7 @@ public class SpongeEvidenceManager : MonoBehaviour
     public static SpongeEvidenceManager Instance { get; private set; }
 
     private SpongeEvidenceData[] evidences;
+    private HashSet<string> unlockedIds;
 
     [Serializable]
     private class EvidenceDatabaseWrapper
@@ -36,6 +38,15 @@ public class SpongeEvidenceManager : MonoBehaviour
     {
         var json = Resources.Load<TextAsset>("SpongeData/SpongeEvidenceDatabase");
         evidences = JsonUtility.FromJson<EvidenceDatabaseWrapper>(json.text).evidences;
+        unlockedIds = new HashSet<string> { "bread", "burger", "poster" };
+    }
+
+    public bool IsUnlocked(string id) => unlockedIds.Contains(id);
+
+    public void UnlockEvidence(string id)
+    {
+        if (unlockedIds.Add(id))
+            OnEvidenceListChanged?.Invoke();
     }
 
     // 증거 슬롯 첫 클릭 시 호출 — 하이라이트 + 상세 이미지 표시
