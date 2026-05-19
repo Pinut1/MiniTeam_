@@ -85,7 +85,7 @@ public class SpongeEvidenceManager : MonoBehaviour
             // 실패해도 심문 상태는 유지 (CrossExamination 상태 그대로)
             // 실패 고정 대사 출력
             // "evidence_fail_default" 는 TrialScriptSO에 반드시 입력해야 함
-            SpongeDialogueManager.Instance.ShowLine("evidence_fail_default");
+            SpongeDialogueManager.Instance.ShowLine("evidence_fail_default_01");
         }
     }
 
