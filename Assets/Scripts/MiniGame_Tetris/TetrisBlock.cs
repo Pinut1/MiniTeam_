@@ -294,7 +294,7 @@ public class TetrisBlock : MonoBehaviour
         // 타마마 임팩트를 1번만 체크하기 위한 Trigger
         bool hasTriggeredEffect = false;
 
-        for (int j = 0; j < width; j++)
+        for (int j = width - 1; j >= 0; j--)
         {
             Transform cell = grid[j, i];
             if (cell != null) // 안전장치
@@ -319,13 +319,14 @@ public class TetrisBlock : MonoBehaviour
                                 }
                             }
 
-                            // ⭐️ [누락되었던 핵심 코드!] 파편들을 독립시키고 부모 껍데기 파괴
+                         
                             parentTransform.DetachChildren();
                             Destroy(parentTransform.gameObject);
 
                             // 2. 타마마 임팩트 발동
                             if (!hasTriggeredEffect)
                             {
+                                // grid의 오른쪽부터 스캔하기 때문에, 무조건 가장 오른쪽의 블록에서 발동.
                                 Debug.Log($"[{j}번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
                                 //TODO 타마마 임팩트
                                 hasTriggeredEffect = true;
