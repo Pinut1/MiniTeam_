@@ -6,4 +6,5 @@ public class SpongeEvidenceData
     public string id;
     public string evidenceName;
     public string description;
+    public string iconSpr;
 }

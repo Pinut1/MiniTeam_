@@ -11,8 +11,6 @@ public class SpongeEvidenceButtonUI : MonoBehaviour
 
     public string EvidenceId { get; private set; }
 
-    [SerializeField] private TMP_Text nameTxt;
-    [SerializeField] private TMP_Text descriptionTxt;
     [SerializeField] private Image iconImg;
     [SerializeField] private Image borderImg;
 
@@ -32,17 +30,20 @@ public class SpongeEvidenceButtonUI : MonoBehaviour
             originalBorderY = borderImg.rectTransform.anchoredPosition.y;
     }
 
-    public void Setup(SpongeEvidenceData data)
+    public void Setup(SpongeEvidenceData data, bool isUnlocked = true)
     {
-        if (data == null)
+        if (data == null || !isUnlocked)
         {
             EvidenceId = null;
             SetState(SlotState.Empty);
             return;
         }
         EvidenceId = data.id;
-        if (nameTxt != null)        nameTxt.text        = data.evidenceName;
-        if (descriptionTxt != null) descriptionTxt.text = data.description;
+        if (iconImg != null && !string.IsNullOrEmpty(data.iconSpr))
+        {
+            var spr = Resources.Load<Sprite>(data.iconSpr);
+            if (spr != null) iconImg.sprite = spr;
+        }
         SetState(SlotState.Filled);
     }
 
@@ -79,18 +80,14 @@ public class SpongeEvidenceButtonUI : MonoBehaviour
         switch (newState)
         {
             case SlotState.Empty:
-                if (borderImg != null)      { borderImg.sprite = emptySprite;       borderImg.SetNativeSize(); }
-                if (iconImg != null)        iconImg.gameObject.SetActive(false);
-                if (nameTxt != null)        nameTxt.gameObject.SetActive(false);
-                if (descriptionTxt != null) descriptionTxt.gameObject.SetActive(false);
+                if (borderImg != null) { borderImg.sprite = emptySprite; borderImg.SetNativeSize(); }
+                if (iconImg != null)   iconImg.gameObject.SetActive(false);
                 if (isHighlighted) { ShiftChildrenY(12f); isHighlighted = false; }
                 SetPosY(originalBorderY);
                 break;
             case SlotState.Filled:
-                if (borderImg != null)      { borderImg.sprite = filledSprite;       borderImg.SetNativeSize(); }
-                if (iconImg != null)        iconImg.gameObject.SetActive(true);
-                if (nameTxt != null)        nameTxt.gameObject.SetActive(true);
-                if (descriptionTxt != null) descriptionTxt.gameObject.SetActive(true);
+                if (borderImg != null) { borderImg.sprite = filledSprite; borderImg.SetNativeSize(); }
+                if (iconImg != null)   iconImg.gameObject.SetActive(true);
                 if (isHighlighted) { ShiftChildrenY(12f); isHighlighted = false; }
                 SetPosY(originalBorderY);
                 break;

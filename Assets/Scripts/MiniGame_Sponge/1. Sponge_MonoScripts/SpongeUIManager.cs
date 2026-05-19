@@ -16,7 +16,9 @@ public class SpongeUIManager : MonoBehaviour
     public static SpongeUIManager Instance { get; private set; }
     
     [Header("증거 패널")]
-    [SerializeField] private GameObject evidencePnl; // 증거 목록 전체를 감싸는 패널
+    [SerializeField] private GameObject evidencePnl;
+    [SerializeField] private TMP_Text evidenceNameTxt;
+    [SerializeField] private TMP_Text evidenceDescriptionTxt;
     [Header("증거 슬롯")]
     // 씬에 이미 배치된 버튼들을 직접 참조 연결
     [SerializeField] private SpongeEvidenceButtonUI[] evidenceSlots;
@@ -50,7 +52,7 @@ public class SpongeUIManager : MonoBehaviour
             { "recorder",  holderRecorder  },
             { "poster",    holderPoster    },
             { "receipt",   holderReceipt   },
-            { "statement", holderStatement }
+            { "bankstatement", holderStatement }
         };
     }
 
@@ -96,6 +98,9 @@ public class SpongeUIManager : MonoBehaviour
     private void Update()
     {
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
+
+        if (Input.GetKeyDown(KeyCode.S))
+            TryDevSkip();
 
         if (Input.GetKeyDown(KeyCode.Tab) && SpongeGameManager.Instance.CurrentState != SpongeGameState.GameState.Resolution)
             TryOpenEvidencePanel();
@@ -211,7 +216,8 @@ public class SpongeUIManager : MonoBehaviour
         for (int i = 0; i < evidenceSlots.Length; i++)
         {
             SpongeEvidenceData data = i < evidences.Length ? evidences[i] : null;
-            evidenceSlots[i].Setup(data);
+            bool unlocked = data != null && SpongeEvidenceManager.Instance.IsUnlocked(data.id);
+            evidenceSlots[i].Setup(data, unlocked);
 
             // 클릭 이벤트 연결 — EventTrigger 사용 (첫 클릭: 선택, 두 번째 클릭: 제시)
             var trigger = evidenceSlots[i].GetComponent<EventTrigger>()
@@ -257,6 +263,13 @@ public class SpongeUIManager : MonoBehaviour
 
         if (holderMap.TryGetValue(evidenceId, out var target) && target != null)
             target.SetActive(true);
+
+        var data = SpongeEvidenceManager.Instance.GetById(evidenceId);
+        if (data != null)
+        {
+            if (evidenceNameTxt != null)        evidenceNameTxt.text        = data.evidenceName;
+            if (evidenceDescriptionTxt != null) evidenceDescriptionTxt.text = data.description;
+        }
     }
 
     void SelectFirstFilledSlot()
@@ -291,6 +304,22 @@ public class SpongeUIManager : MonoBehaviour
             }
             next += dir;
         }
+    }
+
+    // ── 개발자 스킵 (S키) ────────────────────────────────────────
+    void TryDevSkip()
+    {
+        var state = SpongeGameManager.Instance.CurrentState;
+
+        // 오프닝 스킵
+        if (state == SpongeGameState.GameState.Dialogue && SpongeGameManager.Instance.CurrentRound == 1)
+            SpongeDialogueManager.Instance.SkipOpening();
+        // 증언 낭독 스킵
+        else if (state == SpongeGameState.GameState.Testifying)
+            SpongeCrossExaminationManager.Instance.SkipTestifying();
+        // 재증언 전 대사 스킵
+        else if (state == SpongeGameState.GameState.CrossExamination && SpongeDialogueManager.Instance.IsInDialogueSequence)
+            SpongeDialogueManager.Instance.SkipBeforeRetestimony();
     }
 
     /// <summary>
