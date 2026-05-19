@@ -19,15 +19,24 @@ public class SpongeEvidenceManager : MonoBehaviour
     public static event Action<string> OnEvidenceSelected; // 증거 선택됨
     public static event Action OnEvidenceListChanged; // 목록 변경됨
 
+    public string SelectedEvidenceId { get; private set; }
+
     private void Awake()
     {
         Instance = this;
     }
 
-    // 증거 선택 시 호출
-    public void SelectEivdence(string evidenceId)
+    // 증거 슬롯 첫 클릭 시 호출 — 하이라이트 + 상세 이미지 표시
+    public void SelectEvidence(string evidenceId)
     {
+        SelectedEvidenceId = evidenceId;
         OnEvidenceSelected?.Invoke(evidenceId);
+    }
+
+    // 패널 닫힐 때 선택 초기화
+    public void ClearSelection()
+    {
+        SelectedEvidenceId = null;
     }
 
     // ── 증거 제시 ────────────────────────────────────────────

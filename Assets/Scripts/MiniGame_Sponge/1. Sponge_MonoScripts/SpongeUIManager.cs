@@ -177,12 +177,18 @@ public class SpongeUIManager : MonoBehaviour
             SpongeEvidenceData data = i < evidences.Length ? evidences[i] : null;
             evidenceSlots[i].Setup(data);
 
-            // 클릭 이벤트 연결
+            // 클릭 이벤트 연결 — 첫 클릭: 선택(하이라이트+상세), 두 번째 클릭: 제시
             if (data != null)
             {
                 string evidenceId = data.id;
                 evidenceSlots[i].GetComponent<Button>().onClick.RemoveAllListeners();
-                evidenceSlots[i].GetComponent<Button>().onClick.AddListener(() => SpongeEvidenceManager.Instance.PresentEvidence(evidenceId));
+                evidenceSlots[i].GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    if (SpongeEvidenceManager.Instance.SelectedEvidenceId == evidenceId)
+                        SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
+                    else
+                        SpongeEvidenceManager.Instance.SelectEvidence(evidenceId);
+                });
             }
         }
     }
@@ -211,6 +217,7 @@ public class SpongeUIManager : MonoBehaviour
     public void CloseEvidencePanel()
     {
         evidencePnl.SetActive(false);
+        SpongeEvidenceManager.Instance.ClearSelection();
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
             SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
     }
