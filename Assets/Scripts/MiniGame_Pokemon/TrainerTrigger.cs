@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace MiniTeam.Pokemon
@@ -14,6 +15,9 @@ namespace MiniTeam.Pokemon
         public string     pokemonName   = "아구몬";
         public GameObject pokemonPrefab; // 애니메이션 프리팹
 
+        [Header("발견 대사 (비어있으면 즉시 배틀)")]
+        public string encounterDialogueKey = ""; // DialogueDB 키
+
         private bool isDefeated = false;
         public bool IsDefeated => isDefeated;
 
@@ -22,6 +26,22 @@ namespace MiniTeam.Pokemon
             if (isDefeated) return;
             if (!other.CompareTag("Player")) return;
 
+            if (!string.IsNullOrEmpty(encounterDialogueKey))
+                StartCoroutine(EncounterWithDialogue());
+            else
+                BattleManager.Instance?.StartBattle(this);
+        }
+
+        IEnumerator EncounterWithDialogue()
+        {
+            FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
+            if (MapDialogueUI.Instance != null)
+            {
+                string text = DialogueDB.Instance != null
+                    ? DialogueDB.Instance.Get(encounterDialogueKey)
+                    : encounterDialogueKey;
+                yield return StartCoroutine(MapDialogueUI.Instance.Show(text));
+            }
             BattleManager.Instance?.StartBattle(this);
         }
 

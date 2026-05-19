@@ -96,8 +96,8 @@ namespace MiniTeam.Pokemon
             BattleUIManager.Instance?.ShowBlackoutNow();
             if (MapDialogueUI.Instance != null)
                 yield return StartCoroutine(MapDialogueUI.Instance.Show(L("battle_defeat")));
-            PokemonGameController.Instance?.RespawnPlayer();
             EndBattle();
+            PokemonGameController.Instance?.RespawnPlayer();
         }
 
         IEnumerator RunRoutine()
