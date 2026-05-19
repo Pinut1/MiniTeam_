@@ -59,9 +59,9 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         SpongeDialogueManager.Instance.SetTextBox(false);
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
-        ShowCurrentTestimonyAsDialogue();
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
         SpongeDialogueManager.Instance.SetTextBox(true);
+        ShowCurrentTestimonyAsDialogue();
     }
 
     // ── 증언 낭독 (Testifying) ───────────────────────────────
@@ -172,9 +172,9 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         SpongeDialogueManager.Instance.SetTextBox(false);
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-        ShowCurrentTestimony();
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
         SpongeDialogueManager.Instance.SetTextBox(true);
+        ShowCurrentTestimony();
     }
 
     public void OnEvidenceResolved(bool success)

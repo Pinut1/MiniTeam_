@@ -147,8 +147,7 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <param name="lineId"></param>
     public void ShowLine(string lineId)
     {
-        // 딕셔너리에서 lined로 대사를 찾음
-        // 없으면 경고 메세지
+        if (string.IsNullOrEmpty(lineId)) { OnSequenceEnd(); return; }
         if (!lineMap.TryGetValue(lineId, out var line))
         {
             Debug.LogWarning($"[DialogueManager] lineId를 찾을 수 없음 : {lineId}");
@@ -677,8 +676,8 @@ public class SpongeDialogueManager : MonoBehaviour
     {
         SetTextBox(false);
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
-        Instance.ShowLine("ending_01");
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
         SetTextBox(true);
+        Instance.ShowLine("ending_01");
     }
 }
