@@ -119,6 +119,13 @@ public class SpongeCrossExaminationManager : MonoBehaviour
             ShowCurrentTestimony();
         }
     }
+
+    // 추궁 후 복귀 전용 — 마지막 라인이면 첫 라인으로 루프
+    public void NextLineOrLoop()
+    {
+        currentIdx = (currentIdx < lines.Length - 1) ? currentIdx + 1 : 0;
+        ShowCurrentTestimony();
+    }
     // ── 이전 증언으로 ────────────────────────────────────────────
     /// <summary>
     /// 왼쪽 화살표 시 이전 증언으로 이동
@@ -172,9 +179,8 @@ public class SpongeCrossExaminationManager : MonoBehaviour
 
     public void OnEvidenceResolved(bool success)
     {
-        if (success)
-            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Pressing);
-        else
-            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+        // 성공/실패 모두 Pressing 상태로 유지 — 대사 시퀀스가 OnScreenClick() 흐름을 타게 함
+        // 실패 시 OnSequenceEnd()에서 lineId로 분기해 같은 증언으로 복귀
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Pressing);
     }
 }

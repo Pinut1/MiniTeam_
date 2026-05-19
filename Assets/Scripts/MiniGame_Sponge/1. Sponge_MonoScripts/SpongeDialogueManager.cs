@@ -29,7 +29,8 @@ public class SpongeDialogueManager : MonoBehaviour
 
     [Header("선택지 UI")]
     [SerializeField] private GameObject choicePnl;
-    [SerializeField] private Button[] choiceBtns; // 버튼 2개 고정 (선택지 더 추가 될 예정X)
+    [SerializeField] private Button[] choiceBtns;    // 버튼 2개 고정 (선택지 더 추가 될 예정X)
+    [SerializeField] private TMP_Text[] choiceBtnTxts; // 각 버튼의 TMP_Text — choiceBtns와 순서 맞춰 연결
 
     [Header("배경 / 캐릭터")]
     [SerializeField] private Image backgroundImg; // 배경
@@ -87,6 +88,7 @@ public class SpongeDialogueManager : MonoBehaviour
     private bool currentTestimonyIsLast;
 
     public bool IsTyping => isTyping;
+    public bool IsInDialogueSequence { get; private set; }
 
     private void Awake()
     {
@@ -152,6 +154,7 @@ public class SpongeDialogueManager : MonoBehaviour
             Debug.LogWarning($"[DialogueManager] lineId를 찾을 수 없음 : {lineId}");
             return;
         }
+        IsInDialogueSequence = true;
         currentLine = line;
 
         // 이전 타이핑 코루틴이 있으면 중단
@@ -165,6 +168,7 @@ public class SpongeDialogueManager : MonoBehaviour
     /// </summary>
     public void ShowTestimonyLine(SpongeTestimonyLine testimony, bool isFirst, bool isLast)
     {
+        IsInDialogueSequence = false;
         currentTestimonyText = testimony.txt;
         currentTestimonyIsFirst = isFirst;
         currentTestimonyIsLast = isLast;
@@ -227,6 +231,7 @@ public class SpongeDialogueManager : MonoBehaviour
     /// </summary>
     public void ShowTestimonyAsDialogue(SpongeTestimonyLine testimony)
     {
+        IsInDialogueSequence = false;
         currentTestimonyText = testimony.txt;
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         typingCoroutine = StartCoroutine(TypeTestimonyLine(testimony));
@@ -509,6 +514,13 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
 
+        // press_02_12 이후 : press_01(인덱스 0) 추궁 여부에 따라 분기
+        if (currentLine.lineId == "press_02_12" && !SpongeGameManager.Instance.HasPressedTestimony(0))
+        {
+            ShowLine("press_need_more");
+            return;
+        }
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
@@ -553,7 +565,8 @@ public class SpongeDialogueManager : MonoBehaviour
 
             // 클로저 캡쳐 - 람다 안에서 i를 쓰면 루프 끝난 값으로 고정되므로 idx로 복사해서 사용
             int idx = i;
-            choiceBtns[i].GetComponentInChildren<TMP_Text>().text = line.choices[i].choiceTxt;
+            if (i < choiceBtnTxts.Length && choiceBtnTxts[i] != null)
+                choiceBtnTxts[i].text = line.choices[i].choiceTxt;
             
             // 이전 이벤트 제거 -> 새 이벤트 연결
             choiceBtns[i].onClick.RemoveAllListeners();
@@ -601,12 +614,26 @@ public class SpongeDialogueManager : MonoBehaviour
                         StartCoroutine(StartEndingWithFade());
                     }
                 }
+                else if (currentLine != null && currentLine.lineId == "press_02_14")
+                {
+                    // press_02_12에서 이미 press_01 여부를 체크했으므로 여기까지 왔다면 조건 충족
+                    SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                    Instance.ShowLine("before_retestimony_01");
+                }
                 else
                 {
-                    // 조건 미충족 -> 다음 증언으로 넘어감
                     SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-                    SpongeCrossExaminationManager.Instance.NextLine();
+                    // 증거 제시 실패 대사 끝 → 같은 증언으로 복귀
+                    if (currentLine != null && currentLine.lineId.StartsWith("evidence_fail"))
+                        SpongeCrossExaminationManager.Instance.ShowCurrentTestimony();
+                    else
+                        SpongeCrossExaminationManager.Instance.NextLineOrLoop();
                 }
+                break;
+
+            case SpongeGameState.GameState.CrossExamination:
+                // before_retestimony 시퀀스가 CrossExamination 상태에서 끝날 때
+                SpongeCrossExaminationManager.Instance.StartRetestimony();
                 break;
 
             case SpongeGameState.GameState.Dialogue:

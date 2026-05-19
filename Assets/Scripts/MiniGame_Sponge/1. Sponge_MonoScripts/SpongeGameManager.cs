@@ -60,6 +60,8 @@ public class SpongeGameManager : MonoBehaviour
     // CrossExamination(심문) 상태에서만 true
     public bool CanPress() => currentState == GameState.CrossExamination;
 
+    public bool HasPressedTestimony(int idx) => completedPresses.Contains(idx);
+
     // ─프로퍼티를 이용해 캡슐화 (실시간으로 상태를 확인하여 결과를 반환)─
     // TAB키(증거 목록)를 열 수 있는 상태인지
     // 일반 대사 중이거나 심문 중일때만 가능
