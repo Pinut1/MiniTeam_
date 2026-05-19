@@ -1483,18 +1483,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfa5fbaa52f1a7240a1ccf51130b2199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcSpawner
-  boyNpcPrefab: {fileID: 5063496021859228331, guid: 192f941f59b48b84e858453923e98207, type: 3}
-  npcPrefabs:
+  boyPrefabs:
+  - {fileID: 5063496021859228331, guid: 192f941f59b48b84e858453923e98207, type: 3}
+  - {fileID: 3139337701844923548, guid: cbebda89842b9004fa86f6a1e9a55e9c, type: 3}
+  - {fileID: 3359113495046507175, guid: fbfd346d7f7432349aecb0d1ef140d10, type: 3}
+  - {fileID: 630220681163198060, guid: 86f263823167c774bb59f12c8ae25383, type: 3}
+  girlPrefabs:
   - {fileID: 6368241826221722612, guid: d84218830aa27f542a77b67ecca77f12, type: 3}
   - {fileID: 23921636532512797, guid: 56ac4fc46700f73479d0d8ee5076aeaa, type: 3}
   - {fileID: 3283147466150932370, guid: 6084b69f6771ac14989fd924ddee25c4, type: 3}
   - {fileID: 5326620766795767573, guid: d5276426da67c5b42a169799db91f9cb, type: 3}
+  minX: -14
+  maxX: 95
+  minY: 0.5
+  maxY: 1
   minGirlCount: 7
   maxGirlCount: 15
-  minX: 5
-  maxX: 90
-  minY: 0
-  maxY: 0.5
 --- !u!4 &1260487766
 Transform:
   m_ObjectHideFlags: 0
