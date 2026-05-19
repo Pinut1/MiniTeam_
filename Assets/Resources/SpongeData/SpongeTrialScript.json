@@ -551,8 +551,8 @@
       "speaker": "징징이",
       "txt": "증인.\n이름과 직업은?",
       "animationTrig": "",
-      "backgroundSpr": "",
-      "deskSpr": "",
+      "backgroundSpr": "Sponge_BG/BG_Defense",
+      "deskSpr": "Sponge_Table/JingJingi",
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
@@ -592,7 +592,7 @@
       "txt": "단체 손님이 들어와서\n굉장히 바쁜날이었습니다.",
       "ispressable": true,
       "firstPressDialogueId": "press_00_01",
-      "isRequiredPress": false,
+      "isRequiredPress": true,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
@@ -600,7 +600,7 @@
     {
       "txt": "직원 두명과 저는\n정신이 없었습니다.",
       "ispressable": true,
-      "firstPressDialogueId": "press_00_02",
+      "firstPressDialogueId": "press_01_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
@@ -609,8 +609,8 @@
     {
       "txt": "그때 전 잠시 일이 있어\n밖에 나가있었고",
       "ispressable": true,
-      "firstPressDialogueId": "press_00_03",
-      "isRequiredPress": false,
+      "firstPressDialogueId": "press_02_01",
+      "isRequiredPress": true,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
@@ -618,7 +618,7 @@
     {
       "txt": "어쩔 수 없이 직원 두명이\n일을 해야했습니다.",
       "ispressable": true,
-      "firstPressDialogueId": "press_00_04",
+      "firstPressDialogueId": "press_03_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
@@ -626,8 +626,8 @@
     },
     {
       "txt": "바쁜틈을 타 뚱이가 몰래\n집게리아 안으로 들어갔습니다.",
-      "ispressable": false,
-      "firstPressDialogueId": "press_00_05",
+      "ispressable": true,
+      "firstPressDialogueId": "press_04_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
@@ -635,24 +635,16 @@
     },
     {
       "txt": "아니글쎄 뚱이가 손님에게 나갈\n게살버거를 먹고 있는겁니다!",
-      "ispressable": false,
-      "firstPressDialogueId": "press_00_06",
-      "isRequiredPress": false,
-      "validEvidenceIds": [],
-      "evidenceSuccessDialogueId": "",
-      "isRequiredEvidence": false
-    },
-    {
-      "txt": "그래서 바로\n신고를 했지요.",
-      "ispressable": false,
-      "firstPressDialogueId": "",
+      "ispressable": true,
+      "firstPressDialogueId": "press_05_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
     }
   ],
-  "beforeRetestimonyLines": [
+  "beforeRetestimonyLines": 
+  [
     {
       "lineId": "before_retestimony_01",
       "speaker": "나",
@@ -719,21 +711,13 @@
       "alignment": ""
     }
   ],
-  "retestimonyLines": [
+  "retestimonyLines": 
+  [
     {
       "txt": "단체 손님이 20명이 들어와\n굉장히 바빴습니다.",
       "ispressable": true,
-      "firstPressDialogueId": "",
-      "isRequiredPress": false,
-      "validEvidenceIds": [],
-      "evidenceSuccessDialogueId": "",
-      "isRequiredEvidence": false
-    },
-    {
-      "txt": "직원 두 명과 전 굉장히\n정신없이 일을 했죠.",
-      "ispressable": true,
-      "firstPressDialogueId": "",
-      "isRequiredPress": false,
+      "firstPressDialogueId": "re_press_00_01",
+      "isRequiredPress": true,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
@@ -741,7 +725,7 @@
     {
       "txt": "그때 잠시 은행에 볼일이 있어\n은행에 다녀왔습니다.",
       "ispressable": true,
-      "firstPressDialogueId": "",
+      "firstPressDialogueId": "re_press_01_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
@@ -750,41 +734,43 @@
     {
       "txt": "그렇게 멀지않은 거리에 가게가\n통유리라 멀리서도 가게가 잘 보였죠.",
       "ispressable": true,
-      "firstPressDialogueId": "",
+      "firstPressDialogueId": "re_press_02_01",
       "isRequiredPress": true,
       "validEvidenceIds": ["receipt"],
-      "evidenceSuccessDialogueId": "",
+      "evidenceSuccessDialogueId": "evidence_00_00",
       "isRequiredEvidence": true
     },
     {
       "txt": "그때뚱이가 몰래 집게리아 안으로\n들어가는걸 봤고",
       "ispressable": true,
-      "firstPressDialogueId": "",
+      "firstPressDialogueId": "re_press_03_01",
       "isRequiredPress": true,
       "validEvidenceIds": ["recorder"],
-      "evidenceSuccessDialogueId": "",
+      "evidenceSuccessDialogueId": "evidence_01_00",
       "isRequiredEvidence": true
     },
     {
       "txt": "손님에게 나갈 게살버거를\n훔쳐먹는 모습까지 보고 말았죠.",
       "ispressable": true,
-      "firstPressDialogueId": "",
+      "firstPressDialogueId": "re_press_04_01",
       "isRequiredPress": false,
       "validEvidenceIds": ["bread"],
-      "evidenceSuccessDialogueId": "",
+      "evidenceSuccessDialogueId": "evidence_02_00",
       "isRequiredEvidence": true
     },
     {
       "txt": "그래서 바로 신고를\n했을뿐 입니다...",
       "ispressable": true,
-      "firstPressDialogueId": "",
+      "firstPressDialogueId": "re_press_05_01",
       "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
     }
   ],
-  "pressDialogueLines": [
+  
+  "pressDialogueLines": 
+  [
     {
       "lineId": "press_00_01",
       "speaker": "나",
@@ -1100,7 +1086,7 @@
     {
       "lineId": "press_02_13",
       "speaker": "플랑크톤",
-      "txt": "......그럼 다시 한 번\n<증언>해 주십시오.",
+      "txt": "......그럼 다시 한 번\n<증언>을 해주셔야겠습니다.",
       "animationTrig": "",
       "backgroundSpr": "Sponge_BG/BG_Judge",
       "deskSpr": "Sponge_Table/Plankton",
@@ -1111,7 +1097,7 @@
       "alignment": ""
     },
     {
-      "lineId": "press_02_15",
+      "lineId": "press_02_14",
       "speaker": "나",
       "txt": "(그렇게 간단히\n져주지 않는군...)",
       "animationTrig": "",
@@ -1345,6 +1331,32 @@
       "alignment": ""
     },
     {
+      "lineId": "re_press_00_04",
+      "speaker": "나",
+      "txt": "(별로 중요한 게 아니었나...)",
+      "animationTrig": "",
+      "backgroundSpr": "Sponge_BG/BG_Player",
+      "deskSpr": "None",
+      "characterType": 2,
+      "characterPos": 1,
+      "choices": [],
+      "nextLineId": "re_press_00_05",
+      "alignment": ""
+    },
+    {
+      "lineId": "re_press_00_05",
+      "speaker": "징징이",
+      "txt": "...증인은 그때\n어디에 가있었나?",
+      "animationTrig": "",
+      "backgroundSpr": "Sponge_BG/BG_Defense",
+      "deskSpr": "Sponge_Table/JingJingi",
+      "characterType": 4,
+      "characterPos": 2,
+      "choices": [],
+      "nextLineId": "",
+      "alignment": ""
+    },
+    {
       "lineId": "re_press_01_01",
       "speaker": "스폰지밥",
       "txt": "은행에 간 증거.\n있습니까?",
@@ -1514,7 +1526,7 @@
       "alignment": ""
     },
     {
-      "lineId": "re_press_02_11",
+      "lineId": "re_press_02_10",
       "speaker": "나",
       "txt": "(아무래도 크게 당황한 모양이다...!)",
       "animationTrig": "",
@@ -1523,11 +1535,11 @@
       "characterType": 2,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "re_press_02_12",
+      "nextLineId": "re_press_02_11",
       "alignment": ""
     },
     {
-      "lineId": "re_press_02_12",
+      "lineId": "re_press_02_11",
       "speaker": "나",
       "txt": "(......조금 더 깊이 파고들어 볼까?)",
       "animationTrig": "",
@@ -1667,7 +1679,7 @@
       "alignment": ""
     },
     {
-      "lineId": "re_press_",
+      "lineId": "re_press_choice_00_10",
       "speaker": "",
       "txt": "",
       "animationTrig": "",
@@ -1676,28 +1688,15 @@
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
-      "nextLineId": "re_press_choice_00_10",
-      "alignment": ""
-    },
-    {
-      "lineId": "re_press_choice_00_10",
-      "speaker": "플랑크톤",
-      "txt": "정숙하시오. 정숙!",
-      "animationTrig": "",
-      "backgroundSpr": "Sponge_BG/BG_Judge",
-      "deskSpr": "Sponge_Table/Plankton",
-      "characterType": 5,
-      "characterPos": 4,
-      "choices": [],
       "nextLineId": "re_press_choice_00_11",
       "alignment": ""
     },
     {
       "lineId": "re_press_choice_00_11",
       "speaker": "플랑크톤",
-      "txt": "변호인......\n앞으로는 조심해 주십시오.",
+      "txt": "정숙하시오. 정숙!",
       "animationTrig": "",
-      "backgroundSpr": "",
+      "backgroundSpr": "Sponge_BG/BG_Judge",
       "deskSpr": "Sponge_Table/Plankton",
       "characterType": 5,
       "characterPos": 4,
@@ -1707,6 +1706,19 @@
     },
     {
       "lineId": "re_press_choice_00_12",
+      "speaker": "플랑크톤",
+      "txt": "변호인......\n앞으로는 조심해 주십시오.",
+      "animationTrig": "",
+      "backgroundSpr": "",
+      "deskSpr": "Sponge_Table/Plankton",
+      "characterType": 5,
+      "characterPos": 4,
+      "choices": [],
+      "nextLineId": "re_press_choice_00_13",
+      "alignment": ""
+    },
+    {
+      "lineId": "re_press_choice_00_13",
       "speaker": "나",
       "txt": "(이런......순식간에\n비열한 놈이 되어 버렸다......)",
       "animationTrig": "",
@@ -2226,6 +2238,19 @@
       "lineId": "re_press_05_03",
       "speaker": "나",
       "txt": "(별로 중요하지\n않은 것 같다...)",
+      "animationTrig": "",
+      "backgroundSpr": "Sponge_BG/BG_Player",
+      "deskSpr": "None",
+      "characterType": 2,
+      "characterPos": 1,
+      "choices": [],
+      "nextLineId": "",
+      "alignment": ""
+    },
+    {
+      "lineId": "press_need_more",
+      "speaker": "나",
+      "txt": "아직 뭔가 부족하다...\n추궁을 더 해보자...!",
       "animationTrig": "",
       "backgroundSpr": "Sponge_BG/BG_Player",
       "deskSpr": "None",
