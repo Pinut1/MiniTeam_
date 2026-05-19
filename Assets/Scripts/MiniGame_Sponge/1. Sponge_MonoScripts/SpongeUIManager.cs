@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 /// <summary>
 /// 모든 UI패널 표시/숨김과 키 입력을 담당
@@ -29,6 +30,8 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject holderStatement;
 
     private Dictionary<string, GameObject> holderMap;
+    private int selectedSlotIndex = 0;
+    private SpongeGameState.GameState stateBeforeEvidence;
 
     [Header("메뉴 이미지")]
     [SerializeField] private GameObject menuDefault;
@@ -83,6 +86,7 @@ public class SpongeUIManager : MonoBehaviour
             if (menuCrossExam != null) menuCrossExam.SetActive(false);
             return;
         }
+        if (newState == SpongeGameState.GameState.EvidenceSelect) return;
         bool isCrossExam = newState == SpongeGameState.GameState.CrossExamination;
         if (menuDefault != null)  menuDefault.SetActive(!isCrossExam);
         if (menuCrossExam != null) menuCrossExam.SetActive(isCrossExam);
@@ -93,10 +97,19 @@ public class SpongeUIManager : MonoBehaviour
     {
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
 
-        //if (Input.GetKeyDown(KeyCode.Escape))
-            //ToggleOptionPanel();
-        if (Input.GetKeyDown(KeyCode.Tab) && SpongeGameManager.Instance.CanOpenEvidence)
+        if (Input.GetKeyDown(KeyCode.Tab) && SpongeGameManager.Instance.CurrentState != SpongeGameState.GameState.Resolution)
             TryOpenEvidencePanel();
+
+        // 증거 패널이 열려 있을 때는 방향키/Enter를 슬롯 조작에만 사용
+        if (evidencePnl.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow)) MoveEvidenceSelection(1);
+            if (Input.GetKeyDown(KeyCode.LeftArrow))  MoveEvidenceSelection(-1);
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                TryPresentSelectedEvidence();
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Q) && SpongeGameManager.Instance.CanPress())
             SpongeCrossExaminationManager.Instance.PressWitness();
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.Testifying)
@@ -106,14 +119,32 @@ public class SpongeUIManager : MonoBehaviour
         }
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.CrossExamination)
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-                SpongeCrossExaminationManager.Instance.NextLine();
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-                SpongeCrossExaminationManager.Instance.PrevLine();
+            if (SpongeDialogueManager.Instance.IsInDialogueSequence)
+            {
+                // before_retestimony 같은 일반 대사가 재생 중일 때는 OnScreenClick()으로 진행
+                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
+                    SpongeDialogueManager.Instance.OnScreenClick();
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    if (SpongeDialogueManager.Instance.IsTyping)
+                        SpongeDialogueManager.Instance.SkipCrossExamTyping();
+                    else
+                        SpongeCrossExaminationManager.Instance.NextLine();
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    if (SpongeDialogueManager.Instance.IsTyping)
+                        SpongeDialogueManager.Instance.SkipCrossExamTyping();
+                    else
+                        SpongeCrossExaminationManager.Instance.PrevLine();
+                }
+            }
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
             HandleScreenClick();
-
     }
 
     // ── 화면 클릭 처리 ───────────────────────────────────────────
@@ -135,9 +166,11 @@ public class SpongeUIManager : MonoBehaviour
             case SpongeGameState.GameState.Testifying:
                 SpongeDialogueManager.Instance.OnScreenClick();
                 break;
-            // 심문중 클릭 -> 타이핑 중이면 스킵, 아니면 다음 증언으로 이동
+            // 심문중 클릭 -> 일반 대사 중이면 OnScreenClick(), 아니면 다음 증언으로 이동
             case SpongeGameState.GameState.CrossExamination:
-                if (SpongeDialogueManager.Instance.IsTyping)
+                if (SpongeDialogueManager.Instance.IsInDialogueSequence)
+                    SpongeDialogueManager.Instance.OnScreenClick();
+                else if (SpongeDialogueManager.Instance.IsTyping)
                     SpongeDialogueManager.Instance.SkipCrossExamTyping();
                 else
                     SpongeCrossExaminationManager.Instance.NextLine();
@@ -157,11 +190,14 @@ public class SpongeUIManager : MonoBehaviour
             return;
         }
 
-        // 증거 선택 상태로 전환
+        // 패널 열기 전 상태 저장 후 EvidenceSelect로 전환
+        stateBeforeEvidence = SpongeGameManager.Instance.CurrentState;
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.EvidenceSelect);
 
-        RebuildEvidenceSlots();
+        evidencePnl.transform.SetAsLastSibling();
         evidencePnl.SetActive(true);
+        RebuildEvidenceSlots();
+        SelectFirstFilledSlot();
     }
 
     /// <summary>
@@ -177,18 +213,26 @@ public class SpongeUIManager : MonoBehaviour
             SpongeEvidenceData data = i < evidences.Length ? evidences[i] : null;
             evidenceSlots[i].Setup(data);
 
-            // 클릭 이벤트 연결 — 첫 클릭: 선택(하이라이트+상세), 두 번째 클릭: 제시
+            // 클릭 이벤트 연결 — EventTrigger 사용 (첫 클릭: 선택, 두 번째 클릭: 제시)
+            var trigger = evidenceSlots[i].GetComponent<EventTrigger>()
+                       ?? evidenceSlots[i].gameObject.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
             if (data != null)
             {
                 string evidenceId = data.id;
-                evidenceSlots[i].GetComponent<Button>().onClick.RemoveAllListeners();
-                evidenceSlots[i].GetComponent<Button>().onClick.AddListener(() =>
+                var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
+                entry.callback.AddListener(_ =>
                 {
                     if (SpongeEvidenceManager.Instance.SelectedEvidenceId == evidenceId)
-                        SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
+                    {
+                        if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
+                            SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
+                    }
                     else
                         SpongeEvidenceManager.Instance.SelectEvidence(evidenceId);
                 });
+                trigger.triggers.Add(entry);
             }
         }
     }
@@ -201,14 +245,52 @@ public class SpongeUIManager : MonoBehaviour
     /// <param name="evidenceId"></param>
     void HandleEvidenceSelected(string evidenceId)
     {
-        foreach (var btn in evidenceSlots)
-            btn.SetHighlight(btn.EvidenceId == evidenceId);
+        for (int i = 0; i < evidenceSlots.Length; i++)
+        {
+            bool match = evidenceSlots[i].EvidenceId == evidenceId;
+            evidenceSlots[i].SetHighlight(match);
+            if (match) selectedSlotIndex = i;
+        }
 
         foreach (var holder in holderMap.Values)
             if (holder != null) holder.SetActive(false);
 
         if (holderMap.TryGetValue(evidenceId, out var target) && target != null)
             target.SetActive(true);
+    }
+
+    void SelectFirstFilledSlot()
+    {
+        for (int i = 0; i < evidenceSlots.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(evidenceSlots[i].EvidenceId))
+            {
+                SpongeEvidenceManager.Instance.SelectEvidence(evidenceSlots[i].EvidenceId);
+                return;
+            }
+        }
+    }
+
+    void TryPresentSelectedEvidence()
+    {
+        if (stateBeforeEvidence != SpongeGameState.GameState.CrossExamination) return;
+        string id = SpongeEvidenceManager.Instance.SelectedEvidenceId;
+        if (!string.IsNullOrEmpty(id))
+            SpongeEvidenceManager.Instance.PresentEvidence(id);
+    }
+
+    void MoveEvidenceSelection(int dir)
+    {
+        int next = selectedSlotIndex + dir;
+        while (next >= 0 && next < evidenceSlots.Length)
+        {
+            if (!string.IsNullOrEmpty(evidenceSlots[next].EvidenceId))
+            {
+                SpongeEvidenceManager.Instance.SelectEvidence(evidenceSlots[next].EvidenceId);
+                return;
+            }
+            next += dir;
+        }
     }
 
     /// <summary>
@@ -219,7 +301,7 @@ public class SpongeUIManager : MonoBehaviour
         evidencePnl.SetActive(false);
         SpongeEvidenceManager.Instance.ClearSelection();
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
-            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+            SpongeGameManager.Instance.ChangeState(stateBeforeEvidence);
     }
 
     /*
