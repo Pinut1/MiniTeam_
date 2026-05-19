@@ -2141,7 +2141,7 @@ MonoBehaviour:
   - {fileID: 2754525108269261730, guid: 74f8cb83a191e41448a30a965e3fcb28, type: 3}
   - {fileID: 6801526386922595897, guid: c51d48ce0d12dfe40aef54e5ca18d760, type: 3}
   wave1Duration: 30
-  wave1Interval: 2.5
+  wave1Interval: 2
   wave1Speed: 1.2
   wave1ShootRatio: 0.3
   wave2Duration: 30
