@@ -177,6 +177,13 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         ShowCurrentTestimony();
     }
 
+    public void SkipTestifying()
+    {
+        SpongeDialogueManager.Instance.StopTyping();
+        currentIdx = lines.Length - 1;
+        AdvanceTestifying();
+    }
+
     public void OnEvidenceResolved(bool success)
     {
         // 성공/실패 모두 Pressing 상태로 유지 — 대사 시퀀스가 OnScreenClick() 흐름을 타게 함

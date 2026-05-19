@@ -178,10 +178,18 @@ public class SpongeGameManager : MonoBehaviour
         return result; // 저장해뒀던 값 반환
     }
 
-    // 조건 충족 즉시 체크 - 필요 시 자동 Resolution 전환
-    void CheckAllConditions()
+    public void SkipAllRequiredConditions()
     {
-        // 필요시 사용
+        if (CurrentRound == 1)
+        {
+            foreach (int i in requiredPressIndices)   completedPresses.Add(i);
+            foreach (string id in requiredEvidenceIds) completedEvidences.Add(id);
+        }
+        else
+        {
+            foreach (int i in requiredRetestimonyPressIndices)    completedRetestimonyPresses.Add(i);
+            foreach (string id in requiredRetestimonyEvidenceIds) completedRetestimonyEvidences.Add(id);
+        }
     }
 
     // ── 게임 시작 / 재시작 ───────────────────────────────────
