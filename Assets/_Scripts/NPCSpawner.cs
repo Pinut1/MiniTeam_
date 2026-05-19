@@ -25,7 +25,6 @@ public class NpcSpawner : MonoBehaviour
     void SpawnAll()
     {
         int spawnCount = Random.Range(minGirlCount, maxGirlCount + 1);
-
         for (int i = 0; i < spawnCount; i++)
         {
             Vector3 spawnPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), transform.position.z);
@@ -40,19 +39,23 @@ public class NpcSpawner : MonoBehaviour
     {
         // 1. 첫 생성은 즉시 (딜레이 없음)
         GameObject boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], girl.position + new Vector3(1.5f, 0, 0), Quaternion.identity);
+
         boy.tag = "NPC";
 
         // 2. 이후 남학생이 죽었을 때만 3초 딜레이 후 재생성
         while (girl != null)
         {
             if (boy == null)
+
             {
                 yield return new WaitForSeconds(3f);
 
                 if (girl != null)
                 {
                     Vector3 spawnPos = girl.position + new Vector3(1.5f, 0, 0);
+
                     boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], spawnPos, Quaternion.identity);
+
                     boy.tag = "NPC";
                 }
             }

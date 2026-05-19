@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerLaser : MonoBehaviour
 {
@@ -52,6 +53,9 @@ public class PlayerLaser : MonoBehaviour
 
     [Header("Scripts")]
     public PlayerMove playerMoveScript;
+
+    // 중복 방지를 위한 하트 이미지 제비뽑기 주머니
+    private List<Sprite> heartSpritePool = new List<Sprite>();
 
     void Start()
     {
@@ -358,6 +362,33 @@ public class PlayerLaser : MonoBehaviour
         }
     }
 
+    // 중복 없는 하트 이미지를 반환하는 제비뽑기 함수
+    private Sprite GetUniqueHeartSprite()
+    {
+        if (HeartUIManager.instance == null || HeartUIManager.instance.possibleHeartSprites.Length == 0) return null;
+
+        // 주머니가 비었으면 매니저에 있는 이미지들을 다시 채우고 섞어줍니다.
+        if (heartSpritePool.Count == 0)
+        {
+            heartSpritePool.AddRange(HeartUIManager.instance.possibleHeartSprites);
+
+            // 리스트 섞기 (Fisher-Yates Shuffle)
+            for (int i = 0; i < heartSpritePool.Count; i++)
+            {
+                Sprite temp = heartSpritePool[i];
+                int randomIndex = Random.Range(i, heartSpritePool.Count);
+                heartSpritePool[i] = heartSpritePool[randomIndex];
+                heartSpritePool[randomIndex] = temp;
+            }
+        }
+
+        // 섞인 주머니에서 첫 번째 이미지를 꺼내고 제거합니다.
+        Sprite selectedSprite = heartSpritePool[0];
+        heartSpritePool.RemoveAt(0);
+        return selectedSprite;
+    }
+
+    // 마우스를 올렸을 때 무작위가 아닌 제비뽑기 색상을 적용하도록 변경
     void ShowOrSpawnHeart(GameObject npc)
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
@@ -372,10 +403,14 @@ public class PlayerLaser : MonoBehaviour
         newHeart.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
 
         SpriteRenderer heartSR = newHeart.GetComponent<SpriteRenderer>();
-        if (heartSR != null && HeartUIManager.instance != null)
+        if (heartSR != null)
         {
-            int randomIndex = Random.Range(0, HeartUIManager.instance.possibleHeartSprites.Length);
-            heartSR.sprite = HeartUIManager.instance.possibleHeartSprites[randomIndex];
+            // 기존의 순수 랜덤 로직 대신, 제비뽑기 함수를 호출합니다!
+            Sprite pickedSprite = GetUniqueHeartSprite();
+            if (pickedSprite != null)
+            {
+                heartSR.sprite = pickedSprite;
+            }
             heartSR.color = new Color(1f, 1f, 1f, 1f);
             heartSR.sortingOrder = 0;
         }
@@ -419,6 +454,7 @@ public class PlayerLaser : MonoBehaviour
                     {
                         currentFillImage = img;
                         currentFillImage.sprite = assignedSprite;
+                        currentFillImage.fillAmount = 0f;
                         currentFillImage.fillAmount = 0f;
                         break;
                     }
@@ -497,22 +533,29 @@ public class PlayerLaser : MonoBehaviour
 
     public void TriggerAllNpcsExit()
     {
-        GameObject[] npcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject npc in npcs)
+        // 1. "GirlNpc" 태그를 가진 여학생들을 찾아 퇴장
+        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
+        foreach (GameObject girlObj in girlNpcs)
         {
-            // NPC 오브젝트에서 GirlNpcReaction 스크립트를 찾습니다.
-            GirlNpcReaction girl = npc.GetComponent<GirlNpcReaction>();
-
+            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
             if (girl != null)
             {
-                // 찾았다면 퇴장 명령!
                 girl.WalkAwayAndDestroy();
             }
-            else
-            {
-                // 만약 GirlNpcReaction 스크립트가 없는 남학생(공격받던 NPC)이라면 그냥 삭제
-                Destroy(npc);
-            }
+        }
+
+        // 2. "NPC" 태그를 가진 남학생들을 찾아 삭제
+        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
+        foreach (GameObject boyObj in boyNpcs)
+        {
+            Destroy(boyObj);
+        }
+
+        // 3. 새로운 NPC 스폰
+        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+        if (npcManager != null)
+        {
+            npcManager.SpawnCutsceneNpcs();
         }
     }
 }

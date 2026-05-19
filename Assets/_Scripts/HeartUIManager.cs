@@ -10,14 +10,13 @@ public class HeartUIManager : MonoBehaviour
     public Sprite[] possibleHeartSprites;  // 등장 가능한 하트 종류들
     public float uncollectedAlpha = 0.3f;  // 미수집 상태 투명도
 
-    // ★ [범인 검거 1] 수집 여부를 체크하는 배열입니다.
     private bool[] isCollected;
 
     void Awake()
     {
         if (instance == null) instance = this;
 
-        // ★ [핵심 방어] 게임 시작 시 하트 슬롯 개수만큼 isCollected 배열 방을 무조건 생성합니다!
+        // 게임 시작 시 하트 슬롯 개수만큼 isCollected 배열 방을 무조건 생성합니다!
         if (heartSlots != null)
         {
             isCollected = new bool[heartSlots.Length];
@@ -36,14 +35,13 @@ public class HeartUIManager : MonoBehaviour
 
     public bool CollectHeart(Sprite collectedSprite)
     {
-        // [방어 1] 주워먹은 하트 아이템에 그림이 아예 없으면 조용히 취소
+        // 주워먹은 하트 아이템에 그림이 아예 없으면 조용히 취소
         if (collectedSprite == null)
         {
-            Debug.Log("먹은 하트에 스프라이트가 없습니다!");
             return false;
         }
 
-        // [방어 2] 혹시라도 isCollected 배열이 날아갔다면 강제 재생성
+        // 혹시라도 isCollected 배열이 날아갔다면 강제 재생성
         if (isCollected == null || isCollected.Length != heartSlots.Length)
         {
             isCollected = new bool[heartSlots.Length];
@@ -52,7 +50,7 @@ public class HeartUIManager : MonoBehaviour
         // 10개의 UI 보드판 칸을 하나하나 검사합니다.
         for (int i = 0; i < heartSlots.Length; i++)
         {
-            // [방어 3] UI 슬롯 자체가 비어있거나, Source Image에 그림이 안 들어있으면 건너뜀!
+            // UI 슬롯 자체가 비어있거나, Source Image에 그림이 안 들어있으면 건너뜀!
             if (heartSlots[i] != null && heartSlots[i].sprite != null)
             {
                 // 아직 수집 안 한 칸이고, 먹은 하트랑 그림 이름이 똑같다면!
@@ -66,8 +64,6 @@ public class HeartUIManager : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log("보드에 없거나 이미 다 채운 색상입니다. 그냥 꿀꺽!");
         return false;
     }
 
@@ -77,8 +73,6 @@ public class HeartUIManager : MonoBehaviour
         {
             if (!isCollected[i]) return; // 하나라도 안 켜진 게 있으면 바로 종료
         }
-
-        Debug.Log("모든 하트 수집 완료! NPC들 퇴장!");
         FindAnyObjectByType<PlayerLaser>().TriggerAllNpcsExit();
     }
 

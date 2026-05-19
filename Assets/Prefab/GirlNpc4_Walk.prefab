@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 8152987296767317977}
   m_Layer: 0
   m_Name: GirlNpc4_Walk
-  m_TagString: Untagged
+  m_TagString: GirlNpc
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
