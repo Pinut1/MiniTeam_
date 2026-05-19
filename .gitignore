@@ -80,8 +80,6 @@ crashlytics-build.properties
 *.wav
 *.mp3
 *.fbx
-*.anim
-*.controller
 
 # OS
 .DS_Store
