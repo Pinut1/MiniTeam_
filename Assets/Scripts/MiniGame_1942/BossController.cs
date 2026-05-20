@@ -50,6 +50,12 @@ namespace MiniTeam.Shooting1942
         public Sprite spriteLeft;
         public Sprite spriteRight;
 
+        [Header("보스 파괴 연출")]
+        public GameObject[] smallExplosionPrefabs; // CFXR 소형 폭발 (여러 개 등록)
+        public GameObject   finalExplosionPrefab;  // CFXR 대형 폭발 (마지막 한 방)
+        public float        deathDuration     = 2.5f; // 폭발 연출 지속 시간
+        public float        explosionInterval = 0.2f; // 소형 폭발 간격
+
         private SpriteRenderer sr;
         private float prevX;
         private Transform playerTransform;
@@ -187,10 +193,7 @@ namespace MiniTeam.Shooting1942
 
             if (currentHp <= 0)
             {
-                isDefeated = true;
-                ShootingUIManager.Instance?.AddScore(200);
-                OnBossDefeated?.Invoke();
-                Destroy(gameObject);
+                StartCoroutine(BossDeathRoutine());
                 return;
             }
 
@@ -213,6 +216,51 @@ namespace MiniTeam.Shooting1942
             currentHp = maxHp / 2 - 1;
             ShootingUIManager.Instance?.UpdateBossHp(currentHp, maxHp);
             StartCoroutine(EnterPhase2());
+        }
+
+        // ── 보스 파괴 연출 ───────────────────────────
+
+        IEnumerator BossDeathRoutine()
+        {
+            isDefeated   = true;
+            isInvincible = true;
+            StopAllPatterns();
+            if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+
+            // 보스 콜라이더 범위 기준으로 폭발 위치 랜덤 계산
+            var col    = GetComponent<Collider2D>();
+            var bounds = col != null ? col.bounds
+                                     : new Bounds(transform.position, new Vector3(2f, 2f, 0f));
+
+            float elapsed     = 0f;
+            float nextBurst   = 0f;
+
+            while (elapsed < deathDuration)
+            {
+                elapsed   += Time.deltaTime;
+                nextBurst -= Time.deltaTime;
+
+                if (nextBurst <= 0f && smallExplosionPrefabs != null && smallExplosionPrefabs.Length > 0)
+                {
+                    Vector3 pos = new Vector3(
+                        UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
+                        UnityEngine.Random.Range(bounds.min.y, bounds.max.y),
+                        0f);
+                    var prefab = smallExplosionPrefabs[UnityEngine.Random.Range(0, smallExplosionPrefabs.Length)];
+                    if (prefab != null) Instantiate(prefab, pos, Quaternion.identity);
+                    nextBurst = explosionInterval;
+                }
+
+                yield return null;
+            }
+
+            // 최종 대형 폭발
+            if (finalExplosionPrefab != null)
+                Instantiate(finalExplosionPrefab, transform.position, Quaternion.identity);
+
+            ShootingUIManager.Instance?.AddScore(200);
+            OnBossDefeated?.Invoke();
+            Destroy(gameObject);
         }
 
         // ── 2페이즈 진입 연출 ─────────────────────
