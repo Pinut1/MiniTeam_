@@ -353,8 +353,10 @@ public class TetrisBlock : MonoBehaviour
                                     //TODO 타마마 임팩트
                                     float distanceToWall = j;
 
+
                                     // 1. 빔 프리팹 생성 (cell.position, 즉 블록 파편의 위치에서 생성)
-                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, cell.position, Quaternion.identity);
+                                    Vector3 spawnPosition = cell.position + new Vector3(-1.8f, 0, 0);
+                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, spawnPosition, Quaternion.identity);
 
                                     // 2. 생성된 빔에게 거리 전달하여 스케일/위치 맞추기
                                     if (beamObj.TryGetComponent(out TamamaBeam beamScript))

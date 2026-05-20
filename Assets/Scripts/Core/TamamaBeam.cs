@@ -17,7 +17,7 @@ public class TamamaBeam : MonoBehaviour
     {
         // 1. 기둥 세팅
         // 중심을 기준으로 양쪽으로 늘어나기 때문에 벽과 발사 지점의 절반(-distance / 2) 위치로 옮겨서 스케일을 늘림
-        beamBody.localPosition = new Vector3(-distance / 2f, 0, 0);
+        beamBody.localPosition = new Vector3(-distance / 2f , 0, 0);
         beamBody.localScale = new Vector3(distance, 1, 1);
 
         // 2. 끝단 세팅
