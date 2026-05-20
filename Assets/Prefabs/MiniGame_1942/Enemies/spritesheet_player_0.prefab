@@ -133,9 +133,11 @@ MonoBehaviour:
   moveSpeed: 2
   sineAmount: 1.5
   sineSpeed: 2
-  canShoot: 0
+  shootType: 0
   enemyBulletPrefab: {fileID: 7156600308698090942, guid: 420869f3f693a494c854fd6c3c57dbf4, type: 3}
   shootInterval: 2
+  spreadAngle: 20
+  burstDelay: 0.15
   hp: 3
   explosionPrefab: {fileID: 7862446294290157411, guid: 51a47ae2a7f65fd46a835c268fc9cbed, type: 3}
 --- !u!60 &9024774217024651043
