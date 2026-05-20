@@ -1,3 +1,4 @@
+using MiniTeam.Tetris;
 using System;
 using UnityEngine;
 
@@ -307,6 +308,18 @@ public class TetrisBlock : MonoBehaviour
                     {
                         if (parentBlock.type == BlockType.I_enable)
                         {
+                            // 블록이 가로인지 세로인지 판별
+                            // 자식(파편) 2개를 잡아, X축으로 떨어져 있는지 Y축으로 떨어져 있는지 검사.
+                            bool isHorizontal = true;
+                            if (parentTransform.childCount >= 2)
+                            {
+                                Transform child1 = parentTransform.GetChild(0);
+                                Transform child2 = parentTransform.GetChild(1);
+
+                                isHorizontal = Mathf.Abs(child1.position.x - child2.position.x)
+                                                > Mathf.Abs(child1.position.y - child2.position.y);
+                            }
+
                             // 1. 살아남을 파편(형제들) 색상을 회색으로 변경
                             foreach (Transform sibling in parentTransform)
                             {
@@ -319,19 +332,31 @@ public class TetrisBlock : MonoBehaviour
                                 }
                             }
 
-                         
                             parentTransform.DetachChildren();
                             Destroy(parentTransform.gameObject);
 
                             // 2. 타마마 임팩트 발동
                             if (!hasTriggeredEffect)
                             {
-                                // grid의 오른쪽부터 스캔하기 때문에, 무조건 가장 오른쪽의 블록에서 발동.
-                                Debug.Log($"[{j}번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
-                                //TODO 타마마 임팩트
+                                if (isHorizontal)
+                                {
+                                    Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발! (가로 빔 발사!)");
+                                    // TODO 가로 전용 타마마 임팩트
+                                }
+                                else
+                                {
+                                    // grid의 오른쪽부터 스캔하기 때문에, 무조건 가장 오른쪽의 블록에서 발동.
+                                    Debug.Log($"[{j}번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
+                                    //TODO 타마마 임팩트
+                                    if (TetrisGameController.Instance != null)
+                                    {
+                                        TetrisGameController.Instance.OnTamamaImpactTriggered();
+                                    }
+                                }
                                 hasTriggeredEffect = true;
                             }
                         }
+
                     }
                 }
 
@@ -381,8 +406,8 @@ public class TetrisBlock : MonoBehaviour
                 // TODO
                 // 게임 오버시 처리
                 SpawnTetromino.Instance.TogglespawnTrigger();
-
-                continue;
+                TetrisGameController.Instance.OnGameFail();
+                return;
             }
 
             grid[roundedX, roundedY] = children;

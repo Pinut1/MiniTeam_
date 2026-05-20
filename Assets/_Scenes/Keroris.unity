@@ -621,6 +621,15 @@ MonoBehaviour:
   - reactionType: 0
     characterSprite: {fileID: 125727378, guid: 87633075d2a460b45a94035f1d8984cf, type: 3}
     duration: 0
+  - reactionType: 1
+    characterSprite: {fileID: 21300000, guid: 0f158336d3b23004381d4a244f6c7201, type: 3}
+    duration: 1.5
+  - reactionType: 2
+    characterSprite: {fileID: 21300000, guid: 13ebd9c4c606298428ebe480542e5dca, type: 3}
+    duration: 1.5
+  - reactionType: 4
+    characterSprite: {fileID: 21300000, guid: 61e5342bf16ab1043938f1f4108a180b, type: 3}
+    duration: 1.5
 --- !u!114 &885787054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1503,6 +1512,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1449145084}
   m_CullTransparentMesh: 1
+--- !u!1 &1588115705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1588115707}
+  - component: {fileID: 1588115706}
+  m_Layer: 0
+  m_Name: TetrisGameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1588115706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588115705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fe6c79cdb596fd429c077f7401d1bcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Tetris.TetrisGameController
+  targetImpactCount: 2
+--- !u!4 &1588115707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588115705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.88534, y: 9.46869, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1848746414
 GameObject:
   m_ObjectHideFlags: 0
@@ -2068,3 +2122,4 @@ SceneRoots:
   - {fileID: 2126049462}
   - {fileID: 1265009297}
   - {fileID: 1401194739}
+  - {fileID: 1588115707}
