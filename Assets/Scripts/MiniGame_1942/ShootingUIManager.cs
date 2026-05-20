@@ -32,6 +32,7 @@ namespace MiniTeam.Shooting1942
         public GameObject resultPanel;
         public TextMeshProUGUI resultTitleText;
         public TextMeshProUGUI resultScoreText;
+        public TextMeshProUGUI continueHintText;
 
         private int score = 0;
 
@@ -142,11 +143,19 @@ namespace MiniTeam.Shooting1942
             if (resultScoreText != null)
                 resultScoreText.text = $"SCORE: {score}";
 
+            if (continueHintText != null)
+                continueHintText.gameObject.SetActive(!isCleared);
+
             CancelInvoke(nameof(HideWaveMessage));
             if (wavePanel    != null) wavePanel.SetActive(false);
             if (pausePanel   != null) pausePanel.SetActive(false);
             if (bossHpPanel  != null) bossHpPanel.SetActive(false);
             resultPanel.SetActive(true);
+        }
+
+        public void HideResult()
+        {
+            if (resultPanel != null) resultPanel.SetActive(false);
         }
     }
 }
