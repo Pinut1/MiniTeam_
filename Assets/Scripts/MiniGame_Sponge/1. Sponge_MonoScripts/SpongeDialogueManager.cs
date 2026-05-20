@@ -48,6 +48,7 @@ public class SpongeDialogueManager : MonoBehaviour
     [SerializeField] private Vector2 posCenter;
     [SerializeField] private Vector2 posRight;
     [SerializeField] private Vector2 posJudgeCenter;
+    [SerializeField] private Vector2 posWitnessCenter;
 
     [Header("화살표")]
     [SerializeField] private Image arrowImg;                // 대사 진행 화살표
@@ -410,10 +411,11 @@ public class SpongeDialogueManager : MonoBehaviour
         // 위치 이동
         target.rectTransform.anchoredPosition = line.characterPos switch
         {
-            SpongeDialogueLine.CharacterPosition.Left        => posLeft,
-            SpongeDialogueLine.CharacterPosition.Center      => posCenter,
-            SpongeDialogueLine.CharacterPosition.Right       => posRight,
-            SpongeDialogueLine.CharacterPosition.JudgeCenter => posJudgeCenter,
+            SpongeDialogueLine.CharacterPosition.Left          => posLeft,
+            SpongeDialogueLine.CharacterPosition.Center        => posCenter,
+            SpongeDialogueLine.CharacterPosition.Right         => posRight,
+            SpongeDialogueLine.CharacterPosition.JudgeCenter   => posJudgeCenter,
+            SpongeDialogueLine.CharacterPosition.WitnessCenter => posWitnessCenter,
             _ => target.rectTransform.anchoredPosition
         };
 

@@ -32,6 +32,6 @@ public class SpongeDialogueLine
 
     public enum CharacterPosition
     {
-        None, Center, Right, Left, JudgeCenter
+        None, Center, Right, Left, JudgeCenter, WitnessCenter
     }
 }
