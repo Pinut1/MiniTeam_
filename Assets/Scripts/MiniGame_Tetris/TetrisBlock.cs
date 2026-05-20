@@ -23,6 +23,7 @@ public class TetrisBlock : MonoBehaviour
     private float lockTimer = 0f;
 
     private int rotationState = 0;
+    public GameObject tamamaBeamPrefab;
 
     // ---  [SRS 하드코딩 데이터] ---
     // [JLSTZ = Normal 블록] 시계 방향 회전 시 벽차기 오프셋 (Test 2 ~ 5)
@@ -342,12 +343,25 @@ public class TetrisBlock : MonoBehaviour
                                 {
                                     Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발! (가로 빔 발사!)");
                                     // TODO 가로 전용 타마마 임팩트
+                                    
                                 }
                                 else
                                 {
+                                    
                                     // grid의 오른쪽부터 스캔하기 때문에, 무조건 가장 오른쪽의 블록에서 발동.
                                     Debug.Log($"[{j}번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
                                     //TODO 타마마 임팩트
+                                    float distanceToWall = j;
+
+                                    // 1. 빔 프리팹 생성 (cell.position, 즉 블록 파편의 위치에서 생성)
+                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, cell.position, Quaternion.identity);
+
+                                    // 2. 생성된 빔에게 거리 전달하여 스케일/위치 맞추기
+                                    if (beamObj.TryGetComponent(out TamamaBeam beamScript))
+                                    {
+                                        beamScript.Setup(distanceToWall);
+                                    }
+
                                     if (TetrisGameController.Instance != null)
                                     {
                                         TetrisGameController.Instance.OnTamamaImpactTriggered();

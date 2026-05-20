@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 43ab6c45bdf15c14ca2a8d61579c883b
+guid: 0165d1e37640a084f9dd80ca449cbfc8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 10000
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uCF00\uB85C\uB9AC\uC2A4_\uC624\uD504\uB2DD_CutScene_0"
+      name: "\uCF00\uB85C\uB9AC\uC2A4_\uD0C0\uB9C8\uB9C8\uC784\uD329\uD2B8_\uAE30\uB465\uB2E8_0"
       rect:
         serializedVersion: 2
-        x: 113
-        y: 79
-        width: 849
-        height: 1266
+        x: 0
+        y: 0
+        width: 14063
+        height: 9334
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c15d266b8b682084dbead74d2ad775f9
-      internalID: 1660060167
+      spriteID: 17bc39320e13a444f82f19c5592338ac
+      internalID: 64892971
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: bce0a873a3574a746bad4a9dc6dbddab
     internalID: 0
     vertices: []
     indices: 
@@ -147,7 +147,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      "\uCF00\uB85C\uB9AC\uC2A4_\uC624\uD504\uB2DD_CutScene_0": 1660060167
+      "\uCF00\uB85C\uB9AC\uC2A4_\uD0C0\uB9C8\uB9C8\uC784\uD329\uD2B8_\uAE30\uB465\uB2E8_0": 64892971
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

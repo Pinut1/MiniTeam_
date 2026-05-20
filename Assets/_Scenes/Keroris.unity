@@ -144,11 +144,11 @@ Transform:
   m_GameObject: {fileID: 364541272}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.2999997, y: 0.19999981, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1170167931}
+  m_Father: {fileID: 1137454572}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &381140378
 GameObject:
@@ -214,7 +214,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -2
+  m_SortingOrder: -11
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: e24ad112abfe2b2479933706ea02fb9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -868,7 +868,8 @@ Transform:
   m_LocalPosition: {x: -1.2649999, y: 1.0889997, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 364541273}
   m_Father: {fileID: 1170167931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1137454573
@@ -918,7 +919,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -11
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -992,7 +993,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1137454572}
-  - {fileID: 364541273}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1192614781
@@ -1075,7 +1075,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -11
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1541,7 +1541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fe6c79cdb596fd429c077f7401d1bcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Tetris.TetrisGameController
-  targetImpactCount: 2
+  targetImpactCount: 10
 --- !u!4 &1588115707
 Transform:
   m_ObjectHideFlags: 0
@@ -1794,7 +1794,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -11
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 6d2b8bfc0a37f994aaf0b316c9ae84e0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2059,6 +2059,10 @@ PrefabInstance:
     - target: {fileID: 3196320613225938292, guid: 20942716a5982314d98cafab81eb52f2, type: 3}
       propertyPath: m_Name
       value: NextBlockSquareSet 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4355919088275312750, guid: 20942716a5982314d98cafab81eb52f2, type: 3}
+      propertyPath: m_SortingOrder
+      value: -11
       objectReference: {fileID: 0}
     - target: {fileID: 7486084859302453405, guid: 20942716a5982314d98cafab81eb52f2, type: 3}
       propertyPath: m_LocalPosition.x
