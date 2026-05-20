@@ -578,7 +578,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneNpcManager
   pierrePrefab: {fileID: 6772039159492646424, guid: aca556fe30e101c468e8e0b564a6cb86, type: 3}
-  vanillaPrefab: {fileID: 1679512321017206970, guid: ad5d07144b89ed848b164114ba748350, type: 3}
+  banillaPrefab: {fileID: 1679512321017206970, guid: ad5d07144b89ed848b164114ba748350, type: 3}
   newGirlPrefabs:
   - {fileID: 6368241826221722612, guid: d84218830aa27f542a77b67ecca77f12, type: 3}
   - {fileID: 23921636532512797, guid: 56ac4fc46700f73479d0d8ee5076aeaa, type: 3}
@@ -586,16 +586,16 @@ MonoBehaviour:
   - {fileID: 5326620766795767573, guid: d5276426da67c5b42a169799db91f9cb, type: 3}
   girlSpawnSpacing: 1.5
   pierreSpawnPosition: {x: 14, y: 1.22, z: 0}
-  vanillaSpawnPosition: {x: -11, y: -1, z: 0}
+  banillaSpawnPosition: {x: -13, y: -1, z: -1.5}
   mainBrain: {fileID: 1491392494}
   vcamPierre: {fileID: 1130959865}
-  vcamVanilla: {fileID: 1447255805}
+  vcamBanilla: {fileID: 1447255805}
   vcamGirlsWalk: {fileID: 903730957}
   vcamPlayer: {fileID: 1724008627}
   playerMoveScript: {fileID: 1933622940}
   playerRb: {fileID: 1933622941}
   playerAnim: {fileID: 775077596}
-  girlWalkSpeed: 3
+  girlWalkSpeed: 4
 --- !u!4 &572917595
 Transform:
   m_ObjectHideFlags: 0
@@ -1548,10 +1548,10 @@ MonoBehaviour:
   - {fileID: 5326620766795767573, guid: d5276426da67c5b42a169799db91f9cb, type: 3}
   minX: -14
   maxX: 95
-  minY: 0.5
-  maxY: 1
+  minY: 0
+  maxY: 0.5
   minGirlCount: 7
-  maxGirlCount: 15
+  maxGirlCount: 11
 --- !u!4 &1260487766
 Transform:
   m_ObjectHideFlags: 0

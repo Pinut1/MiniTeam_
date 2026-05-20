@@ -9,6 +9,8 @@ public class DroppedHeart : MonoBehaviour
     // 레이더 범위 (Update 스캔 방식 유지)
     public float pickupRadius = 0.8f;
 
+    public bool isPierreHeart = false;
+
     void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -93,6 +95,16 @@ public class DroppedHeart : MonoBehaviour
             if (hit.CompareTag("Player"))
             {
                 isCollected = true;
+                Debug.Log($"하트 획득 완료! 이 하트가 피에르 하트인가요? : {isPierreHeart}");
+                if (isPierreHeart)
+                {
+                    PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
+                    if (laser != null)
+                    {
+                        Debug.Log("PlayerLaser를 찾아서 TriggerPierreEnding을 호출합니다!");
+                        laser.TriggerPierreEnding();
+                    }
+                }
 
                 if (HeartUIManager.instance != null)
                 {

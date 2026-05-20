@@ -353,10 +353,9 @@ public class PlayerLaser : MonoBehaviour
         float floorY = transform.position.y + dropYOffset;
         GameObject npcToDestroy = currentBurningNpc;
 
-        // 1. 피에르 하트 성공 시 바닐라 울기
+        // 1. 피에르 하트 성공 시 바닐라 울기 처리
         if (npcToDestroy.name.Contains("Pierre"))
         {
-            // 씬에서 "Vanilla" 태그를 가진 오브젝트를 찾습니다.
             GameObject BanillaObj = GameObject.FindWithTag("Banilla");
             if (BanillaObj != null)
             {
@@ -364,42 +363,39 @@ public class PlayerLaser : MonoBehaviour
                 if (BanillaAnim != null)
                 {
                     BanillaAnim.SetBool("isCrying", true);
-                    Debug.Log("피에르 하트 획득! 바닐라가 울기 시작합니다.");
                 }
             }
         }
 
-        // 2. 기본 정리 작업
+        // 2. 기본 정리 작업 (레이저 멈춤 및 여학생 복귀)
         StopFiring();
         ResumeAllGirls();
 
-        // 3. 피에르가 아닐 때만 삭제
-        if (!npcToDestroy.name.Contains("Pierre"))
-        {
-            Destroy(npcToDestroy);
-        }
-        else
-        {
-            // 피에르라면 삭제 대신 다시 순찰 상태로 복귀
-            var patrol = npcToDestroy.GetComponent<NpcRandomPatrol>();
-            if (patrol != null)
-            {
-                patrol.enabled = true;
-                patrol.ResetDirectionAfterReaction();
-            }
-        }
-
-        // 4. 하트 프리팹 생성 로직
+        // 3. 하트 생성 로직 (피에르라면 무지개 하트로 설정)
         if (droppedHeartPrefab != null)
         {
             GameObject droppedHeart = Instantiate(droppedHeartPrefab, npcPos, Quaternion.identity);
             DroppedHeart heartScript = droppedHeart.GetComponent<DroppedHeart>();
+            if (heartScript == null) heartScript = droppedHeart.GetComponentInChildren<DroppedHeart>();
 
-            // 피에르였다면 떨어지는 하트도 무지개로 고정
-            if (npcToDestroy != null)
+            // NPC의 순찰 스크립트를 가져와서 피에르인지 확실하게 체크합니다.
+            NpcRandomPatrol patrol = npcToDestroy.GetComponent<NpcRandomPatrol>();
+
+            // 방법 A: 스크립트의 isPierre 체크박스가 켜져있거나
+            // 방법 B: 오브젝트 이름에 pierre(대소문자 무시)가 들어가면 피에르로 인정!
+            bool isActuallyPierre = (patrol != null && patrol.isPierre) || npcToDestroy.name.ToLower().Contains("pierre");
+
+            if (isActuallyPierre)
             {
-                NpcRandomPatrol patrol = npcToDestroy.GetComponent<NpcRandomPatrol>();
-                if (patrol != null && patrol.isPierre && patrol.pierreHeartSprite != null)
+                // 1) 하트 스크립트에 피에르 하트라고 마킹 찍기!
+                if (heartScript != null)
+                {
+                    heartScript.isPierreHeart = true;
+                    Debug.Log("SuccessAndDropHeart: 피에르 하트 마킹 완료 (isPierreHeart = true)");
+                }
+
+                // 2) 무지개 하트 스프라이트로 덮어씌우기
+                if (patrol != null && patrol.pierreHeartSprite != null)
                 {
                     finalHeartSprite = patrol.pierreHeartSprite;
                 }
@@ -407,6 +403,9 @@ public class PlayerLaser : MonoBehaviour
 
             if (heartScript != null) heartScript.Initialize(finalHeartSprite, npcPos, floorY);
         }
+
+        // 4. 소멸 처리 (피에르 여부와 관계없이 무조건 삭제)
+        Destroy(npcToDestroy);
     }
 
     void UpdateHovering()
@@ -414,7 +413,7 @@ public class PlayerLaser : MonoBehaviour
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-        if (hit.collider != null && hit.collider.CompareTag("NPC"))
+        if (hit.collider != null && (hit.collider.CompareTag("NPC") || hit.collider.CompareTag("Banilla")))
         {
             GameObject hitNpc = hit.collider.gameObject;
             if (targetPoint != null)
@@ -485,11 +484,20 @@ public class PlayerLaser : MonoBehaviour
         {
             Sprite pickedSprite = GetUniqueHeartSprite();
 
-            // ★ [여기 추가] 만약 마우스를 올린 대상이 피에르라면 무조건 무지개 하트로 덮어씁니다!
+            // 만약 마우스를 올린 대상이 피에르라면 무조건 무지개 하트로 덮어씁니다!
             NpcRandomPatrol patrol = npc.GetComponent<NpcRandomPatrol>();
             if (patrol != null && patrol.isPierre && patrol.pierreHeartSprite != null)
             {
                 pickedSprite = patrol.pierreHeartSprite;
+            }
+
+            if (npc.CompareTag("Banilla"))
+            {
+                BanillaNpcManager banillaManager = npc.GetComponent<BanillaNpcManager>();
+                if (banillaManager != null && banillaManager.heartSprite != null)
+                {
+                    pickedSprite = banillaManager.heartSprite;
+                }
             }
 
             if (pickedSprite != null)
@@ -497,7 +505,7 @@ public class PlayerLaser : MonoBehaviour
                 heartSR.sprite = pickedSprite;
             }
             heartSR.color = new Color(1f, 1f, 1f, 1f);
-            heartSR.sortingOrder = 0;
+            heartSR.sortingOrder = 3;
         }
     }
 
@@ -639,6 +647,30 @@ public class PlayerLaser : MonoBehaviour
         if (npcManager != null)
         {
             npcManager.SpawnAndPlayCutscene();
+        }
+    }
+
+    public void TriggerPierreEnding()
+    {
+        // 1. 엔딩 컷신 시작 전, 화면에 남은 일반 NPC들을 싹 정리해 줍니다.
+        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
+        foreach (GameObject girlObj in girlNpcs)
+        {
+            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+            if (girl != null) girl.WalkAwayAndDestroy();
+        }
+
+        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
+        foreach (GameObject boyObj in boyNpcs)
+        {
+            Destroy(boyObj);
+        }
+
+        // 2. 오프닝(SpawnAndPlayCutscene)이 아닌 엔딩 컷신을 호출합니다!
+        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+        if (npcManager != null)
+        {
+            npcManager.OnPlayerGetPierreHeart(); // 방금 만든 피에르 엔딩 카메라 연출 시작
         }
     }
 }

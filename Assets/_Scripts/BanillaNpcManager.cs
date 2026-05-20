@@ -18,6 +18,8 @@ public class BanillaNpcManager : MonoBehaviour
     [Header("UI 설정")]
     public Image gaugeImage; // 화면에 띄울 게이지 바 이미지
 
+    public Sprite heartSprite;
+
     [Header("연타 설정")]
     public float vanillaPushSpeed = 0.3f; // 가만히 있을 때 바닐라가 밀어붙이는 속도 (초당)
     public float playerClickPower = 0.05f; // 스페이스바 1번 누를 때 차오르는 게이지 양
@@ -40,11 +42,11 @@ public class BanillaNpcManager : MonoBehaviour
             vanillaLaser.SetActive(false);
         }
 
-        // ★ [추가된 부분] 게임 시작 시 하이어라키에 있는 기존 게이지 UI를 자동으로 찾아 연결합니다.
+        // 게임 시작 시 하이어라키에 있는 기존 게이지 UI를 자동으로 찾아 연결합니다.
         if (gaugeImage == null)
         {
             // 스크린샷의 하이어라키 경로(Canvas -> Gage -> Image)를 그대로 추적해서 찾습니다.
-            GameObject findGauge = GameObject.Find("Canvas/Gage/Image");
+            GameObject findGauge = GameObject.Find("Canvas/Gage");
             if (findGauge != null)
             {
                 gaugeImage = findGauge.GetComponent<UnityEngine.UI.Image>();
@@ -56,7 +58,7 @@ public class BanillaNpcManager : MonoBehaviour
         }
     }
 
-    void Update() // ★ 연타 입력을 받기 위해 Update 추가
+    void Update() // 연타 입력을 받기 위해 Update 추가
     {
         if (isClashing)
         {

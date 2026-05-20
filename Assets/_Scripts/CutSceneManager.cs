@@ -7,18 +7,18 @@ public class CutsceneNpcManager : MonoBehaviour
 {
     [Header("스폰할 NPC 프리팹")]
     public GameObject pierrePrefab;
-    public GameObject vanillaPrefab;
+    public GameObject banillaPrefab;
     public GameObject[] newGirlPrefabs;
     public float girlSpawnSpacing = 1.5f;
 
     [Header("스폰 좌표")]
     public Vector3 pierreSpawnPosition;
-    public Vector3 vanillaSpawnPosition;
+    public Vector3 banillaSpawnPosition;
 
     [Header("시네마머신 카메라 설정")]
     public CinemachineBrain mainBrain;
     public CinemachineCamera vcamPierre;
-    public CinemachineCamera vcamVanilla;
+    public CinemachineCamera vcamBanilla;
     public CinemachineCamera vcamGirlsWalk;
     public CinemachineCamera vcamPlayer;
 
@@ -35,34 +35,33 @@ public class CutsceneNpcManager : MonoBehaviour
     private List<GameObject> spawnedGirls = new List<GameObject>();
 
     private GameObject instanceVanilla;
-    private Animator vanillaAnimator;
+    private Animator banillaAnimator;
 
     public void SpawnAndPlayCutscene()
     {
         spawnedGirls.Clear();
-        vanillaAnimator = null;
+        banillaAnimator = null;
 
         if (pierrePrefab != null) Instantiate(pierrePrefab, pierreSpawnPosition, Quaternion.identity);
 
-        if (vanillaPrefab != null)
+        if (banillaPrefab != null)
         {
-            instanceVanilla = Instantiate(vanillaPrefab, vanillaSpawnPosition, Quaternion.identity);
+            instanceVanilla = Instantiate(banillaPrefab, banillaSpawnPosition, Quaternion.identity);
 
-            vanillaAnimator = instanceVanilla.GetComponent<Animator>();
-            if (vanillaAnimator == null)
+            banillaAnimator = instanceVanilla.GetComponent<Animator>();
+            if (banillaAnimator == null)
             {
-                vanillaAnimator = instanceVanilla.GetComponentInChildren<Animator>();
+                banillaAnimator = instanceVanilla.GetComponentInChildren<Animator>();
             }
 
-            // 스폰 시점에는 무조건 Idle 상태로 대기
-            SetVanillaCrying(false);
+            SetBanillaCrying(false);
         }
 
         if (newGirlPrefabs != null)
         {
             for (int i = 0; i < newGirlPrefabs.Length; i++)
             {
-                Vector3 spawnPos = vanillaSpawnPosition + new Vector3((i + 1) * girlSpawnSpacing, 0, 0);
+                Vector3 spawnPos = banillaSpawnPosition + new Vector3((i + 1) * girlSpawnSpacing, 0, 0);
                 GameObject girl = Instantiate(newGirlPrefabs[i], spawnPos, Quaternion.identity);
                 SetGirlAIEnabled(girl, false);
                 spawnedGirls.Add(girl);
@@ -75,7 +74,7 @@ public class CutsceneNpcManager : MonoBehaviour
     {
         vcamPlayer.gameObject.SetActive(false);
         vcamPierre.gameObject.SetActive(false);
-        vcamVanilla.gameObject.SetActive(false);
+        vcamBanilla.gameObject.SetActive(false);
         vcamGirlsWalk.gameObject.SetActive(false);
 
         playerMoveScript.enabled = false;
@@ -89,26 +88,23 @@ public class CutsceneNpcManager : MonoBehaviour
             playerAnim.Play("Idle");
         }
 
-        // 1. 컷신 시작 시 플레이어를 강제로 왼쪽(-) 보게 만듭니다.
+        // 오프닝 컷신: 왼쪽 바라보기
         Vector3 playerScale = playerRb.transform.localScale;
         playerScale.x = -Mathf.Abs(playerScale.x);
         playerRb.transform.localScale = playerScale;
-
-        // ★ [핵심 추가] 이동 스크립트(PlayerMove)의 내부 방향 기억 변수도 '왼쪽(false)'으로 강제 동기화합니다.
-        // 이 코드가 들어가야 조작이 켜졌을 때 문워크를 안 합니다!
         SyncPlayerMoveDirection(false);
 
         vcamPlayer.gameObject.SetActive(true);
         if (mainBrain != null) mainBrain.enabled = true;
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2f);
 
         vcamPierre.gameObject.SetActive(true);
         vcamPlayer.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(4.5f);
 
-        vcamVanilla.gameObject.SetActive(true);
+        vcamBanilla.gameObject.SetActive(true);
         vcamPierre.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(3.0f);
@@ -119,7 +115,7 @@ public class CutsceneNpcManager : MonoBehaviour
         }
 
         vcamGirlsWalk.gameObject.SetActive(true);
-        vcamVanilla.gameObject.SetActive(false);
+        vcamBanilla.gameObject.SetActive(false);
 
         yield return StartCoroutine(GirlsWalkToPierre());
 
@@ -128,7 +124,6 @@ public class CutsceneNpcManager : MonoBehaviour
 
         yield return new WaitForSeconds(3.0f);
 
-        // 유저님 의도대로 방향 전환 코드를 삭제하여 컷신 종료 후에도 왼쪽을 바라봅니다.
         if (playerAnim != null)
         {
             playerAnim.SetBool("isIdle", false);
@@ -143,16 +138,12 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
-    // =========================================================================
-    // ★ [새로 추가] 플레이어 이동 스크립트의 내부 방향 변수를 강제로 맞춰주는 함수
-    // =========================================================================
     private void SyncPlayerMoveDirection(bool faceRight)
     {
         if (playerMoveScript == null) return;
         try
         {
             System.Type type = playerMoveScript.GetType();
-            // PlayerMove 스크립트 내부의 모든 변수들을 싹 훑습니다.
             System.Reflection.FieldInfo[] fields = type.GetFields(
                 System.Reflection.BindingFlags.Public |
                 System.Reflection.BindingFlags.NonPublic |
@@ -161,14 +152,12 @@ public class CutsceneNpcManager : MonoBehaviour
 
             foreach (var field in fields)
             {
-                // 변수 타입이 bool 이면서 이름에 right, facing, face 등이 들어가면 전부 강제 세팅해 버립니다.
                 if (field.FieldType == typeof(bool))
                 {
                     string name = field.Name.ToLower();
                     if (name.Contains("right") || name.Contains("facing") || name.Contains("face"))
                     {
                         field.SetValue(playerMoveScript, faceRight);
-                        Debug.Log($"[방향 동기화 완] {field.Name} 변수를 {faceRight}로 강제 변경함.");
                     }
                 }
             }
@@ -225,55 +214,116 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
-    private void SetVanillaCrying(bool isCrying)
+    private void SetBanillaCrying(bool isCrying)
     {
-        if (vanillaAnimator != null)
+        if (banillaAnimator != null)
         {
-            vanillaAnimator.SetBool("isCry", isCrying);
+            banillaAnimator.SetBool("isCrying", isCrying);
+        }
+        else
+        {
+            // 혹시 씬에 미리 배치된 바닐라가 있다면 태그로 찾아봅니다.
+            GameObject banillaObj = GameObject.FindWithTag("Banilla");
+            if (banillaObj != null)
+            {
+                banillaAnimator = banillaObj.GetComponent<Animator>();
+                if (banillaAnimator != null) banillaAnimator.SetBool("isCry", isCrying);
+            }
         }
     }
 
-    private void TriggerVanillaSmile()
+    private void TriggerBanillaSmile()
     {
-        if (vanillaAnimator != null)
+        if (banillaAnimator != null)
         {
-            SetVanillaCrying(false);
-            vanillaAnimator.SetTrigger("toSmile");
+            SetBanillaCrying(false);
+            banillaAnimator.SetTrigger("toSmile");
         }
     }
 
     // =========================================================================
-    // ★ 외부 매니저/판정 스크립트에서 호출할 깔끔하게 정리된 함수들 ★
+    // ★ 피에르 하트 획득 시 발동하는 컷신 로직 ★
     // =========================================================================
 
     public void OnPlayerGetPierreHeart()
     {
-        // ★ [수정됨] 하트 획득 시 정말 이 함수가 실행되는지, 바닐라가 있는지 추적합니다!
-        Debug.Log("1. 하트 획득 신호가 매니저에 도착했습니다!");
+        Debug.Log("피에르 하트 획득! 엔딩 컷신 코루틴 시작.");
 
-        if (vanillaAnimator != null)
-        {
-            SetVanillaCrying(true); // 하트를 뺏기고 Crying으로 전환!
-            Debug.Log("2. 바닐라에게 울기(isCry) 명령을 내렸습니다!");
-        }
-        else
-        {
-            Debug.LogError("에러: 매니저가 생성된 바닐라(vanillaAnimator)를 찾지 못했습니다! 매니저 스크립트가 씬에 2개 이상 중복되지 않았는지 확인하세요.");
-        }
+        // 1. 바닐라 울기 시작
+        SetBanillaCrying(true);
+
+        // 2. 엔딩 컷신 연출 시작
+        StartCoroutine(PierreHeartCutsceneSequence());
     }
 
-    public void StartVanillaCompetition()
+    private IEnumerator PierreHeartCutsceneSequence()
     {
-        SetVanillaCrying(false);
+        // 1. 플레이어 조작 잠금 및 정지
+        playerMoveScript.enabled = false;
+        playerRb.linearVelocity = Vector2.zero;
+
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isRun", false);
+            playerAnim.SetBool("isWalk", false);
+            playerAnim.SetBool("isIdle", true);
+            playerAnim.Play("Idle");
+        }
+
+        // 2. 플레이어가 왼쪽(-)을 보도록 강제 전환 (문워크 방지 포함)
+        Vector3 playerScale = playerRb.transform.localScale;
+        playerScale.x = -Mathf.Abs(playerScale.x);
+        playerRb.transform.localScale = playerScale;
+        SyncPlayerMoveDirection(false);
+
+        // 시네마머신 켜기 및 다른 카메라 초기화
+        if (mainBrain != null) mainBrain.enabled = true;
+        vcamBanilla.gameObject.SetActive(false);
+        vcamPierre.gameObject.SetActive(false);
+        vcamGirlsWalk.gameObject.SetActive(false);
+
+        // 3. 플레이어 (왼쪽 바라보는 모습) 2초 비추기
+        vcamPlayer.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+
+        // 4. 우는 바닐라 3초 비추기
+        vcamPlayer.gameObject.SetActive(false);
+        vcamBanilla.gameObject.SetActive(true);
+        yield return new WaitForSeconds(6f);
+
+        // 5. 다시 플레이어 1.5초 비추기
+        vcamBanilla.gameObject.SetActive(false);
+        vcamPlayer.gameObject.SetActive(true);
+        yield return new WaitForSeconds(3f);
+
+        // 6. 컷신 종료 후 플레이어 조작 복구
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isIdle", false);
+        }
+
+        SyncPlayerMoveDirection(false);
+
+        if (mainBrain != null) mainBrain.enabled = false;
+        playerMoveScript.enabled = true;
+
+        playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
+
+        Debug.Log("엔딩 컷신 종료, 플레이어 조작 복구 완료!");
+    }
+
+    public void StartBanillaCompetition()
+    {
+        SetBanillaCrying(false);
     }
 
     public void OnPlayerLoseCompetition()
     {
-        SetVanillaCrying(true);
+        SetBanillaCrying(true);
     }
 
     public void OnPlayerWinCompetition()
     {
-        TriggerVanillaSmile();
+        TriggerBanillaSmile();
     }
 }

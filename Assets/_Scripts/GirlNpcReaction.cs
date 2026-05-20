@@ -281,7 +281,7 @@ isLaserActive = true;
 
         // 약 4초간 화면 밖으로 스르륵 이동하며 나갑니다.
         float time = 0f;
-        while (time < 4f)
+        while (time < 2f)
         {
             time += Time.deltaTime;
             // Space.World를 붙여주면 캐릭터가 뒤집혀있어도 무조건 정해진 월드 방향으로 걸어갑니다.
@@ -298,8 +298,8 @@ isLaserActive = true;
         Animator anim = GetComponent<Animator>();
         if (anim != null)
         {
-            anim.SetBool("isWalk", true); // 걷기 애니메이션 시작
-            anim.SetBool("isIdle", false);
+            anim.SetBool("isWalking", true); // 걷기 애니메이션 시작
+            anim.SetBool("isWalking", false);
         }
 
         // 이동 스크립트 정지
