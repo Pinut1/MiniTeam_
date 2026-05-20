@@ -161,8 +161,12 @@ public class SpongeCrossExaminationManager : MonoBehaviour
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Pressing);
         
         // 필수 추궁인 경우 완료 등록
+        // 2번 증언은 receipt 획득 후에만 등록 — 미획득 시 press_02_12에서 press_need_more로 분기되므로 조건 미등록 상태 유지
         if (line.isRequiredPress)
-            SpongeGameManager.Instance.RegisterPress(currentIdx);
+        {
+            if (currentIdx != 2 || SpongeEvidenceManager.Instance.IsUnlocked("receipt"))
+                SpongeGameManager.Instance.RegisterPress(currentIdx);
+        }
         // 추궁 대사 시작 - 대사 끝난 뒤 OnSequenceEnd()에서 조건 체크
         SpongeDialogueManager.Instance.ShowLine(line.firstPressDialogueId);
     }

@@ -515,8 +515,8 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
 
-        // press_02_12 이후 : press_01(인덱스 0) 추궁 여부에 따라 분기
-        if (currentLine.lineId == "press_02_12" && !SpongeGameManager.Instance.HasPressedTestimony(0))
+        // press_02_12 이후 : 매출영수증 획득 여부에 따라 분기
+        if (currentLine.lineId == "press_02_12" && !SpongeEvidenceManager.Instance.IsUnlocked("receipt"))
         {
             ShowLine("press_need_more");
             return;
@@ -614,11 +614,19 @@ public class SpongeDialogueManager : MonoBehaviour
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
                 if (SpongeGameManager.Instance.ConsumeConditionMet())
                 {
-                    // 첫번째 심문 조건 충족
+                    // 첫번째 심문 조건 충족 — press_02 시퀀스 안에서 끝난 경우에만 재증언 전환
                     if (SpongeGameManager.Instance.CurrentRound == 1)
                     {
-                        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-                        Instance.ShowLine("before_retestimony_01");
+                        if (currentLine != null && currentLine.lineId.StartsWith("press_02_"))
+                        {
+                            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                            Instance.ShowLine("before_retestimony_01");
+                        }
+                        else
+                        {
+                            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                            SpongeCrossExaminationManager.Instance.NextLineOrLoop();
+                        }
                     }
                     // 두번째 심문 조건 충족 -> 엔딩 대사 시작 (Dialogue 상태에서 클릭이 정상 동작하도록)
                     else

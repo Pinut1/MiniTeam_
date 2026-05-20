@@ -144,25 +144,40 @@ public class SpongeGameManager : MonoBehaviour
     /// <returns></returns>
     public bool IsAllConditionsMet()
     {
-        // 필수 추궁/증거 목록을 순회 - 하나라도 완료 안됐으면 false
+        bool allMet = true;
+
         if (CurrentRound == 1)
         {
-            // 첫번째 심문
             foreach (int i in requiredPressIndices)
-                if (!completedPresses.Contains(i)) return false;
+                if (!completedPresses.Contains(i))
+                {
+                    Debug.Log($"남은 필수 추궁 : {i}");
+                    allMet = false;
+                }
             foreach (string id in requiredEvidenceIds)
-                if (!completedEvidences.Contains(id)) return false;
+                if (!completedEvidences.Contains(id))
+                {
+                    Debug.Log($"남은 필수 증거 제시 : {id}");
+                    allMet = false;
+                }
         }
         else
         {
-            // 두번째 심문
             foreach (int i in requiredRetestimonyPressIndices)
-                if (!completedRetestimonyPresses.Contains(i)) return false;
+                if (!completedRetestimonyPresses.Contains(i))
+                {
+                    Debug.Log($"남은 필수 추궁 : {i}");
+                    allMet = false;
+                }
             foreach (string id in requiredRetestimonyEvidenceIds)
-                if (!completedRetestimonyEvidences.Contains(id)) return false;
+                if (!completedRetestimonyEvidences.Contains(id))
+                {
+                    Debug.Log($"남은 필수 증거 제시 : {id}");
+                    allMet = false;
+                }
         }
-        // 모든 조건 완료시 true로 반환
-        return true;
+
+        return allMet;
     }
 
     /// <summary>

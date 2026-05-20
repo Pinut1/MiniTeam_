@@ -6739,7 +6739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   requiredPressIndices: 0000000002000000
   requiredEvidenceIds: []
-  requiredRetestimonyPressIndices: 000000000200000003000000
+  requiredRetestimonyPressIndices: 02000000
   requiredRetestimonyEvidenceIds:
   - receipt
   - recorder
