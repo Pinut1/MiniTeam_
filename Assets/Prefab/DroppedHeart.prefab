@@ -107,6 +107,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroppedHeart
   pickupRadius: 0.5
+  isPierreHeart: 0
+  pierreEffectPrefab: {fileID: 7172107419783844229, guid: 9b9bd1f807a7cfc4a9223feef4642dab, type: 3}
 --- !u!58 &2680478329212666069
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -11,6 +11,9 @@ public class DroppedHeart : MonoBehaviour
 
     public bool isPierreHeart = false;
 
+    [Header("피에르 이펙트 설정")]
+    public GameObject pierreEffectPrefab;
+
     void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -26,7 +29,6 @@ public class DroppedHeart : MonoBehaviour
         StartCoroutine(DropAnimation(targetHorizontalLineY));
     }
 
-    // ★★★ [수정됨] 목표 Y좌표를 매개변수로 받습니다. ★★★
     IEnumerator DropAnimation(float targetY)
     {
         Vector3 startPos = transform.position; // 남학생 위치
@@ -58,7 +60,6 @@ public class DroppedHeart : MonoBehaviour
         }
 
         // 2. 바닥에 닿았을 때 "통~" 하고 한 번 튕기는 맛 살리기 (툭! 느낌 극대화)
-        // 튕기는 로직은 동일하지만 targetPos가 바닥으로 명확해서 더 정확합니다.
         time = 0;
         float bounceDuration = 0.1f;
         Vector3 bounceTarget = targetPos + new Vector3(0, 0.15f, 0); // 위로 살짝 튕길 높이
@@ -96,8 +97,21 @@ public class DroppedHeart : MonoBehaviour
             {
                 isCollected = true;
                 Debug.Log($"하트 획득 완료! 이 하트가 피에르 하트인가요? : {isPierreHeart}");
+
                 if (isPierreHeart)
                 {
+                    if (pierreEffectPrefab != null)
+                    {
+                        GameObject effect = Instantiate(pierreEffectPrefab, transform.position, Quaternion.identity);
+                        SpriteRenderer[] allRenderers = effect.GetComponentsInChildren<SpriteRenderer>(true);
+                        foreach (SpriteRenderer renderer in allRenderers)
+                        {
+                            renderer.sortingLayerName = "Magic"; // 레이어를 Magic으로 고정
+                            renderer.sortingOrder = 10;          // 숫자를 확 높여서 무조건 맨 앞에 오게 강제 설정
+                        }
+                        Destroy(effect, 2.0f); // 1.5초 후 이펙트 자동 삭제 (애니메이션 길이에 맞춰 조절하세요)
+                    }
+
                     PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
                     if (laser != null)
                     {

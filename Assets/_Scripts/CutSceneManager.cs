@@ -61,7 +61,7 @@ public class CutsceneNpcManager : MonoBehaviour
         {
             for (int i = 0; i < newGirlPrefabs.Length; i++)
             {
-                Vector3 spawnPos = banillaSpawnPosition + new Vector3((i + 1) * girlSpawnSpacing, 0, 0);
+                Vector3 spawnPos = new Vector3(banillaSpawnPosition.x + ((i + 1) * girlSpawnSpacing), pierreSpawnPosition.y - 1.1f, 0);
                 GameObject girl = Instantiate(newGirlPrefabs[i], spawnPos, Quaternion.identity);
                 SetGirlAIEnabled(girl, false);
                 spawnedGirls.Add(girl);

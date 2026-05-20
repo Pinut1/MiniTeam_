@@ -505,7 +505,7 @@ public class PlayerLaser : MonoBehaviour
                 heartSR.sprite = pickedSprite;
             }
             heartSR.color = new Color(1f, 1f, 1f, 1f);
-            heartSR.sortingOrder = 3;
+            heartSR.sortingOrder = 0;
         }
     }
 

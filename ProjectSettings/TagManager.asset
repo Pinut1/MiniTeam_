@@ -65,5 +65,8 @@ TagManager:
   - name: Player
     uniqueID: 1976330389
     locked: 0
+  - name: Magic
+    uniqueID: 2572098445
+    locked: 0
   m_RenderingLayers:
   - Default
