@@ -406,11 +406,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04cdcb1db3c5ae4482c2d153590d571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcRandomPatrol
-  patrolDistance: 3
+  patrolDistance: 4
   minSpeed: 1
   maxSpeed: 2.5
   minIdleTime: 1
-  maxIdleTime: 3
+  maxIdleTime: 5
 --- !u!70 &5770515520825939229
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -445,7 +445,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.32, y: -0.000000029802322}
+  m_Offset: {x: -0.32, y: 0}
   m_Size: {x: 20.36, y: 0.24}
   m_Direction: 0
 --- !u!114 &8152987296767317977

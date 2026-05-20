@@ -138,21 +138,28 @@ public class GirlNpcReaction : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         // 4. 놀람 마크 끄고 여학생 공격 애니메이션 온!
-        if (surpriseMark != null) surpriseMark.SetActive(false);
-        if (anim != null) anim.SetBool("isAttacking", true);
+if (surpriseMark != null) surpriseMark.SetActive(false);
+if (anim != null) anim.SetBool("isAttacking", true);
 
-        // ★★★ [추가된 핵심 로직] 여학생이 레이저를 쏘는 순간, 남학생을 노란색 불타기로 바꿈! ★★★
-        if (targetBoyNpc != null)
-        {
-            Animator boyAnim = targetBoyNpc.GetComponent<Animator>();
-            if (boyAnim != null)
-            {
-                boyAnim.SetBool("isYellowBurn", true); // 결투 애니메이션 발동!
-            }
-        }
+// 여학생이 레이저를 쏘는 순간, 남학생(또는 피에르)을 노란색 불타기로 바꿈
+if (targetBoyNpc != null)
+{
+    // ★ [핵심 수정] 피에르의 애니메이터가 자식 모델링 쪽에 붙어있을 경우를 대비해 GetComponentInChildren으로 넓게 찾습니다.
+    Animator boyAnim = targetBoyNpc.GetComponentInChildren<Animator>();
+    
+    if (boyAnim != null)
+    {
+        boyAnim.SetBool("isYellowBurn", true); // 결투 애니메이션 발동!
+    }
+    else
+    {
+        // 만약 이 메시지가 유니티 콘솔(Console)에 뜬다면 피에르에게 애니메이터가 아예 없는 겁니다!
+        Debug.LogWarning(targetBoyNpc.name + " 오브젝트에서 Animator를 찾을 수 없습니다!");
+    }
+}
 
-        if (npcLaser != null) npcLaser.SetActive(true);
-        isLaserActive = true;
+if (npcLaser != null) npcLaser.SetActive(true);
+isLaserActive = true;
     }
 
     public void StartFlyingAway(Vector3 laserOriginPos)
@@ -178,7 +185,6 @@ public class GirlNpcReaction : MonoBehaviour
         flyStartPos = transform.position;
         flyTargetPos = flyStartPos + new Vector3(flyDirection * 15f, -2f, 0f);
 
-        // ★ [에러 해결] 이름이 정확히 일치하는지 대소문자 확인 사살!
         StartCoroutine(FlyAwayCoroutine());
     }
 

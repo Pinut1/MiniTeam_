@@ -406,11 +406,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04cdcb1db3c5ae4482c2d153590d571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcRandomPatrol
-  patrolDistance: 3
+  patrolDistance: 5
   minSpeed: 1
   maxSpeed: 2.5
   minIdleTime: 1
-  maxIdleTime: 3
+  maxIdleTime: 4
 --- !u!70 &5120857521303467181
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

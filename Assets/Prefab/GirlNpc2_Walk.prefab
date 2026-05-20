@@ -133,11 +133,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04cdcb1db3c5ae4482c2d153590d571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcPatrol
-  patrolDistance: 10
+  patrolDistance: 5
   minSpeed: 1
   maxSpeed: 2.5
   minIdleTime: 1
-  maxIdleTime: 8
+  maxIdleTime: 6
+  isPierre: 0
+  heartPrefab: {fileID: 0}
+  pierreHeartSprite: {fileID: 0}
 --- !u!70 &7032091275162204331
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -172,7 +175,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.32, y: 0.000000059604645}
+  m_Offset: {x: -0.32, y: 0}
   m_Size: {x: 20.36, y: 0.24}
   m_Direction: 0
 --- !u!114 &-9194061367476026294
