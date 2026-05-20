@@ -124,6 +124,12 @@ MonoBehaviour:
   spriteIdle: {fileID: 21300000, guid: 357c0f3db7ff8934b9d405892a46dbfe, type: 3}
   spriteLeft: {fileID: 21300000, guid: 68de336207ec78a448ac75cfad3ee386, type: 3}
   spriteRight: {fileID: 21300000, guid: a695d0c27bbbb6947ac828848ce93d8f, type: 3}
+  smallExplosionPrefabs:
+  - {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
+  - {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
+  finalExplosionPrefab: {fileID: 1670004801674776445, guid: 3813f830b2f21974c8f32fd73b53fa2a, type: 3}
+  deathDuration: 2.5
+  explosionInterval: 0.2
 --- !u!60 &-2706112450488502957
 PolygonCollider2D:
   m_ObjectHideFlags: 0
