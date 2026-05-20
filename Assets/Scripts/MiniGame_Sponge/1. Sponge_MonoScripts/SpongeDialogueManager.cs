@@ -600,6 +600,15 @@ public class SpongeDialogueManager : MonoBehaviour
         {
             case SpongeGameState.GameState.Pressing:
             case SpongeGameState.GameState.EvidenceSelect:
+                // evidence_02_17 끝 → 전체 조건 충족 여부에 따라 엔딩 진입 or 심문 복귀
+                if (currentLine != null && currentLine.lineId == "evidence_02_17")
+                {
+                    if (SpongeGameManager.Instance.IsAllConditionsMet())
+                        ShowLine("evidence_02_18");
+                    else
+                        ShowLine("need_more_evidence");
+                    break;
+                }
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
                 if (SpongeGameManager.Instance.ConsumeConditionMet())
                 {

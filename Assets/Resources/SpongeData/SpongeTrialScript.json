@@ -3077,7 +3077,7 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_02_18"
+      "nextLineId": ""
     },
     {
       "lineId": "evidence_02_18",
@@ -3161,7 +3161,20 @@
       "characterType": 6,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "ending_01"
+      "nextLineId": ""
+    },
+    {
+      "lineId": "need_more_evidence",
+      "speaker": "나",
+      "txt": "(심문을 더 해보자...!)",
+      "animationTrig": "",
+      "backgroundSpr": "",
+      "deskSpr": "",
+      "characterType": 3,
+      "characterPos": 1,
+      "choices": [],
+      "nextLineId": "",
+      "alignment": ""
     }
   ],
   "endingLines": 
