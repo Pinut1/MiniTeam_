@@ -20,5 +20,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/EndingCut_Test.unity
     guid: de794ff4a7c7e634480a52f321d8a575
+  - enabled: 1
+    path: Assets/_Scenes/AceSponge.unity
+    guid: 5a55e4e0d7cf9fc4b8646aa2690d62b8
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

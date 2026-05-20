@@ -53,6 +53,7 @@ namespace MiniTeam.Core
             if (IsInMiniGame) return;
 
             // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
+            playerMove.UnlockCursor();
             hubRootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
             foreach (var go in hubRootObjects)
                 go.SetActive(false);
