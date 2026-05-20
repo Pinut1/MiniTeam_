@@ -1,3 +1,4 @@
+using MiniTeam.Tetris;
 using System;
 using UnityEngine;
 
@@ -17,6 +18,9 @@ public class TetrisBlock : MonoBehaviour
     public float das = 0.17f;
     public float arr = 0.05f;
     private float horizontalTimer = 0f;
+
+    public float lockDelay = 0.5f;
+    private float lockTimer = 0f;
 
     private int rotationState = 0;
 
@@ -69,60 +73,58 @@ public class TetrisBlock : MonoBehaviour
     /// </remarks>
     void Update()
     {
-
-        //1 순위 입력. HOLD 입력
+        // 입력 1순위 : HOLD (가장 먼저 검사)
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            //SpawnTetromino 한테 자신을 넘기며 홀드 요청
             SpawnTetromino.Instance.HoldBlock(this.gameObject);
             return;
         }
 
-
-        //2 순위 입력. 블록 회전
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (type == BlockType.O) return;
-
-            transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
-
-            // 회전하는데 벽에 걸린 경우
-            if (!ValidMove())
+            if (type != BlockType.O)
             {
+                // 일단 돌려봄
+                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+                bool rotationSuccess = true;
 
-                if (!PerformWallKick(rotationState))
+                // 벽에 걸렸다면 벽차기 시도
+                if (!ValidMove())
                 {
-                    transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-                    return;
+                    if (!PerformWallKick(rotationState))
+                    {
+                        // 벽차기마저 실패하면 원상복구
+                        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                        rotationSuccess = false;
+                    }
                 }
 
+                // 회전에 최종적으로 성공했을 때만 상태값 증가
+                if (rotationSuccess)
+                {
+                    rotationState = (rotationState + 1) % 4;
+                    lockTimer = 0f;
+                }
             }
-
-            rotationState = (rotationState + 1) % 4;
         }
 
-        
-        //3 순위 입력. 블록 좌우
+        // ⭐️ 3순위: 좌우 이동 (독립된 if문. 좌/우끼리만 동시 입력 안 되게 else if로 묶음)
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             MoveHorizontal(-1);
             horizontalTimer = Time.time + das;
         }
-
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             MoveHorizontal(1);
             horizontalTimer = Time.time + das;
         }
-
-        // 키를 '꾹' 누르고 있을때
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
             if (Time.time > horizontalTimer)
             {
                 MoveHorizontal(-1);
                 horizontalTimer = Time.time + arr;
-
             }
         }
         else if (Input.GetKey(KeyCode.RightArrow))
@@ -131,36 +133,91 @@ public class TetrisBlock : MonoBehaviour
             {
                 MoveHorizontal(1);
                 horizontalTimer = Time.time + arr;
-
             }
         }
 
-        //4 순위 입력. 블록 하강
-        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
+        // ⭐️ 4순위: 하강 로직 (독립된 if문)
+        // 가상으로 아래로 한 칸 움직여서 바닥(또는 다른 블록)에 닿는지 검사
+        transform.position += new Vector3(0, -1, 0);
+        bool canDrop = ValidMove();
+        transform.position += new Vector3(0, 1, 0);     // 제자리로 복구
+
+        if (!canDrop)
         {
-            transform.position += new Vector3(0, -1, 0);
-            if (!ValidMove())
+            // 바닥에 닿은 상태면 유예 시간(Lock 타이머) 시작
+            lockTimer += Time.deltaTime;
+
+            if (lockTimer >= lockDelay)
             {
-                transform.position += new Vector3(0, 1, 0);
-             
-                AddToGrid();
-                int cleared = CheckForLines();
-                LineClearEventManager.Instance?.ProcessLineClear(cleared);
-
-                this.enabled = false;
-
-                SpawnTetromino.Instance.NewTetromino();
+                LockBlock();
                 return;
             }
-            previousTime = Time.time;
+        }
+        else
+        {
+            // 바닥에서 떨어져서 다시 공중에 떴다면 타이머 완벽 리셋
+            lockTimer = 0f;
+
+            if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10f : fallTime))
+            {
+                transform.position += new Vector3(0, -1, 0);
+                previousTime = Time.time;
+            }
+        }
+        //if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10f : fallTime))
+        //{
+        //    transform.position += new Vector3(0, -1, 0);
+
+        //    // 바닥이나 다른 블록에 닿았을 때
+        //    if (!ValidMove())
+        //    {
+        //        transform.position += new Vector3(0, 1, 0); // 닿기 직전으로 원상복구
+
+        //        AddToGrid();
+        //        int cleared = CheckForLines();
+        //        LineClearEventManager.Instance?.ProcessLineClear(cleared); // Null-safe 호출!
+
+        //        // 메모리 누수 방지 (자식들은 놔두고 부모 껍데기만 깔끔하게 파괴)
+        //        // I_enable 특수 블록은 나중에 폭발 검사를 받아야 하니 껍데기를 살려둠
+               
+        //        if (type != BlockType.I_enable)
+        //        {
+        //            transform.DetachChildren();
+        //            Destroy(gameObject);
+        //        }
+        //        else
+        //        {
+                    
+        //            this.enabled = false;
+        //        }
+
+        //        SpawnTetromino.Instance.NewTetromino();
+        //        return;
+        //    }
+
+        //    // 무사히 한 칸 떨어졌다면 타이머 리셋
+        //    previousTime = Time.time;
+        //}
+
+    }
+
+    private void LockBlock()
+    {
+        AddToGrid();
+        int cleared = CheckForLines();
+        LineClearEventManager.Instance?.ProcessLineClear(cleared);
+
+        if (type != BlockType.I_enable)
+        {
+            transform.DetachChildren();
+            Destroy(gameObject);
+        }
+        else
+        {
+            this.enabled = false;
         }
 
-
-        
-
-        
-
-       
+        SpawnTetromino.Instance.NewTetromino();
     }
 
     /// <summary>
@@ -235,7 +292,10 @@ public class TetrisBlock : MonoBehaviour
     /// <param name="i">Index of the row to delete (0-based, 0 is the bottom row).</param>
     private void DeleteLine(int i)
     {
-        for (int j = 0; j < width; j++)
+        // 타마마 임팩트를 1번만 체크하기 위한 Trigger
+        bool hasTriggeredEffect = false;
+
+        for (int j = width - 1; j >= 0; j--)
         {
             Transform cell = grid[j, i];
             if (cell != null) // 안전장치
@@ -248,13 +308,21 @@ public class TetrisBlock : MonoBehaviour
                     {
                         if (parentBlock.type == BlockType.I_enable)
                         {
-                            Debug.Log("I_enable 블록의 파편을 찾았습니다");
-                            parentBlock.type = BlockType.I_disable;
-                            //TODO 타마마 임펙트 처리
+                            // 블록이 가로인지 세로인지 판별
+                            // 자식(파편) 2개를 잡아, X축으로 떨어져 있는지 Y축으로 떨어져 있는지 검사.
+                            bool isHorizontal = true;
+                            if (parentTransform.childCount >= 2)
+                            {
+                                Transform child1 = parentTransform.GetChild(0);
+                                Transform child2 = parentTransform.GetChild(1);
 
+                                isHorizontal = Mathf.Abs(child1.position.x - child2.position.x)
+                                                > Mathf.Abs(child1.position.y - child2.position.y);
+                            }
+
+                            // 1. 살아남을 파편(형제들) 색상을 회색으로 변경
                             foreach (Transform sibling in parentTransform)
                             {
-                                // 이번에 지워질 자기 자신은 어차피 곧 파괴되니 색칠할 필요 없음
                                 if (sibling != cell)
                                 {
                                     if (sibling.TryGetComponent(out SpriteRenderer sr))
@@ -263,13 +331,39 @@ public class TetrisBlock : MonoBehaviour
                                     }
                                 }
                             }
+
+                            parentTransform.DetachChildren();
+                            Destroy(parentTransform.gameObject);
+
+                            // 2. 타마마 임팩트 발동
+                            if (!hasTriggeredEffect)
+                            {
+                                if (isHorizontal)
+                                {
+                                    Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발! (가로 빔 발사!)");
+                                    // TODO 가로 전용 타마마 임팩트
+                                }
+                                else
+                                {
+                                    // grid의 오른쪽부터 스캔하기 때문에, 무조건 가장 오른쪽의 블록에서 발동.
+                                    Debug.Log($"[{j}번째 열] I_enable 블록 파편 발견! 타마마 임팩트 발동!");
+                                    //TODO 타마마 임팩트
+                                    if (TetrisGameController.Instance != null)
+                                    {
+                                        TetrisGameController.Instance.OnTamamaImpactTriggered();
+                                    }
+                                }
+                                hasTriggeredEffect = true;
+                            }
                         }
+
                     }
                 }
+
+                // 3. 줄이 지워지는 해당 칸 파괴
                 Destroy(cell.gameObject);
                 grid[j, i] = null;
             }
-           
         }
     }
     /// <summary>
@@ -278,7 +372,7 @@ public class TetrisBlock : MonoBehaviour
     /// <param name="i">The starting row index (inclusive); all occupied cells in row <c>i</c> and above are shifted down one row. This updates both the static grid references and each moved transform's world position.</param>
     private void RowDown(int i)
     {
-        for (int y = i + 1; y < height; y++)
+        for (int y = i ; y < height; y++)
         {
             for (int j = 0; j < width; j++)
             {
@@ -303,8 +397,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.2f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.2f);
 
             if (roundedY >= height)
             {
@@ -312,8 +406,8 @@ public class TetrisBlock : MonoBehaviour
                 // TODO
                 // 게임 오버시 처리
                 SpawnTetromino.Instance.TogglespawnTrigger();
-
-                continue;
+                TetrisGameController.Instance.OnGameFail();
+                return;
             }
 
             grid[roundedX, roundedY] = children;
@@ -329,8 +423,8 @@ public class TetrisBlock : MonoBehaviour
     {
         foreach (Transform children in transform)
         {
-            int roundedX = Mathf.RoundToInt(children.transform.position.x);
-            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.2f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.2f);
 
             if (roundedX < 0 || roundedX >= width || roundedY < 0)
             {
@@ -351,6 +445,10 @@ public class TetrisBlock : MonoBehaviour
         if (!ValidMove())
         {
             transform.position -= new Vector3(direction, 0, 0);
+        }
+        else
+        {
+            lockTimer = 0f;
         }
     }
 }
