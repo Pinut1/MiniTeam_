@@ -6,7 +6,8 @@ namespace MiniTeam.Shooting1942
     // 역할: 이동 패턴 / 총알 발사 / 피격 처리 / 화면 밖 삭제
     public class Enemy : MonoBehaviour
     {
-        public enum MovementType { Straight, Sine, Horizontal }
+        public enum MovementType { Straight, Sine, SineReverse, Horizontal }
+        public enum ShootType   { None, Single, Burst, Spread }
 
         [Header("이동")]
         public MovementType movementType = MovementType.Straight;
@@ -15,9 +16,11 @@ namespace MiniTeam.Shooting1942
         public float sineSpeed  = 2f;
 
         [Header("총알")]
-        public bool canShoot = false;
+        public ShootType  shootType       = ShootType.None;
         public GameObject enemyBulletPrefab;
-        public float shootInterval = 2f;
+        public float      shootInterval   = 2f;
+        public float      spreadAngle     = 20f; // Spread 3갈래 각도
+        public float      burstDelay      = 0.15f; // Burst 연발 간격
 
         [Header("HP")]
         public int hp = 1;
@@ -49,7 +52,7 @@ namespace MiniTeam.Shooting1942
 
             startX = transform.position.x;
 
-            if (canShoot && enemyBulletPrefab != null)
+            if (shootType != ShootType.None && enemyBulletPrefab != null)
                 StartCoroutine(ShootRoutine());
         }
 
@@ -71,8 +74,10 @@ namespace MiniTeam.Shooting1942
                     break;
 
                 case MovementType.Sine:
-                    float offsetX = Mathf.Sin(elapsed * sineSpeed) * sineAmount;
-                    Vector3 pos = transform.position;
+                case MovementType.SineReverse:
+                    float sign    = movementType == MovementType.SineReverse ? -1f : 1f;
+                    float offsetX = Mathf.Sin(elapsed * sineSpeed) * sineAmount * sign;
+                    Vector3 pos   = transform.position;
                     pos.y -= moveSpeed * Time.deltaTime;
                     pos.x  = startX + offsetX;
                     if (waveManager != null)
@@ -91,8 +96,34 @@ namespace MiniTeam.Shooting1942
             while (true)
             {
                 yield return new WaitForSeconds(shootInterval);
-                if (enemyBulletPrefab != null)
-                    Instantiate(enemyBulletPrefab, transform.position, Quaternion.identity);
+                switch (shootType)
+                {
+                    case ShootType.Single: FireSingle(Vector3.down); break;
+                    case ShootType.Burst:  yield return StartCoroutine(FireBurst()); break;
+                    case ShootType.Spread: FireSpread(); break;
+                }
+            }
+        }
+
+        void FireSingle(Vector3 dir)
+        {
+            var b = Instantiate(enemyBulletPrefab, transform.position, Quaternion.identity);
+            b.GetComponent<EnemyBullet>()?.SetDirection(dir);
+        }
+
+        IEnumerator FireBurst()
+        {
+            FireSingle(Vector3.down);
+            yield return new WaitForSeconds(burstDelay);
+            FireSingle(Vector3.down);
+        }
+
+        void FireSpread()
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                Vector3 dir = Quaternion.Euler(0f, 0f, spreadAngle * i) * Vector3.down;
+                FireSingle(dir);
             }
         }
 

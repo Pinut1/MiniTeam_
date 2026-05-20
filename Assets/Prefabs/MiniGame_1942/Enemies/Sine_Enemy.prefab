@@ -106,13 +106,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1b0b2d256ecfc4c8446aedae07dc88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  movementType: 1
+  movementType: 2
   moveSpeed: 3
   sineAmount: 1.5
   sineSpeed: 2
-  canShoot: 0
+  shootType: 0
   enemyBulletPrefab: {fileID: 0}
   shootInterval: 2
+  spreadAngle: 20
+  burstDelay: 0.15
   hp: 1
   explosionPrefab: {fileID: 0}
 --- !u!60 &-6325261680127380603
