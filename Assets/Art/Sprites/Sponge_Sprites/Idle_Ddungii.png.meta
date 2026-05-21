@@ -123,7 +123,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 856
-        y: 1039
+        y: 1042
         width: 715
         height: 894
       alignment: 0
@@ -146,7 +146,7 @@ TextureImporter:
         serializedVersion: 2
         x: 1666
         y: 1039
-        width: 716
+        width: 715
         height: 894
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -168,7 +168,7 @@ TextureImporter:
         serializedVersion: 2
         x: 2490
         y: 1039
-        width: 717
+        width: 715
         height: 894
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -190,7 +190,7 @@ TextureImporter:
         serializedVersion: 2
         x: 3314
         y: 1039
-        width: 716
+        width: 715
         height: 894
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -212,7 +212,7 @@ TextureImporter:
         serializedVersion: 2
         x: 4098
         y: 1039
-        width: 732
+        width: 715
         height: 894
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -232,9 +232,9 @@ TextureImporter:
       name: Ddungiidle_6
       rect:
         serializedVersion: 2
-        x: 50
+        x: 47
         y: 43
-        width: 752
+        width: 715
         height: 893
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -256,7 +256,7 @@ TextureImporter:
         serializedVersion: 2
         x: 878
         y: 43
-        width: 734
+        width: 715
         height: 893
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -322,7 +322,7 @@ TextureImporter:
         serializedVersion: 2
         x: 3361
         y: 43
-        width: 717
+        width: 715
         height: 893
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
