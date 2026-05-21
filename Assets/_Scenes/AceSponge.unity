@@ -6703,6 +6703,10 @@ MonoBehaviour:
   pressStartPnlRight: {fileID: 1847053995}
   pressStartAnimLeft: {fileID: 1196980112}
   pressStartAnimRight: {fileID: 1847053999}
+  questionPnlLeft: {fileID: 1267974592}
+  questionPnlRight: {fileID: 458231990}
+  questionAnimLeft: {fileID: 1267974594}
+  questionAnimRight: {fileID: 458231992}
 --- !u!1 &1715998412
 GameObject:
   m_ObjectHideFlags: 0
