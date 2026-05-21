@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c2e640b2a74a3c44a35c42733ddf09a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BanillaNpcManager
-  playerAnim: {fileID: 4672231077142925076, guid: 28db68c71c0430b44b1f07004032252f, type: 3}
+  playerAnim: {fileID: 0}
   heartSprite: {fileID: -1854226887, guid: 17b2f404853f3564c86608f116c93754, type: 3}
 --- !u!95 &4228332659750791685
 Animator:

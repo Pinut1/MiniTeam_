@@ -16,12 +16,7 @@ public class BanillaNpcManager : MonoBehaviour
             GameObject playerObj = GameObject.Find("player");
             if (playerObj != null)
             {
-                // 부모에게 있으면 가져오고, 없으면 자식(Player_walk 등)에서 찾아옵니다.
-                playerAnim = playerObj.GetComponent<Animator>();
-                if (playerAnim == null)
-                {
-                    playerAnim = playerObj.GetComponentInChildren<Animator>();
-                }
+                playerAnim = playerObj.GetComponentInChildren<Animator>();
             }
         }
 
@@ -62,7 +57,6 @@ public class BanillaNpcManager : MonoBehaviour
             playerAnim.SetBool("isIdle", false);
 
             // 2. 공격 상태를 켜고 트리거를 작동시킵니다.
-            playerAnim.SetBool("isAttacking", true);
             playerAnim.SetTrigger("DoBackAttack");
         }
 
