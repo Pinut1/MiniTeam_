@@ -597,16 +597,15 @@ public class SpongeDialogueManager : MonoBehaviour
         SelectChoice(0);
     }
 
-    static readonly Color ChoiceNormalColor    = Color.white;
-    static readonly Color ChoiceHighlightColor = new Color(1f, 0.85f, 0.3f, 1f);
-
     void SelectChoice(int index)
     {
         selectedChoiceIndex = index;
         for (int i = 0; i < choiceBtns.Length; i++)
         {
-            if (i < choiceBtnTxts.Length && choiceBtnTxts[i] != null)
-                choiceBtnTxts[i].color = (i == index) ? ChoiceHighlightColor : ChoiceNormalColor;
+            if (!choiceBtns[i].gameObject.activeSelf) continue;
+            choiceBtns[i].image.overrideSprite = (i == index)
+                ? choiceBtns[i].spriteState.highlightedSprite
+                : null;
         }
     }
 
@@ -615,7 +614,6 @@ public class SpongeDialogueManager : MonoBehaviour
         int activeCount = 0;
         for (int i = 0; i < choiceBtns.Length; i++)
             if (choiceBtns[i].gameObject.activeSelf) activeCount++;
-        Debug.Log($"[Choice] NavigateChoice dir={dir} activeCount={activeCount} before={selectedChoiceIndex}");
         if (activeCount <= 1) return;
         SelectChoice(Mathf.Clamp(selectedChoiceIndex + dir, 0, activeCount - 1));
     }
@@ -624,7 +622,16 @@ public class SpongeDialogueManager : MonoBehaviour
     {
         if (selectedChoiceIndex >= 0 && selectedChoiceIndex < choiceBtns.Length
             && choiceBtns[selectedChoiceIndex].gameObject.activeSelf)
-            choiceBtns[selectedChoiceIndex].onClick.Invoke();
+            StartCoroutine(ConfirmChoiceSequence());
+    }
+
+    IEnumerator ConfirmChoiceSequence()
+    {
+        var btn = choiceBtns[selectedChoiceIndex];
+        btn.image.overrideSprite = btn.spriteState.pressedSprite;
+        yield return new WaitForSeconds(0.1f);
+        btn.image.overrideSprite = null;
+        btn.onClick.Invoke();
     }
 
     // ── 대사 시퀀스 종료 → 다음 상태로 전환 ────────────────────

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -49,6 +50,16 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject pressingImgObj;
     [SerializeField] private Animator pressingImgAnim;
 
+    [Header("추궁 연출")]
+    [SerializeField] private GameObject whitePnl;
+    [SerializeField] private float flashDuration = 0.1f;
+    [SerializeField] private GameObject holditObj;
+    [SerializeField] private Animator holditAnim;
+
+    [Header("증거 제시 연출")]
+    [SerializeField] private GameObject objectionObj;
+    [SerializeField] private Animator objectionAnim;
+
     [Header("심문 시작 패널")]
     [SerializeField] private GameObject questionPnlLeft;
     [SerializeField] private GameObject questionPnlRight;
@@ -56,6 +67,8 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private Animator questionAnimRight;
 
     private bool questionPnlShown = false;
+    public bool IsPlayingHoldit { get; private set; }
+    public bool IsPlayingObjection { get; private set; }
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -150,6 +163,37 @@ public class SpongeUIManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    // ── 추궁 연출 ────────────────────────────────────────────────
+    public IEnumerator PlayHolditAnim()
+    {
+        IsPlayingHoldit = true;
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+        holditObj.SetActive(true);
+        holditAnim.Play("HoldItAnim");
+        yield return null;
+        yield return new WaitForSeconds(holditAnim.GetCurrentAnimatorStateInfo(0).length);
+        holditObj.SetActive(false);
+        IsPlayingHoldit = false;
+    }
+
+    IEnumerator PresentEvidenceSequence(string evidenceId)
+    {
+        IsPlayingObjection = true;
+        CloseEvidencePanel();
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+        objectionObj.SetActive(true);
+        objectionAnim.Play("HoldItAnim");
+        yield return null;
+        yield return new WaitForSeconds(objectionAnim.GetCurrentAnimatorStateInfo(0).length);
+        objectionObj.SetActive(false);
+        IsPlayingObjection = false;
+        SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
     }
 
     // ── 키 입력 처리 ─────────────────────────────────────────────
@@ -300,7 +344,7 @@ public class SpongeUIManager : MonoBehaviour
                     if (SpongeEvidenceManager.Instance.SelectedEvidenceId == evidenceId)
                     {
                         if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
-                            SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
+                            StartCoroutine(PresentEvidenceSequence(evidenceId));
                     }
                     else
                         SpongeEvidenceManager.Instance.SelectEvidence(evidenceId);
@@ -356,7 +400,7 @@ public class SpongeUIManager : MonoBehaviour
         if (stateBeforeEvidence != SpongeGameState.GameState.CrossExamination) return;
         string id = SpongeEvidenceManager.Instance.SelectedEvidenceId;
         if (!string.IsNullOrEmpty(id))
-            SpongeEvidenceManager.Instance.PresentEvidence(id);
+            StartCoroutine(PresentEvidenceSequence(id));
     }
 
     void MoveEvidenceSelection(int dir)

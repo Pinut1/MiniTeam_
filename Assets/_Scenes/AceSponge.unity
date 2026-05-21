@@ -3427,7 +3427,6 @@ RectTransform:
   - {fileID: 104270262}
   - {fileID: 499300262}
   - {fileID: 1843533657}
-  - {fileID: 1835246832}
   - {fileID: 1787456843}
   - {fileID: 1821034978}
   - {fileID: 40707195}
@@ -3437,6 +3436,7 @@ RectTransform:
   - {fileID: 1847053996}
   - {fileID: 1738482251}
   - {fileID: 2025598834}
+  - {fileID: 1835246832}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6705,6 +6705,12 @@ MonoBehaviour:
   pressStartAnimRight: {fileID: 1847053999}
   pressingImgObj: {fileID: 1738482250}
   pressingImgAnim: {fileID: 1738482254}
+  whitePnl: {fileID: 1835246831}
+  flashDuration: 0.1
+  holditObj: {fileID: 104270261}
+  holditAnim: {fileID: 104270265}
+  objectionObj: {fileID: 499300261}
+  objectionAnim: {fileID: 499300263}
   questionPnlLeft: {fileID: 1267974592}
   questionPnlRight: {fileID: 458231990}
   questionAnimLeft: {fileID: 1267974594}
