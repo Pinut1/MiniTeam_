@@ -3895,7 +3895,7 @@ MonoBehaviour:
   characterJipgeSajang: {fileID: 2074226658}
   posLeft: {x: -63, y: 33}
   posCenter: {x: 0, y: -100}
-  posRight: {x: 385, y: 53}
+  posRight: {x: 208, y: 26}
   posJudgeCenter: {x: -8, y: -128}
   posWitnessCenter: {x: 0, y: 90}
   arrowImg: {fileID: 838185781}
@@ -4168,7 +4168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1001967631
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4185,8 +4185,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 385, y: 26}
-  m_SizeDelta: {x: 492, y: 887.1732}
+  m_AnchoredPosition: {x: 208, y: 26}
+  m_SizeDelta: {x: 1600, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1001967632
 MonoBehaviour:
@@ -4208,7 +4208,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1635273602, guid: 12a431c5f9d3b6d47b29ce5040be80d1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cac40fbb0c553c846bfcabf2246c98c5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5660,7 +5660,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1287264978
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6534,7 +6534,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 98ce5bfa3b5eea24296a0dabb2fe6532, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6cda7dac8ef110d4486f7e46767acd0d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6703,6 +6703,8 @@ MonoBehaviour:
   pressStartPnlRight: {fileID: 1847053995}
   pressStartAnimLeft: {fileID: 1196980112}
   pressStartAnimRight: {fileID: 1847053999}
+  pressingImgObj: {fileID: 1738482250}
+  pressingImgAnim: {fileID: 1738482254}
   questionPnlLeft: {fileID: 1267974592}
   questionPnlRight: {fileID: 458231990}
   questionAnimLeft: {fileID: 1267974594}
@@ -6764,7 +6766,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 840b78fdc9d70644c85586b60dc36345, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b38206b5538ef894ab00df2440375ff2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

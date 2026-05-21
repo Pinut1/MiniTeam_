@@ -45,11 +45,17 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private Animator pressStartAnimLeft;
     [SerializeField] private Animator pressStartAnimRight;
 
+    [Header("심문 중 표시")]
+    [SerializeField] private GameObject pressingImgObj;
+    [SerializeField] private Animator pressingImgAnim;
+
     [Header("심문 시작 패널")]
     [SerializeField] private GameObject questionPnlLeft;
     [SerializeField] private GameObject questionPnlRight;
     [SerializeField] private Animator questionAnimLeft;
     [SerializeField] private Animator questionAnimRight;
+
+    private bool questionPnlShown = false;
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -107,6 +113,7 @@ public class SpongeUIManager : MonoBehaviour
 
         if (newState == SpongeGameState.GameState.Testifying)
         {
+            questionPnlShown = false;
             if (pressStartPnlLeft != null)
             {
                 pressStartPnlLeft.SetActive(true);
@@ -117,19 +124,30 @@ public class SpongeUIManager : MonoBehaviour
                 pressStartPnlRight.SetActive(true);
                 pressStartAnimRight?.Play("UI_PressStartPnlRight");
             }
+            if (pressingImgObj != null)
+            {
+                pressingImgObj.SetActive(true);
+                pressingImgAnim?.Play("PressingLoof");
+            }
         }
 
         if (newState == SpongeGameState.GameState.CrossExamination)
         {
-            if (questionPnlLeft != null)
+            pressingImgObj?.SetActive(false);
+
+            if (!questionPnlShown)
             {
-                questionPnlLeft.SetActive(true);
-                questionAnimLeft?.Play("UI_QuestionStartPnlLeft");
-            }
-            if (questionPnlRight != null)
-            {
-                questionPnlRight.SetActive(true);
-                questionAnimRight?.Play("UI_QuestionStartPnlRight");
+                questionPnlShown = true;
+                if (questionPnlLeft != null)
+                {
+                    questionPnlLeft.SetActive(true);
+                    questionAnimLeft?.Play("UI_QuestionStartPnlLeft");
+                }
+                if (questionPnlRight != null)
+                {
+                    questionPnlRight.SetActive(true);
+                    questionAnimRight?.Play("UI_QuestionStartPnlRight");
+                }
             }
         }
     }
