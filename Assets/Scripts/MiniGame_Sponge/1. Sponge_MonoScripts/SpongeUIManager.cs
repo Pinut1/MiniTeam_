@@ -99,6 +99,15 @@ public class SpongeUIManager : MonoBehaviour
     {
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
 
+        if (SpongeDialogueManager.Instance.IsChoiceActive)
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow))   SpongeDialogueManager.Instance.NavigateChoice(-1);
+            if (Input.GetKeyDown(KeyCode.DownArrow)) SpongeDialogueManager.Instance.NavigateChoice(1);
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                SpongeDialogueManager.Instance.ConfirmChoice();
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.S))
             TryDevSkip();
 

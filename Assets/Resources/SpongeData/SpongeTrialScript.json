@@ -715,7 +715,7 @@
       "txt": "단체 손님이 20명이 들어와\n굉장히 바빴습니다.",
       "ispressable": true,
       "firstPressDialogueId": "re_press_00_01",
-      "isRequiredPress": true,
+      "isRequiredPress": false,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false
@@ -744,7 +744,7 @@
       "txt": "그때뚱이가 몰래 집게리아 안으로\n들어가는걸 봤고",
       "ispressable": true,
       "firstPressDialogueId": "re_press_03_01",
-      "isRequiredPress": true,
+      "isRequiredPress": false,
       "validEvidenceIds": [
         "recorder"
       ],
@@ -1956,7 +1956,7 @@
       "txt": "뚱이에게 준비한 선물이 있으니\n일이 끝나고 만나자고 했어요!",
       "animationTrig": "",
       "backgroundSpr": "Sponge_BG/BG_None",
-      "deskSpr": "Sponge_Table/JipgeSajang",
+      "deskSpr": "None",
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
@@ -1986,7 +1986,7 @@
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
-      "nextLineId": "re_press_02_06",
+      "nextLineId": "re_chice_press_02_06",
       "alignment": ""
     },
     {
@@ -3087,7 +3087,7 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_02_18"
+      "nextLineId": ""
     },
     {
       "lineId": "evidence_02_18",
@@ -3176,7 +3176,7 @@
     {
       "lineId": "need_more_evidence",
       "speaker": "나",
-      "txt": "<color=#7596B0>(심문을 더 해보자...!)</color>",
+      "txt": "<color=#7596B0>(아직 부족하다...\n심문을 더 해보자...!)</color>",
       "animationTrig": "",
       "backgroundSpr": "",
       "deskSpr": "",
