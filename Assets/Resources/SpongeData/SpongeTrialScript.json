@@ -1614,7 +1614,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "re_press_choice_00_04",
-      "alignment": ""
+      "alignment": "",
+      "playObjectionAnim": true
     },
     {
       "lineId": "re_press_choice_00_04",
@@ -1783,7 +1784,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "re_press_03_03",
-      "alignment": ""
+      "alignment": "",
+      "playObjectionAnim": true
     },
     {
       "lineId": "re_press_03_03",
@@ -1986,7 +1988,7 @@
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
-      "nextLineId": "re_chice_press_02_06",
+      "nextLineId": "re_press_choice_02_06",
       "alignment": ""
     },
     {
@@ -2483,7 +2485,8 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_00_13"
+      "nextLineId": "evidence_00_13",
+      "playObjectionAnim": true
     },
     {
       "lineId": "evidence_00_13",
@@ -2967,7 +2970,8 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_02_08"
+      "nextLineId": "evidence_02_08",
+      "playObjectionAnim": true
     },
     {
       "lineId": "evidence_02_08",

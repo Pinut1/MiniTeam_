@@ -161,8 +161,17 @@ public class SpongeDialogueManager : MonoBehaviour
         IsInDialogueSequence = true;
         currentLine = line;
 
-        // 이전 타이핑 코루틴이 있으면 중단
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+
+        if (line.playObjectionAnim)
+            typingCoroutine = StartCoroutine(ShowLineWithObjection(line));
+        else
+            typingCoroutine = StartCoroutine(TypeLine(line));
+    }
+
+    IEnumerator ShowLineWithObjection(SpongeDialogueLine line)
+    {
+        yield return StartCoroutine(SpongeUIManager.Instance.PlayObjectionAnim());
         typingCoroutine = StartCoroutine(TypeLine(line));
     }
 

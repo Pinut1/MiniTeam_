@@ -180,10 +180,9 @@ public class SpongeUIManager : MonoBehaviour
         IsPlayingHoldit = false;
     }
 
-    IEnumerator PresentEvidenceSequence(string evidenceId)
+    public IEnumerator PlayObjectionAnim()
     {
         IsPlayingObjection = true;
-        CloseEvidencePanel();
         whitePnl.SetActive(true);
         yield return new WaitForSeconds(flashDuration);
         whitePnl.SetActive(false);
@@ -193,6 +192,12 @@ public class SpongeUIManager : MonoBehaviour
         yield return new WaitForSeconds(objectionAnim.GetCurrentAnimatorStateInfo(0).length);
         objectionObj.SetActive(false);
         IsPlayingObjection = false;
+    }
+
+    IEnumerator PresentEvidenceSequence(string evidenceId)
+    {
+        CloseEvidencePanel();
+        yield return StartCoroutine(PlayObjectionAnim());
         SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
     }
 
