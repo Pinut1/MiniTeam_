@@ -317,6 +317,7 @@ public class SpongeUIManager : MonoBehaviour
 
         evidencePnl.transform.SetAsLastSibling();
         evidencePnl.SetActive(true);
+        Time.timeScale = 0f;
         RebuildEvidenceSlots();
         SelectFirstFilledSlot();
     }
@@ -443,6 +444,7 @@ public class SpongeUIManager : MonoBehaviour
     /// </summary>
     public void CloseEvidencePanel()
     {
+        Time.timeScale = 1f;
         evidencePnl.SetActive(false);
         SpongeEvidenceManager.Instance.ClearSelection();
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
