@@ -26,34 +26,68 @@ public class CutsceneNpcManager : MonoBehaviour
     public MonoBehaviour playerMoveScript;
     public Rigidbody2D playerRb;
 
+    public PlayerLaser playerLaserScript;
+
     [Header("플레이어 애니메이션 (직접 연결)")]
     public Animator playerAnim;
 
     [Header("여학생 이동 설정")]
     public float girlWalkSpeed = 3f;
 
+    [Header("레이저 경쟁 설정")]
+    public Color playerCompetitionLaserColor = new Color(1f, 0.4f, 0.7f);
+
+    private GameObject banillaLaserObj;
     private List<GameObject> spawnedGirls = new List<GameObject>();
-
-    private GameObject instanceVanilla;
+    private GameObject instanceBanilla;
     private Animator banillaAnimator;
+    private Transform banillaTransform;
 
+    private bool isLaserDuelActive = false;
+    private Vector2 duelMidwayPoint;
+
+    public bool canStartDuel = false;
+
+    // 1. 시작 시 레이저 강제 숨김
+    void Start()
+    {
+        ForceHideBanillaLaser();
+    }
+
+    private void ForceHideBanillaLaser()
+    {
+        GameObject banillaObj = GameObject.FindWithTag("Banilla");
+        if (banillaObj != null)
+        {
+            banillaTransform = banillaObj.transform;
+            if (banillaAnimator == null) banillaAnimator = banillaObj.GetComponentInChildren<Animator>();
+
+            Transform[] allChildren = banillaObj.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in allChildren)
+            {
+                if (child.name == "Laser_Yellow_0")
+                {
+                    banillaLaserObj = child.gameObject;
+                    banillaLaserObj.SetActive(false);
+                    break;
+                }
+            }
+        }
+    }
+
+    // 2. 오프닝 컷신
     public void SpawnAndPlayCutscene()
     {
         spawnedGirls.Clear();
         banillaAnimator = null;
+        banillaTransform = null;
 
         if (pierrePrefab != null) Instantiate(pierrePrefab, pierreSpawnPosition, Quaternion.identity);
 
         if (banillaPrefab != null)
         {
-            instanceVanilla = Instantiate(banillaPrefab, banillaSpawnPosition, Quaternion.identity);
-
-            banillaAnimator = instanceVanilla.GetComponent<Animator>();
-            if (banillaAnimator == null)
-            {
-                banillaAnimator = instanceVanilla.GetComponentInChildren<Animator>();
-            }
-
+            instanceBanilla = Instantiate(banillaPrefab, banillaSpawnPosition, Quaternion.identity);
+            ForceHideBanillaLaser();
             SetBanillaCrying(false);
         }
 
@@ -88,7 +122,6 @@ public class CutsceneNpcManager : MonoBehaviour
             playerAnim.Play("Idle");
         }
 
-        // 오프닝 컷신: 왼쪽 바라보기
         Vector3 playerScale = playerRb.transform.localScale;
         playerScale.x = -Mathf.Abs(playerScale.x);
         playerRb.transform.localScale = playerScale;
@@ -129,6 +162,7 @@ public class CutsceneNpcManager : MonoBehaviour
             playerAnim.SetBool("isIdle", false);
         }
 
+        SyncPlayerMoveDirection(false);
         if (mainBrain != null) mainBrain.enabled = false;
         playerMoveScript.enabled = true;
 
@@ -138,6 +172,7 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
+    // 3. 서브 유틸 함수들
     private void SyncPlayerMoveDirection(bool faceRight)
     {
         if (playerMoveScript == null) return;
@@ -162,10 +197,7 @@ public class CutsceneNpcManager : MonoBehaviour
                 }
             }
         }
-        catch (System.Exception e)
-        {
-            Debug.LogError("플레이어 방향 동기화 실패: " + e.Message);
-        }
+        catch { }
     }
 
     private IEnumerator GirlsWalkToPierre()
@@ -222,12 +254,11 @@ public class CutsceneNpcManager : MonoBehaviour
         }
         else
         {
-            // 혹시 씬에 미리 배치된 바닐라가 있다면 태그로 찾아봅니다.
             GameObject banillaObj = GameObject.FindWithTag("Banilla");
             if (banillaObj != null)
             {
                 banillaAnimator = banillaObj.GetComponent<Animator>();
-                if (banillaAnimator != null) banillaAnimator.SetBool("isCry", isCrying);
+                if (banillaAnimator != null) banillaAnimator.SetBool("isCrying", isCrying);
             }
         }
     }
@@ -242,23 +273,17 @@ public class CutsceneNpcManager : MonoBehaviour
     }
 
     // =========================================================================
-    // ★ 피에르 하트 획득 시 발동하는 컷신 로직 ★
+    // ★ 제가 멍청하게 지워버렸던 엔딩 컷신 함수 (완벽 복구) ★
     // =========================================================================
-
     public void OnPlayerGetPierreHeart()
     {
-        Debug.Log("피에르 하트 획득! 엔딩 컷신 코루틴 시작.");
-
-        // 1. 바닐라 울기 시작
-        SetBanillaCrying(true);
-
-        // 2. 엔딩 컷신 연출 시작
+        canStartDuel = false;
+        ForceHideBanillaLaser();
         StartCoroutine(PierreHeartCutsceneSequence());
     }
 
     private IEnumerator PierreHeartCutsceneSequence()
     {
-        // 1. 플레이어 조작 잠금 및 정지
         playerMoveScript.enabled = false;
         playerRb.linearVelocity = Vector2.zero;
 
@@ -270,60 +295,152 @@ public class CutsceneNpcManager : MonoBehaviour
             playerAnim.Play("Idle");
         }
 
-        // 2. 플레이어가 왼쪽(-)을 보도록 강제 전환 (문워크 방지 포함)
         Vector3 playerScale = playerRb.transform.localScale;
         playerScale.x = -Mathf.Abs(playerScale.x);
         playerRb.transform.localScale = playerScale;
         SyncPlayerMoveDirection(false);
 
-        // 시네마머신 켜기 및 다른 카메라 초기화
         if (mainBrain != null) mainBrain.enabled = true;
         vcamBanilla.gameObject.SetActive(false);
         vcamPierre.gameObject.SetActive(false);
         vcamGirlsWalk.gameObject.SetActive(false);
 
-        // 3. 플레이어 (왼쪽 바라보는 모습) 2초 비추기
         vcamPlayer.gameObject.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1.0f);
 
-        // 4. 우는 바닐라 3초 비추기
+        SetBanillaCrying(true);
+
         vcamPlayer.gameObject.SetActive(false);
         vcamBanilla.gameObject.SetActive(true);
         yield return new WaitForSeconds(6f);
 
-        // 5. 다시 플레이어 1.5초 비추기
         vcamBanilla.gameObject.SetActive(false);
         vcamPlayer.gameObject.SetActive(true);
         yield return new WaitForSeconds(3f);
 
-        // 6. 컷신 종료 후 플레이어 조작 복구
         if (playerAnim != null)
         {
             playerAnim.SetBool("isIdle", false);
         }
 
         SyncPlayerMoveDirection(false);
-
         if (mainBrain != null) mainBrain.enabled = false;
-        playerMoveScript.enabled = true;
 
-        playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
+        canStartDuel = true;
 
-        Debug.Log("엔딩 컷신 종료, 플레이어 조작 복구 완료!");
+        try
+        {
+            if (playerMoveScript != null)
+            {
+                playerMoveScript.enabled = true;
+                playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
+            }
+        }
+        catch { }
+        Debug.Log("엔딩 컷신 종료, 바닐라를 클릭하여 대결을 시작할 수 있습니다!");
+        yield return null;
     }
 
-    public void StartBanillaCompetition()
+    // =========================================================================
+    // ★ 클릭 시 레이저 대결 시작 함수 ★
+    // =========================================================================
+    public void StartLaserDuel()
     {
-        SetBanillaCrying(false);
+        if (isLaserDuelActive || banillaTransform == null) return;
+
+        isLaserDuelActive = true;
+        Debug.Log("플레이어 vs 바닐라 레이저 경쟁 시작!");
+
+        if (playerMoveScript != null) playerMoveScript.enabled = false;
+        if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
+
+        Vector3 playerScale = playerRb.transform.localScale;
+        if (banillaTransform.position.x < playerRb.transform.position.x)
+        {
+            playerScale.x = -Mathf.Abs(playerScale.x);
+            SyncPlayerMoveDirection(false);
+        }
+        else
+        {
+            playerScale.x = Mathf.Abs(playerScale.x);
+            SyncPlayerMoveDirection(true);
+        }
+        playerRb.transform.localScale = playerScale;
+
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isIdle", false);
+            try { playerAnim.Play("BackAttack"); } catch { }
+        }
+
+        if (banillaAnimator != null)
+        {
+            banillaAnimator.SetBool("isCrying", false);
+            try { banillaAnimator.Play("Banilla_Idle"); } catch { }
+        }
+
+        Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null ? playerLaserScript.firePoint.position : playerRb.transform.position;
+        Vector3 banillaFirePos = banillaLaserObj != null ? banillaLaserObj.transform.position : banillaTransform.position;
+        duelMidwayPoint = Vector2.Lerp(playerFirePos, banillaFirePos, 0.5f);
+
+        if (playerLaserScript != null)
+        {
+            playerLaserScript.EnterCompetitionMode(duelMidwayPoint, playerCompetitionLaserColor);
+            Debug.Log("플레이어 레이저 발사 성공!");
+        }
+        else
+        {
+            Debug.LogError("[치명적 오류] 플레이어 레이저가 나가지 않습니다! CutSceneManager 인스펙터의 'Player Laser Script' 칸이 비어있습니다. 하이어라키의 Player 오브젝트를 드래그해서 넣어주세요!");
+        }
+
+        if (banillaLaserObj != null)
+        {
+            FireBanillaLaser(banillaFirePos, duelMidwayPoint);
+            Debug.Log("바닐라 레이저 발사 성공!");
+        }
+        else
+        {
+            Debug.LogError("[치명적 오류] 바닐라 레이저가 나가지 않습니다! 바닐라 안에서 'Laser_Yellow_0'을 찾지 못했습니다.");
+        }
     }
 
-    public void OnPlayerLoseCompetition()
+    private void FireBanillaLaser(Vector3 startPos, Vector3 targetPos)
+{
+    if (banillaLaserObj == null) return;
+    
+    banillaLaserObj.SetActive(true);
+
+    SpriteRenderer sr = banillaLaserObj.GetComponent<SpriteRenderer>();
+    if (sr != null)
     {
-        SetBanillaCrying(true);
+        sr.enabled = true;
+        sr.sortingLayerName = "Foreground"; // 배경보다 무조건 앞! (없으면 "Default"로 유지)
+        sr.sortingOrder = 999;             // 999번으로 맨 앞으로!
     }
 
-    public void OnPlayerWinCompetition()
+    // (기존 위치/크기 조절 코드 그대로 유지...)
+    Vector2 direction = targetPos - startPos;
+    float distance = direction.magnitude;
+    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    banillaLaserObj.transform.rotation = Quaternion.Euler(0, 0, angle);
+    
+    float baseWidth = sr != null && sr.sprite != null ? sr.sprite.bounds.size.x : 1f;
+    float currentYScale = banillaLaserObj.transform.localScale.y; 
+    banillaLaserObj.transform.localScale = new Vector3(distance / baseWidth, currentYScale, 1f);
+}
+
+    // =========================================================================
+    // ★ 기존 일반 대결용 함수들 ★
+    // =========================================================================
+    public void StartBanillaCompetition() { SetBanillaCrying(false); }
+    public void OnPlayerLoseCompetition() { SetBanillaCrying(true); ExitLaserDuel(); }
+    public void OnPlayerWinCompetition() { TriggerBanillaSmile(); ExitLaserDuel(); }
+
+    private void ExitLaserDuel()
     {
-        TriggerBanillaSmile();
+        isLaserDuelActive = false;
+        if (playerLaserScript != null) playerLaserScript.ExitCompetitionMode();
+        if (banillaLaserObj != null) banillaLaserObj.SetActive(false);
     }
 }

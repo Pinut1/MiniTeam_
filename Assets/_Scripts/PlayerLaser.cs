@@ -57,9 +57,25 @@ public class PlayerLaser : MonoBehaviour
     // 중복 방지를 위한 하트 이미지 제비뽑기 주머니
     private List<Sprite> heartSpritePool = new List<Sprite>();
 
+    // ==========================================
+    // ★ 바닐라와의 대결 모드 변수 ★
+    // ==========================================
+    private bool isInCompetitionMode = false;
+    private Vector2 competitionTarget;
+    private Color originalLaserColor = Color.white;
+    private float originalWidth;
+
     void Start()
     {
-        if (laserObject != null) laserObject.SetActive(false);
+        // 원본 레이저의 두께와 색상을 저장해둡니다.
+        originalWidth = laserWidth;
+        if (laserObject != null)
+        {
+            SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
+            if (sr != null) originalLaserColor = sr.color;
+            laserObject.SetActive(false);
+        }
+        
         if (targetPoint != null) targetPoint.SetActive(false);
 
         if (clashGaugeObject != null)
@@ -71,6 +87,13 @@ public class PlayerLaser : MonoBehaviour
 
     void Update()
     {
+        // ★ 대결 모드 중일 때는 마우스 클릭을 무시하고 중앙으로만 레이저를 쏩니다.
+        if (isInCompetitionMode)
+        {
+            DrawLaser(competitionTarget);
+            return; 
+        }
+
         if (isPlayerKnockedBack)
         {
             if (targetPoint != null && targetPoint.activeSelf) targetPoint.SetActive(false);
@@ -113,27 +136,13 @@ public class PlayerLaser : MonoBehaviour
                     playerPinkGauge.fillAmount -= clashDrainSpeed * Time.deltaTime;
                     if (playerPinkGauge.fillAmount <= 0f)
                     {
-                        // 1. 여학생에게 승리 신호를 보내 웃으면서 퇴장하게 만듭니다.
                         LetGirlWinAndLeave();
-
-                        // 2. 남학생을 미리 기억해 둡니다. (StartPlayerKnockback 안에서 정보가 날아가기 때문)
                         GameObject targetToDestroy = currentBurningNpc;
-
-                        // 3. 쇼콜라는 넉백되어 날아갑니다.
                         StartPlayerKnockback();
 
-                        // 4. 빼앗긴 남학생은 하트 없이 그냥 뿅! 삭제시켜버립니다.
                         if (targetToDestroy != null)
                         {
-                            // 피에르도 태그가 "npc"로 똑같으니, 
-                            // 오브젝트 이름에 "Pierre"가 포함되어 있는지로 피에르를 구별합니다.
-                            if (targetToDestroy.name.Contains("Pierre"))
-                            {
-                                // 피에르일 때는 파괴(Destroy)하지 않고 그냥 리턴해서 살려둡니다.
-                                return;
-                            }
-
-                            // 피에르가 아닌 일반 남성 NPC만 삭제시킵니다.
+                            if (targetToDestroy.name.Contains("Pierre")) return;
                             Destroy(targetToDestroy);
                         }
                         return;
@@ -184,17 +193,11 @@ public class PlayerLaser : MonoBehaviour
             pushDirection = transform.position.x >= currentBurningNpc.transform.position.x ? 1f : -1f;
         }
 
-        // 1. 트리거를 가장 먼저 발동시킵니다. (StopFiring보다 먼저)
-        if (anim != null)
-        {
-            anim.SetTrigger("isKnockback");
-        }
+        if (anim != null) anim.SetTrigger("isKnockback");
 
-        // 2. 그 다음 기존 로직들 실행
         StopFiring();
         ResumeAllGirls();
 
-        // ... (이하 나머지 동일)
         PlayerMove[] allMoves = GetComponentsInChildren<PlayerMove>();
         foreach (PlayerMove pm in allMoves) { pm.enabled = false; }
 
@@ -210,8 +213,6 @@ public class PlayerLaser : MonoBehaviour
     private System.Collections.IEnumerator PlayerKnockbackCoroutine(float pushDir)
     {
         Vector3 startPos = transform.position;
-
-        // 최종 목적지(targetPos)의 Y축에 방금 만든 오프셋을 더해줘서 바닥에 착 달라붙게 만듭니다.
         Vector3 targetPos = startPos + new Vector3(pushDir * playerKnockbackDistance, knockbackYOffset, 0f);
 
         float duration = 0.5f;
@@ -235,7 +236,6 @@ public class PlayerLaser : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        // 목적지 안착 (이제 붕 뜨지 않고 바닥에 붙어있습니다)
         transform.position = targetPos;
         if (rb != null) rb.position = targetPos;
 
@@ -274,11 +274,8 @@ public class PlayerLaser : MonoBehaviour
     void LetGirlWinAndLeave()
     {
         if (currentBurningNpc == null) return;
-
-        // 피에르인지 확인
         bool isPierre = currentBurningNpc.name.Contains("Pierre");
 
-        // 주변의 여학생들을 찾아서 처리
         Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(currentBurningNpc.transform.position, 2.0f);
         foreach (Collider2D col in overlappingColliders)
         {
@@ -290,29 +287,21 @@ public class PlayerLaser : MonoBehaviour
             {
                 if (isPierre)
                 {
-                    // 피에르라면: 웃으며 퇴장시키지 않고 그냥 원래 상태로 복귀시킴
                     girl.ResumeWalking();
-                    Debug.Log("피에르 승리! 여학생 퇴장 없이 순찰 복귀.");
                 }
                 else
                 {
-                    // 일반 남학생이라면: 기존처럼 웃으며 퇴장
                     girl.WinAndLeaveScene();
-                    Debug.Log("일반 남학생 패배! 여학생 웃으며 퇴장.");
                 }
             }
         }
 
-        // ★ 중요: 남학생 삭제 로직도 분리해야 합니다.
         if (!isPierre)
         {
-            // 일반 남학생은 여학생이 이기면 삭제
             Destroy(currentBurningNpc);
         }
         else
         {
-            // 피에르는 삭제하지 않고 순찰 복귀 (ResumeAllGirls가 돌아가면서 자동 복귀됨)
-            // 만약 피에르에게도 별도의 '순찰 복귀' 로직이 필요하다면 여기서 호출하세요.
             var patrol = currentBurningNpc.GetComponent<NpcRandomPatrol>();
             if (patrol != null)
             {
@@ -353,48 +342,31 @@ public class PlayerLaser : MonoBehaviour
         float floorY = transform.position.y + dropYOffset;
         GameObject npcToDestroy = currentBurningNpc;
 
-        // 1. 피에르 하트 성공 시 바닐라 울기 처리
         if (npcToDestroy.name.Contains("Pierre"))
         {
             GameObject BanillaObj = GameObject.FindWithTag("Banilla");
             if (BanillaObj != null)
             {
                 Animator BanillaAnim = BanillaObj.GetComponent<Animator>();
-                if (BanillaAnim != null)
-                {
-                    BanillaAnim.SetBool("isCrying", true);
-                }
+                if (BanillaAnim != null) BanillaAnim.SetBool("isCrying", true);
             }
         }
 
-        // 2. 기본 정리 작업 (레이저 멈춤 및 여학생 복귀)
         StopFiring();
         ResumeAllGirls();
 
-        // 3. 하트 생성 로직 (피에르라면 무지개 하트로 설정)
         if (droppedHeartPrefab != null)
         {
             GameObject droppedHeart = Instantiate(droppedHeartPrefab, npcPos, Quaternion.identity);
             DroppedHeart heartScript = droppedHeart.GetComponent<DroppedHeart>();
             if (heartScript == null) heartScript = droppedHeart.GetComponentInChildren<DroppedHeart>();
 
-            // NPC의 순찰 스크립트를 가져와서 피에르인지 확실하게 체크합니다.
             NpcRandomPatrol patrol = npcToDestroy.GetComponent<NpcRandomPatrol>();
-
-            // 방법 A: 스크립트의 isPierre 체크박스가 켜져있거나
-            // 방법 B: 오브젝트 이름에 pierre(대소문자 무시)가 들어가면 피에르로 인정!
             bool isActuallyPierre = (patrol != null && patrol.isPierre) || npcToDestroy.name.ToLower().Contains("pierre");
 
             if (isActuallyPierre)
             {
-                // 1) 하트 스크립트에 피에르 하트라고 마킹 찍기!
-                if (heartScript != null)
-                {
-                    heartScript.isPierreHeart = true;
-                    Debug.Log("SuccessAndDropHeart: 피에르 하트 마킹 완료 (isPierreHeart = true)");
-                }
-
-                // 2) 무지개 하트 스프라이트로 덮어씌우기
+                if (heartScript != null) heartScript.isPierreHeart = true;
                 if (patrol != null && patrol.pierreHeartSprite != null)
                 {
                     finalHeartSprite = patrol.pierreHeartSprite;
@@ -404,7 +376,6 @@ public class PlayerLaser : MonoBehaviour
             if (heartScript != null) heartScript.Initialize(finalHeartSprite, npcPos, floorY);
         }
 
-        // 4. 소멸 처리 (피에르 여부와 관계없이 무조건 삭제)
         Destroy(npcToDestroy);
     }
 
@@ -439,17 +410,13 @@ public class PlayerLaser : MonoBehaviour
         }
     }
 
-    // 중복 없는 하트 이미지를 반환하는 제비뽑기 함수
     private Sprite GetUniqueHeartSprite()
     {
         if (HeartUIManager.instance == null || HeartUIManager.instance.possibleHeartSprites.Length == 0) return null;
 
-        // 주머니가 비었으면 매니저에 있는 이미지들을 다시 채우고 섞어줍니다.
         if (heartSpritePool.Count == 0)
         {
             heartSpritePool.AddRange(HeartUIManager.instance.possibleHeartSprites);
-
-            // 리스트 섞기 (Fisher-Yates Shuffle)
             for (int i = 0; i < heartSpritePool.Count; i++)
             {
                 Sprite temp = heartSpritePool[i];
@@ -459,13 +426,11 @@ public class PlayerLaser : MonoBehaviour
             }
         }
 
-        // 섞인 주머니에서 첫 번째 이미지를 꺼내고 제거합니다.
         Sprite selectedSprite = heartSpritePool[0];
         heartSpritePool.RemoveAt(0);
         return selectedSprite;
     }
 
-    // 마우스를 올렸을 때 무작위가 아닌 제비뽑기 색상을 적용하도록 변경
     void ShowOrSpawnHeart(GameObject npc)
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
@@ -483,8 +448,6 @@ public class PlayerLaser : MonoBehaviour
         if (heartSR != null)
         {
             Sprite pickedSprite = GetUniqueHeartSprite();
-
-            // 만약 마우스를 올린 대상이 피에르라면 무조건 무지개 하트로 덮어씁니다!
             NpcRandomPatrol patrol = npc.GetComponent<NpcRandomPatrol>();
             if (patrol != null && patrol.isPierre && patrol.pierreHeartSprite != null)
             {
@@ -500,10 +463,7 @@ public class PlayerLaser : MonoBehaviour
                 }
             }
 
-            if (pickedSprite != null)
-            {
-                heartSR.sprite = pickedSprite;
-            }
+            if (pickedSprite != null) heartSR.sprite = pickedSprite;
             heartSR.color = new Color(1f, 1f, 1f, 1f);
             heartSR.sortingOrder = 0;
         }
@@ -547,7 +507,6 @@ public class PlayerLaser : MonoBehaviour
                     {
                         currentFillImage = img;
                         currentFillImage.sprite = assignedSprite;
-                        currentFillImage.fillAmount = 0f;
                         currentFillImage.fillAmount = 0f;
                         break;
                     }
@@ -620,39 +579,12 @@ public class PlayerLaser : MonoBehaviour
             }
             currentBurningNpc = null;
         }
-        if (laserObject != null) laserObject.SetActive(false);
+        if (laserObject != null && !isInCompetitionMode) laserObject.SetActive(false);
         if (targetPoint != null) targetPoint.SetActive(false);
     }
 
     public void TriggerAllNpcsExit()
     {
-        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
-        foreach (GameObject girlObj in girlNpcs)
-        {
-            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
-            if (girl != null)
-            {
-                girl.WalkAwayAndDestroy();
-            }
-        }
-
-        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject boyObj in boyNpcs)
-        {
-            Destroy(boyObj);
-        }
-
-        // 스폰 및 시네마머신 컷신 실행
-        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
-        if (npcManager != null)
-        {
-            npcManager.SpawnAndPlayCutscene();
-        }
-    }
-
-    public void TriggerPierreEnding()
-    {
-        // 1. 엔딩 컷신 시작 전, 화면에 남은 일반 NPC들을 싹 정리해 줍니다.
         GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
         foreach (GameObject girlObj in girlNpcs)
         {
@@ -666,11 +598,58 @@ public class PlayerLaser : MonoBehaviour
             Destroy(boyObj);
         }
 
-        // 2. 오프닝(SpawnAndPlayCutscene)이 아닌 엔딩 컷신을 호출합니다!
         CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
-        if (npcManager != null)
+        if (npcManager != null) npcManager.SpawnAndPlayCutscene();
+    }
+
+    public void TriggerPierreEnding()
+    {
+        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
+        foreach (GameObject girlObj in girlNpcs)
         {
-            npcManager.OnPlayerGetPierreHeart(); // 방금 만든 피에르 엔딩 카메라 연출 시작
+            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+            if (girl != null) girl.WalkAwayAndDestroy();
         }
+
+        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
+        foreach (GameObject boyObj in boyNpcs) Destroy(boyObj);
+
+        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+        if (npcManager != null) npcManager.OnPlayerGetPierreHeart();
+    }
+
+    // ==========================================
+    // ★ 바닐라 대결 모드 함수 (SpriteRenderer 대응) ★
+    // ==========================================
+    public void EnterCompetitionMode(Vector2 target, Color color)
+    {
+        isInCompetitionMode = true;
+        competitionTarget = target;
+
+        if (laserObject != null)
+        {
+            SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
+            if (sr != null) sr.color = color;
+        }
+        // 대결 중 레이저 두께를 키웁니다.
+        laserWidth = 0.2f; 
+
+        if (laserObject != null) laserObject.SetActive(true);
+        DrawLaser(competitionTarget);
+    }
+
+    public void ExitCompetitionMode()
+    {
+        isInCompetitionMode = false;
+
+        if (laserObject != null)
+        {
+            SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
+            if (sr != null) sr.color = originalLaserColor;
+        }
+        // 레이저 두께 원상복구
+        laserWidth = originalWidth; 
+        
+        if (laserObject != null) laserObject.SetActive(false);
     }
 }
