@@ -39,6 +39,12 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject menuDefault;
     [SerializeField] private GameObject menuCrossExam;
 
+    [Header("추궁 힌트 패널")]
+    [SerializeField] private GameObject pressStartPnlLeft;
+    [SerializeField] private GameObject pressStartPnlRight;
+    [SerializeField] private Animation pressStartAnimLeft;
+    [SerializeField] private Animation pressStartAnimRight;
+
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
 
@@ -92,6 +98,20 @@ public class SpongeUIManager : MonoBehaviour
         bool isCrossExam = newState == SpongeGameState.GameState.CrossExamination;
         if (menuDefault != null)  menuDefault.SetActive(!isCrossExam);
         if (menuCrossExam != null) menuCrossExam.SetActive(isCrossExam);
+
+        if (newState == SpongeGameState.GameState.Testifying)
+        {
+            if (pressStartPnlLeft != null)
+            {
+                pressStartPnlLeft.SetActive(true);
+                pressStartAnimLeft?.Play("UI_PressStartPnlLeft");
+            }
+            if (pressStartPnlRight != null)
+            {
+                pressStartPnlRight.SetActive(true);
+                pressStartAnimRight?.Play("UI_PressStartPnlRight");
+            }
+        }
     }
 
     // ── 키 입력 처리 ─────────────────────────────────────────────
