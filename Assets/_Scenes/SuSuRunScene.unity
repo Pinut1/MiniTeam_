@@ -600,6 +600,8 @@ MonoBehaviour:
   playerCompetitionLaserColor: {r: 1, g: 1, b: 1, a: 1}
   playerPushPower: 0.15
   banillaPushSpeed: 0.15
+  banillaBlackHeart: {fileID: -1854226887, guid: 17b2f404853f3564c86608f116c93754, type: 3}
+  banillaWhiteHeart: {fileID: -507398062, guid: 17b2f404853f3564c86608f116c93754, type: 3}
   canStartDuel: 0
 --- !u!4 &572917595
 Transform:
