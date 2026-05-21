@@ -54,7 +54,9 @@ public class SpongeGameManager : MonoBehaviour
     // Resolution(게임 클리어) 상태에서만 true
     public bool IsInputBlocked() =>
         currentState == GameState.Resolution ||
-        (SpongeFadeManager.Instance != null && SpongeFadeManager.Instance.IsFading);
+        (SpongeFadeManager.Instance != null && SpongeFadeManager.Instance.IsFading) ||
+        (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingHoldit) ||
+        (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingObjection);
 
     // Q키(추궁하기)를 누를 수 있는 상태인지
     // CrossExamination(심문) 상태에서만 true
