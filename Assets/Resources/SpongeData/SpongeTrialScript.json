@@ -1614,7 +1614,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "re_press_choice_00_04",
-      "alignment": ""
+      "alignment": "",
+      "playObjectionAnim": true
     },
     {
       "lineId": "re_press_choice_00_04",
@@ -1657,13 +1658,13 @@
     },
     {
       "lineId": "re_press_choice_00_07",
-      "speaker": "",
-      "txt": "",
+      "speaker": "나",
+      "txt": "<color=#7596B0>(사람들이\n웅성거리기 시작했다...)</color>",
       "animationTrig": "",
-      "backgroundSpr": "Sponge_BG/BG_Prosecutor",
+      "backgroundSpr": "Sponge_BG/BG_Palyer",
       "deskSpr": "None",
-      "characterType": 1,
-      "characterPos": 3,
+      "characterType": 2,
+      "characterPos": 1,
       "choices": [],
       "nextLineId": "re_press_choice_00_08",
       "alignment": ""
@@ -1683,13 +1684,13 @@
     },
     {
       "lineId": "re_press_choice_00_09",
-      "speaker": "",
+      "speaker": "<color=#7596B0>(사람들이\n웅성거리기 시작했다...)</color>",
       "txt": "",
       "animationTrig": "",
-      "backgroundSpr": "",
+      "backgroundSpr": "Sponge_BG/BG_Player",
       "deskSpr": "None",
-      "characterType": 0,
-      "characterPos": 0,
+      "characterType": 2,
+      "characterPos": 1,
       "choices": [],
       "nextLineId": "re_press_choice_00_10",
       "alignment": ""
@@ -1783,7 +1784,8 @@
       "characterPos": 2,
       "choices": [],
       "nextLineId": "re_press_03_03",
-      "alignment": ""
+      "alignment": "",
+      "playObjectionAnim": true
     },
     {
       "lineId": "re_press_03_03",
@@ -1986,7 +1988,7 @@
       "characterType": 0,
       "characterPos": 0,
       "choices": [],
-      "nextLineId": "re_chice_press_02_06",
+      "nextLineId": "re_press_choice_02_06",
       "alignment": ""
     },
     {
@@ -2483,7 +2485,8 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_00_13"
+      "nextLineId": "evidence_00_13",
+      "playObjectionAnim": true
     },
     {
       "lineId": "evidence_00_13",
@@ -2759,7 +2762,7 @@
     {
       "lineId": "evidence_01_08",
       "speaker": "나",
-      "txt": "<color=#7596B0>(사람들이 웅성된다...!)</color>",
+      "txt": "<color=#7596B0>(사람들이 웅성거린다...!)</color>",
       "animationTrig": "",
       "backgroundSpr": "Sponge_BG/BG_Palyer",
       "deskSpr": "None",
@@ -2967,7 +2970,8 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "evidence_02_08"
+      "nextLineId": "evidence_02_08",
+      "playObjectionAnim": true
     },
     {
       "lineId": "evidence_02_08",
