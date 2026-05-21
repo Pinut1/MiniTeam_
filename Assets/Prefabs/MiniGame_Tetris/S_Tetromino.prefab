@@ -54,7 +54,7 @@ MonoBehaviour:
   das: 0.17
   arr: 0.05
   lockDelay: 0.5
-  tamamaBeamPrefab: {fileID: 1953652864164139839, guid: 597a1b6127f38ac4a9734072593c24d1, type: 3}
+  tamamaBeamPrefab: {fileID: 8504614737765839044, guid: 548187b66dee4714a873f53713ae3738, type: 3}
 --- !u!1 &1944834079706463338
 GameObject:
   m_ObjectHideFlags: 0
