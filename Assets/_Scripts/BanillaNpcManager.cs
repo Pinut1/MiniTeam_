@@ -2,74 +2,27 @@ using UnityEngine;
 
 public class BanillaNpcManager : MonoBehaviour
 {
-    public Animator playerAnim; // 플레이어 애니메이터만 할당해주세요
-
-    private GameObject playerRedLaser;
-    private GameObject banillaLaser;
+    // ★ PlayerLaser에서 찾고 있으니 절대 지우면 안 되는 변수!
     public Sprite heartSprite;
+
+    // 듀얼 매니저 (이름이 다르면 실제 사용하시는 스크립트 이름으로 바꿔주세요)
+    public CutsceneNpcManager duelManager;
 
     void Start()
     {
-        // [수정된 부분] 인스펙터 연결 안 해도 알아서 player 오브젝트의 애니메이터를 찾습니다.
-        if (playerAnim == null)
+        // 씬 시작 시 매니저를 알아서 찾아서 꽂아줍니다 (프리팹 연결 안 됨 방지)
+        if (duelManager == null)
         {
-            GameObject playerObj = GameObject.Find("player");
-            if (playerObj != null)
-            {
-                playerAnim = playerObj.GetComponentInChildren<Animator>();
-            }
-        }
-
-        // 1. 바닐라 레이저 찾기
-        Transform laserTransform = transform.Find("Laser_Yellow_0");
-        if (laserTransform != null)
-        {
-            banillaLaser = laserTransform.gameObject;
-            banillaLaser.SetActive(false);
-        }
-
-        // 2. 플레이어 빨간 레이저 찾기
-        GameObject pObj = GameObject.Find("player");
-        if (pObj != null)
-        {
-            Transform pLaserTransform = pObj.transform.Find("Laser");
-            if (pLaserTransform != null)
-            {
-                playerRedLaser = pLaserTransform.gameObject;
-            }
+            duelManager = FindAnyObjectByType<CutsceneNpcManager>();
         }
     }
 
     private void OnMouseDown()
     {
-        StartClash();
-    }
-
-    public void StartClash()
-    {
-        Debug.Log("플레이어 vs 바닐라 레이저 경쟁 시작!");
-
-        if (playerAnim != null)
+        // 클릭하면 복잡한 짓 하지 말고 그냥 듀얼 매니저한테 대결 시작하라고 토스!
+        if (duelManager != null)
         {
-            // 1. 기존 이동/대기 플래그를 전부 꺼서 Walk 상태로 튕기는 걸 막습니다.
-            playerAnim.SetBool("isWalk", false);
-            playerAnim.SetBool("isRun", false);
-            playerAnim.SetBool("isIdle", false);
-
-            // 2. 공격 상태를 켜고 트리거를 작동시킵니다.
-            playerAnim.SetTrigger("DoBackAttack");
-        }
-
-        // 플레이어 빨간 레이저 활성화
-        if (playerRedLaser != null)
-        {
-            playerRedLaser.SetActive(true);
-        }
-
-        // 바닐라 노란 레이저 활성화
-        if (banillaLaser != null)
-        {
-            banillaLaser.SetActive(true);
+            duelManager.StartLaserDuel();
         }
     }
 }

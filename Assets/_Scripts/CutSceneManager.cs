@@ -371,6 +371,12 @@ public class CutsceneNpcManager : MonoBehaviour
         if (playerAnim != null)
         {
             playerAnim.SetBool("isIdle", false);
+
+            // [추가된 조치] 이전 상태의 잔여 파라미터를 확실하게 청소합니다.
+            playerAnim.SetBool("isWalk", false);
+            playerAnim.SetBool("isRun", false);
+            playerAnim.SetBool("isAttacking", true);
+
             try { playerAnim.Play("BackAttack"); } catch { }
         }
 
@@ -415,7 +421,7 @@ public class CutsceneNpcManager : MonoBehaviour
     if (sr != null)
     {
         sr.enabled = true;
-        sr.sortingLayerName = "Foreground"; // 배경보다 무조건 앞! (없으면 "Default"로 유지)
+        sr.sortingLayerName = "Objects"; // 배경보다 무조건 앞! (없으면 "Default"로 유지)
         sr.sortingOrder = 999;             // 999번으로 맨 앞으로!
     }
 
@@ -426,9 +432,21 @@ public class CutsceneNpcManager : MonoBehaviour
     banillaLaserObj.transform.rotation = Quaternion.Euler(0, 0, angle);
     
     float baseWidth = sr != null && sr.sprite != null ? sr.sprite.bounds.size.x : 1f;
-    float currentYScale = banillaLaserObj.transform.localScale.y; 
-    banillaLaserObj.transform.localScale = new Vector3(distance / baseWidth, currentYScale, 1f);
-}
+
+    float currentYScale = banillaLaserObj.transform.localScale.y;
+        // ★ [땜질 처방] 부모(바닐라)의 실제 월드 스케일(lossyScale)을 가져옵니다. 
+        // 부모가 없거나 스케일이 0일 때 에러가 나지 않도록 최소 1f로 방어합니다.
+        float parentScaleX = 1f;
+        if (banillaLaserObj.transform.parent != null && banillaLaserObj.transform.parent.lossyScale.x != 0)
+        {
+            parentScaleX = Mathf.Abs(banillaLaserObj.transform.parent.lossyScale.x);
+        }
+
+        // ★ [핵심] 원래 구하려던 길이에 부모가 쪼그라든 비율(parentScaleX)을 나눠서 원래 길이로 복구시킵니다!
+        float finalXScale = (distance / baseWidth) / parentScaleX;
+
+        banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, 1f);
+    }
 
     // =========================================================================
     // ★ 기존 일반 대결용 함수들 ★
