@@ -5169,7 +5169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1196980109
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6699,10 +6699,10 @@ MonoBehaviour:
   holderStatement: {fileID: 189399802}
   menuDefault: {fileID: 1233672044}
   menuCrossExam: {fileID: 1030301272}
-  pressStartPnlLeft: {fileID: 0}
-  pressStartPnlRight: {fileID: 0}
-  pressStartAnimLeft: {fileID: 0}
-  pressStartAnimRight: {fileID: 0}
+  pressStartPnlLeft: {fileID: 1196980108}
+  pressStartPnlRight: {fileID: 1847053995}
+  pressStartAnimLeft: {fileID: 1196980112}
+  pressStartAnimRight: {fileID: 1847053999}
 --- !u!1 &1715998412
 GameObject:
   m_ObjectHideFlags: 0
@@ -7811,7 +7811,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1847053996
 RectTransform:
   m_ObjectHideFlags: 0

@@ -58,6 +58,7 @@ public class SpongeCrossExaminationManager : MonoBehaviour
     {
         SpongeDialogueManager.Instance.SetTextBox(false);
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeIn(1f));
+        SpongeDialogueManager.Instance.ApplyTestimonyVisuals();
         SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.Testifying);
         yield return StartCoroutine(SpongeFadeManager.Instance.FadeOut(1f));
         SpongeDialogueManager.Instance.SetTextBox(true);

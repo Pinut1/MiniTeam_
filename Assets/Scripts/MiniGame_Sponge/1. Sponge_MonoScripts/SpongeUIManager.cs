@@ -42,8 +42,8 @@ public class SpongeUIManager : MonoBehaviour
     [Header("추궁 힌트 패널")]
     [SerializeField] private GameObject pressStartPnlLeft;
     [SerializeField] private GameObject pressStartPnlRight;
-    [SerializeField] private Animation pressStartAnimLeft;
-    [SerializeField] private Animation pressStartAnimRight;
+    [SerializeField] private Animator pressStartAnimLeft;
+    [SerializeField] private Animator pressStartAnimRight;
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정

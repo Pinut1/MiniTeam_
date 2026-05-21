@@ -434,7 +434,7 @@ public class SpongeDialogueManager : MonoBehaviour
     }
 
     // ── 증언 고정 배경/캐릭터 적용 ──────────────────────────
-    void ApplyTestimonyVisuals()
+    public void ApplyTestimonyVisuals()
     {
         if (testimonyBgSprite != null) backgroundImg.sprite = testimonyBgSprite;
 
