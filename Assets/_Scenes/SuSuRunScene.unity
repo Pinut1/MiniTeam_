@@ -597,7 +597,9 @@ MonoBehaviour:
   playerLaserScript: {fileID: 1933622942}
   playerAnim: {fileID: 775077596}
   girlWalkSpeed: 4
-  playerCompetitionLaserColor: {r: 1, g: 0.4, b: 0.7, a: 1}
+  playerCompetitionLaserColor: {r: 1, g: 1, b: 1, a: 1}
+  playerPushPower: 0.15
+  banillaPushSpeed: 0.15
   canStartDuel: 0
 --- !u!4 &572917595
 Transform:

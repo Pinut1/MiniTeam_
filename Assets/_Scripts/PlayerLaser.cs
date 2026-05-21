@@ -182,15 +182,21 @@ public class PlayerLaser : MonoBehaviour
         }
     }
 
-    void StartPlayerKnockback()
+    // ★ 매니저에서 넉백을 호출할 수 있도록 public으로 열고, 공격자(바닐라)의 위치를 받을 수 있게 수정했습니다.
+    public void StartPlayerKnockback(Transform attacker = null)
     {
         if (isPlayerKnockedBack) return;
         isPlayerKnockedBack = true;
 
         float pushDirection = -1f;
-        if (currentBurningNpc != null)
+
+        // attacker(바닐라)가 따로 지정되었으면 그 위치를, 아니면 기존 일반 NPC(currentBurningNpc) 위치를 기준으로 삼습니다.
+        Transform target = attacker != null ? attacker : (currentBurningNpc != null ? currentBurningNpc.transform : null);
+
+        if (target != null)
         {
-            pushDirection = transform.position.x >= currentBurningNpc.transform.position.x ? 1f : -1f;
+            // 공격자가 쇼콜라보다 오른쪽에 있으면 왼쪽(-1)으로, 왼쪽에 있으면 오른쪽(1)으로 날아갑니다.
+            pushDirection = transform.position.x >= target.position.x ? 1f : -1f;
         }
 
         if (anim != null) anim.SetTrigger("isKnockback");
@@ -434,32 +440,89 @@ public class PlayerLaser : MonoBehaviour
     void ShowOrSpawnHeart(GameObject npc)
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
-        if (existingHeart != null) { existingHeart.gameObject.SetActive(true); return; }
-        if (heartItemPrefab == null) return;
 
-        Vector3 spawnPos = npc.transform.position;
-        GameObject newHeart = Instantiate(heartItemPrefab, spawnPos, Quaternion.identity);
-        newHeart.name = "NpcHeartItem";
-        newHeart.transform.SetParent(npc.transform);
-        newHeart.transform.localPosition = new Vector3(0, 0, -1f);
-        newHeart.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
+        // ★ [기존 로직 원상복구] 이미 하트가 있고, 바닐라가 아니라면 
+        // 더 이상 계산하지 않고 기존 하트를 그대로 활성화만 시키고 즉시 함수를 끝냅니다!
+        if (existingHeart != null && !npc.CompareTag("Banilla"))
+        {
+            existingHeart.gameObject.SetActive(true);
+            return;
+        }
 
-        SpriteRenderer heartSR = newHeart.GetComponent<SpriteRenderer>();
+        SpriteRenderer heartSR = null;
+        bool isNewHeart = false;
+
+        // 하트 오브젝트 확보 단계
+        if (existingHeart != null)
+        {
+            existingHeart.gameObject.SetActive(true);
+            heartSR = existingHeart.GetComponent<SpriteRenderer>();
+        }
+        else
+        {
+            if (heartItemPrefab == null) return;
+            Vector3 spawnPos = npc.transform.position;
+            GameObject newHeart = Instantiate(heartItemPrefab, spawnPos, Quaternion.identity);
+            newHeart.name = "NpcHeartItem";
+            newHeart.transform.SetParent(npc.transform);
+            newHeart.transform.localPosition = new Vector3(0, 0, -1f);
+            newHeart.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
+
+            heartSR = newHeart.GetComponent<SpriteRenderer>();
+            isNewHeart = true; // 새로 생성됨을 표시
+        }
+
+        // 하트 이미지 결정 단계
         if (heartSR != null)
         {
-            Sprite pickedSprite = GetUniqueHeartSprite();
-            NpcRandomPatrol patrol = npc.GetComponent<NpcRandomPatrol>();
-            if (patrol != null && patrol.isPierre && patrol.pierreHeartSprite != null)
+            // 기본적으로 기존 하트의 이미지를 유지합니다.
+            Sprite pickedSprite = heartSR.sprite;
+
+            // 아예 새로 생성하는 경우에만 랜덤 풀이나 피에르 고정 하트를 집어넣습니다.
+            if (isNewHeart)
             {
-                pickedSprite = patrol.pierreHeartSprite;
+                pickedSprite = GetUniqueHeartSprite();
+
+                NpcRandomPatrol patrol = npc.GetComponent<NpcRandomPatrol>();
+                if (patrol != null && patrol.isPierre && patrol.pierreHeartSprite != null)
+                {
+                    pickedSprite = patrol.pierreHeartSprite;
+                }
             }
 
+            // ★ 바닐라 전용 처리: 한 번 하얀 하트로 바뀌면 더 이상 애니메이터를 검사하지 않고 유지합니다.
             if (npc.CompareTag("Banilla"))
             {
-                BanillaNpcManager banillaManager = npc.GetComponent<BanillaNpcManager>();
-                if (banillaManager != null && banillaManager.heartSprite != null)
+                CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+                if (npcManager != null)
                 {
-                    pickedSprite = banillaManager.heartSprite;
+                    // 1. 현재 하트가 '하얀 하트'라면? -> 검사 끝! (애니메이터 확인할 필요 없이 유지)
+                    if (pickedSprite == npcManager.banillaWhiteHeart && npcManager.banillaWhiteHeart != null)
+                    {
+                        // do nothing (이미 pickedSprite가 하얀 하트이므로 그대로 내려감)
+                    }
+                    else
+                    {
+                        // 2. 아직 하얀 하트가 아닐 때만 한 번 애니메이션 상태를 확인합니다.
+                        Animator banillaAnim = npc.GetComponentInChildren<Animator>();
+                        if (banillaAnim == null) banillaAnim = npc.GetComponentInParent<Animator>();
+
+                        bool isSmiling = false;
+                        if (banillaAnim != null)
+                        {
+                            isSmiling = banillaAnim.GetCurrentAnimatorStateInfo(0).IsName("Banilla_Smile");
+                        }
+
+                        // 웃고 있다면 하얀 하트로 교체! (다음 마우스 Hover부터는 위 1번 조건에 걸려서 이 검사를 안 함)
+                        if (isSmiling && npcManager.banillaWhiteHeart != null)
+                        {
+                            pickedSprite = npcManager.banillaWhiteHeart;
+                        }
+                        else if (npcManager.banillaBlackHeart != null)
+                        {
+                            pickedSprite = npcManager.banillaBlackHeart;
+                        }
+                    }
                 }
             }
 
@@ -632,7 +695,7 @@ public class PlayerLaser : MonoBehaviour
             if (sr != null) sr.color = color;
         }
         // 대결 중 레이저 두께를 키웁니다.
-        laserWidth = 0.2f; 
+        laserWidth = 0.1f; 
 
         if (laserObject != null) laserObject.SetActive(true);
         DrawLaser(competitionTarget);

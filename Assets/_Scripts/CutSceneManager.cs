@@ -25,7 +25,6 @@ public class CutsceneNpcManager : MonoBehaviour
     [Header("플레이어 제어")]
     public MonoBehaviour playerMoveScript;
     public Rigidbody2D playerRb;
-
     public PlayerLaser playerLaserScript;
 
     [Header("플레이어 애니메이션 (직접 연결)")]
@@ -37,14 +36,27 @@ public class CutsceneNpcManager : MonoBehaviour
     [Header("레이저 경쟁 설정")]
     public Color playerCompetitionLaserColor = new Color(1f, 0.4f, 0.7f);
 
+    [Tooltip("플레이어(쇼콜라)가 한 번 연타할 때 밀어내는 힘")]
+    public float playerPushPower = 0.04f;
+    [Tooltip("가만히 있을 때 바닐라가 밀고 들어오는 속도 (초당)")]
+    public float banillaPushSpeed = 0.15f;
+
     private GameObject banillaLaserObj;
     private List<GameObject> spawnedGirls = new List<GameObject>();
     private GameObject instanceBanilla;
     private Animator banillaAnimator;
     private Transform banillaTransform;
 
+    // (기존 변수들 아래쪽 적당한 곳에 추가하세요)
+    [Header("바닐라 대결 전용 하트 이미지 (승리 후 교체용)")]
+    public Sprite banillaBlackHeart; // 원래의 검은 하트
+    public Sprite banillaWhiteHeart; // 이겼을 때 하얀 하트
+
     private bool isLaserDuelActive = false;
     private Vector2 duelMidwayPoint;
+
+    // 줄다리기 진행도 (0.0f = 바닐라 완승 / 0.5f = 정중앙 시작 / 1.0f = 쇼콜라 완승)
+    private float duelProgress = 0.5f;
 
     public bool canStartDuel = false;
 
@@ -52,6 +64,50 @@ public class CutsceneNpcManager : MonoBehaviour
     void Start()
     {
         ForceHideBanillaLaser();
+    }
+
+    // 대결 중일 때 실시간으로 레이저 줄다리기 계산 및 애니메이션 트리거 감지
+    void Update()
+    {
+        if (!isLaserDuelActive) return;
+
+        // 1. 가만히 있으면 바닐라가 플레이어(쇼콜라) 쪽으로 점점 밀고 들어옴 (진행도 감소)
+        duelProgress -= banillaPushSpeed * Time.deltaTime;
+        duelProgress = Mathf.Clamp(duelProgress, 0f, 1f);
+
+        // 바뀐 진행도에 맞춰 실시간으로 충돌 지점 계산
+        UpdateDuelLasers();
+
+        // ★ 패배 조건: 시간이 지나서 게이지가 0이 되면 패배 처리
+        if (duelProgress <= 0.0f)
+        {
+            Debug.Log("바닐라 승리! (쇼콜라가 밀림)");
+            OnPlayerLoseCompetition();
+        }
+    }
+
+    private void UpdateDuelLasers()
+    {
+        if (banillaTransform == null || playerRb == null) return;
+
+        // 시작 지점들 확보
+        Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null ? playerLaserScript.firePoint.position : playerRb.transform.position;
+        Vector3 banillaFirePos = banillaLaserObj != null ? banillaLaserObj.transform.position : banillaTransform.position;
+
+        // duelProgress 비율에 따라 실시간 충돌점 동적 이동 (Lerp)
+        duelMidwayPoint = Vector2.Lerp(playerFirePos, banillaFirePos, duelProgress);
+
+        // 플레이어 레이저 실시간 갱신
+        if (playerLaserScript != null)
+        {
+            playerLaserScript.EnterCompetitionMode(duelMidwayPoint, playerCompetitionLaserColor);
+        }
+
+        // 바닐라 레이저 실시간 갱신
+        if (banillaLaserObj != null)
+        {
+            FireBanillaLaser(banillaFirePos, duelMidwayPoint);
+        }
     }
 
     private void ForceHideBanillaLaser()
@@ -135,7 +191,7 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamPierre.gameObject.SetActive(true);
         vcamPlayer.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(4.5f);
+        yield return new WaitForSeconds(2.5f);
 
         vcamBanilla.gameObject.SetActive(true);
         vcamPierre.gameObject.SetActive(false);
@@ -172,7 +228,6 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
-    // 3. 서브 유틸 함수들
     private void SyncPlayerMoveDirection(bool faceRight)
     {
         if (playerMoveScript == null) return;
@@ -263,18 +318,30 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
+    // ★ 쇼콜라 승리 시 호출되어 바닐라의 미소 애니메이션을 켜는 핵심 기능
+    // ★ 쇼콜라가 완전히 이겼을 때 바닐라를 미소 상태로 '강제 전환'하는 함수
     private void TriggerBanillaSmile()
     {
         if (banillaAnimator != null)
         {
-            SetBanillaCrying(false);
+            // 1. 기존에 세팅해두신 'toSmile' 트리거를 작동시킵니다.
             banillaAnimator.SetTrigger("toSmile");
+
+            // 2. ★[강제 해결책] 만약 트리거 조건이 씹히더라도 무조건 미소를 짓도록 
+            //    애니메이션 상태 이름을 직접 호출하여 강제로 틀어버립니다.
+            //    (애니메이터 창에 있는 미소 애니메이션 블록 이름이 "Banilla_Smile"이 맞는지 꼭 확인하세요!)
+            try
+            {
+                banillaAnimator.Play("Banilla_Smile");
+                Debug.Log("바닐라 미소 애니메이션(Banilla_Smile) 강제 재생 완료!");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("애니메이션 강제 재생 실패: " + e.Message);
+            }
         }
     }
 
-    // =========================================================================
-    // ★ 제가 멍청하게 지워버렸던 엔딩 컷신 함수 (완벽 복구) ★
-    // =========================================================================
     public void OnPlayerGetPierreHeart()
     {
         canStartDuel = false;
@@ -306,8 +373,7 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamGirlsWalk.gameObject.SetActive(false);
 
         vcamPlayer.gameObject.SetActive(true);
-        yield return new WaitForSeconds(2.5f);
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(3f);
 
         SetBanillaCrying(true);
 
@@ -338,18 +404,34 @@ public class CutsceneNpcManager : MonoBehaviour
             }
         }
         catch { }
-        Debug.Log("엔딩 컷신 종료, 바닐라를 클릭하여 대결을 시작할 수 있습니다!");
         yield return null;
     }
 
-    // =========================================================================
-    // ★ 클릭 시 레이저 대결 시작 함수 ★
-    // =========================================================================
+    // 클릭 시 레이저 대결 시작 함수
     public void StartLaserDuel()
     {
-        if (isLaserDuelActive || banillaTransform == null) return;
+        if (!canStartDuel && !isLaserDuelActive)
+        {
+            Debug.Log("이미 대결이 승리로 종료되었습니다.");
+            return;
+        }
+        if (banillaTransform == null) return;
+
+        if (isLaserDuelActive)
+        {
+            duelProgress += playerPushPower;
+            duelProgress = Mathf.Clamp(duelProgress, 0f, 1f);
+            UpdateDuelLasers();
+            if (duelProgress >= 1.0f)
+            {
+                Debug.Log("쇼콜라 연타로 1.0 도달! 승리 함수 즉시 실행!");
+                OnPlayerWinCompetition();
+            }
+            return;
+        }
 
         isLaserDuelActive = true;
+        duelProgress = 0.5f;
         Debug.Log("플레이어 vs 바닐라 레이저 경쟁 시작!");
 
         if (playerMoveScript != null) playerMoveScript.enabled = false;
@@ -371,8 +453,6 @@ public class CutsceneNpcManager : MonoBehaviour
         if (playerAnim != null)
         {
             playerAnim.SetBool("isIdle", false);
-
-            // [추가된 조치] 이전 상태의 잔여 파라미터를 확실하게 청소합니다.
             playerAnim.SetBool("isWalk", false);
             playerAnim.SetBool("isRun", false);
             playerAnim.SetBool("isAttacking", true);
@@ -386,79 +466,183 @@ public class CutsceneNpcManager : MonoBehaviour
             try { banillaAnimator.Play("Banilla_Idle"); } catch { }
         }
 
-        Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null ? playerLaserScript.firePoint.position : playerRb.transform.position;
-        Vector3 banillaFirePos = banillaLaserObj != null ? banillaLaserObj.transform.position : banillaTransform.position;
-        duelMidwayPoint = Vector2.Lerp(playerFirePos, banillaFirePos, 0.5f);
-
-        if (playerLaserScript != null)
-        {
-            playerLaserScript.EnterCompetitionMode(duelMidwayPoint, playerCompetitionLaserColor);
-            Debug.Log("플레이어 레이저 발사 성공!");
-        }
-        else
-        {
-            Debug.LogError("[치명적 오류] 플레이어 레이저가 나가지 않습니다! CutSceneManager 인스펙터의 'Player Laser Script' 칸이 비어있습니다. 하이어라키의 Player 오브젝트를 드래그해서 넣어주세요!");
-        }
-
-        if (banillaLaserObj != null)
-        {
-            FireBanillaLaser(banillaFirePos, duelMidwayPoint);
-            Debug.Log("바닐라 레이저 발사 성공!");
-        }
-        else
-        {
-            Debug.LogError("[치명적 오류] 바닐라 레이저가 나가지 않습니다! 바닐라 안에서 'Laser_Yellow_0'을 찾지 못했습니다.");
-        }
+        UpdateDuelLasers();
     }
 
     private void FireBanillaLaser(Vector3 startPos, Vector3 targetPos)
-{
-    if (banillaLaserObj == null) return;
-    
-    banillaLaserObj.SetActive(true);
-
-    SpriteRenderer sr = banillaLaserObj.GetComponent<SpriteRenderer>();
-    if (sr != null)
     {
-        sr.enabled = true;
-        sr.sortingLayerName = "Objects"; // 배경보다 무조건 앞! (없으면 "Default"로 유지)
-        sr.sortingOrder = 999;             // 999번으로 맨 앞으로!
-    }
+        if (banillaLaserObj == null) return;
 
-    // (기존 위치/크기 조절 코드 그대로 유지...)
-    Vector2 direction = targetPos - startPos;
-    float distance = direction.magnitude;
-    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    banillaLaserObj.transform.rotation = Quaternion.Euler(0, 0, angle);
-    
-    float baseWidth = sr != null && sr.sprite != null ? sr.sprite.bounds.size.x : 1f;
+        banillaLaserObj.SetActive(true);
 
-    float currentYScale = banillaLaserObj.transform.localScale.y;
-        // ★ [땜질 처방] 부모(바닐라)의 실제 월드 스케일(lossyScale)을 가져옵니다. 
-        // 부모가 없거나 스케일이 0일 때 에러가 나지 않도록 최소 1f로 방어합니다.
+        SpriteRenderer sr = banillaLaserObj.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.enabled = true;
+            sr.sortingLayerName = "Objects";
+            sr.sortingOrder = 999;
+        }
+
+        Vector2 direction = targetPos - startPos;
+        float distance = direction.magnitude;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        banillaLaserObj.transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        float baseWidth = sr != null && sr.sprite != null ? sr.sprite.bounds.size.x : 1f;
+        float currentYScale = banillaLaserObj.transform.localScale.y;
+
         float parentScaleX = 1f;
         if (banillaLaserObj.transform.parent != null && banillaLaserObj.transform.parent.lossyScale.x != 0)
         {
             parentScaleX = Mathf.Abs(banillaLaserObj.transform.parent.lossyScale.x);
         }
 
-        // ★ [핵심] 원래 구하려던 길이에 부모가 쪼그라든 비율(parentScaleX)을 나눠서 원래 길이로 복구시킵니다!
         float finalXScale = (distance / baseWidth) / parentScaleX;
-
         banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, 1f);
     }
 
-    // =========================================================================
-    // ★ 기존 일반 대결용 함수들 ★
-    // =========================================================================
     public void StartBanillaCompetition() { SetBanillaCrying(false); }
-    public void OnPlayerLoseCompetition() { SetBanillaCrying(true); ExitLaserDuel(); }
-    public void OnPlayerWinCompetition() { TriggerBanillaSmile(); ExitLaserDuel(); }
+    // 플레이어가 졌을 때
+    public void OnPlayerLoseCompetition()
+    {
+        // 1. 바닐라가 다시 우는 애니메이션을 틀어줍니다.
+        SetBanillaCrying(true);
+
+        // 2. 대결 상태를 끄고 화면의 레이저를 싹 지웁니다.
+        ExitLaserDuel();
+
+        // 3. ★ 쇼콜라에게 바닐라의 위치(banillaTransform)를 넘겨주면서 넉백을 실행합니다!
+        if (playerLaserScript != null && banillaTransform != null)
+        {
+            playerLaserScript.StartPlayerKnockback(banillaTransform);
+            Debug.Log("쇼콜라 패배! 넉백 애니메이션 실행");
+        }
+    }
+
+    // 플레이어가 완승하면 이 함수가 호출되어 미소 짓는 애니메이션이 나갑니다!
+    public void OnPlayerWinCompetition()
+    {
+        // 승리 컷씬이 나오면 바닐라를 더이상 클릭할수없게 잠금 처리
+        canStartDuel = false;
+
+        // 1. 레이저 오브젝트들을 먼저 화면에서 즉시 지웁니다.
+        ExitLaserDuel();
+
+        // 2. 그 직후 바닐라에게 'toSmile' 트리거를 던져 미소 애니메이션을 실행합니다.
+        TriggerBanillaSmile();
+
+        // 3. ★ 대결이 성공적으로 끝났으니 쇼콜라의 이동 스크립트를 켜서 조작권을 돌려줍니다.
+        if (playerMoveScript != null)
+        {
+            playerMoveScript.enabled = true;
+
+            // 넉백 복구 때 쓰셨던 백무빙(방향 오류) 방지 초기화 함수를 여기서도 쏴줍니다.
+            try
+            {
+                playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
+            }
+            catch { }
+        }
+
+        // 쇼콜라가 자연스럽게 대기 상태로 돌아가도록 파라미터를 정리해 줍니다.
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isAttacking", false);
+            playerAnim.SetBool("isIdle", true);
+        }
+
+        StartCoroutine(BanillaFadeOutAndDropHeart());
+    }
+
+    // ★ 새롭게 추가되는 바닐라 정화 소멸 및 하얀 하트 드롭 코루틴
+    private IEnumerator BanillaFadeOutAndDropHeart()
+    {
+        // 대결 중이던 바닐라 오브젝트 확보 (기존 스폰 인스턴스 또는 태그 검색)
+        GameObject banillaObj = instanceBanilla;
+        if (banillaObj == null) banillaObj = GameObject.FindWithTag("Banilla");
+        if (banillaObj == null) yield break;
+
+        // 잠시 미소 짓는 모습을 아주 잠깐(예: 0.5초) 보여준 뒤 페이드아웃 하려면 여기에 추가 가능합니다.
+        yield return new WaitForSeconds(0.3f);
+
+        // 1. 바닐라와 자식 오브젝트들의 모든 SpriteRenderer를 싹 긁어옵니다.
+        SpriteRenderer[] renderers = banillaObj.GetComponentsInChildren<SpriteRenderer>();
+
+        float fadeDuration = 1.5f; // 1.5초 동안 서서히 페이드 아웃
+        float elapsed = 0f;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
+
+            // 모든 스프라이트의 알파(투명도)값을 동시에 줄여나갑니다.
+            foreach (SpriteRenderer sr in renderers)
+            {
+                if (sr != null)
+                {
+                    Color c = sr.color;
+                    c.a = alpha;
+                    sr.color = c;
+                }
+            }
+            yield return null;
+        }
+
+        // 2. 완전히 사라진 바닐라의 마지막 월드 좌표를 정확히 기록합니다.
+        Vector3 dropPos = banillaObj.transform.position;
+
+        // 3. 기존 PlayerLaser에 설정된 바닥 오프셋 값을 가져와 동일한 높이의 바닥 라인(floorY)을 계산합니다.
+        float floorY = playerRb.transform.position.y - 1.5f; // 기본 방어용 최소값
+        if (playerLaserScript != null)
+        {
+            floorY = playerRb.transform.position.y + playerLaserScript.dropYOffset;
+        }
+
+        // 4. 기존 남자 NPC들과 동일한 프리랩을 생성하고, 하트 스크립트를 추출해 초기화합니다.
+        if (playerLaserScript != null && playerLaserScript.droppedHeartPrefab != null && banillaWhiteHeart != null)
+        {
+            // 하트 프리팹 생성
+            GameObject droppedHeart = Instantiate(playerLaserScript.droppedHeartPrefab, dropPos, Quaternion.identity);
+
+            // 하트 컴포넌트 획득
+            DroppedHeart heartScript = droppedHeart.GetComponent<DroppedHeart>();
+            if (heartScript == null) heartScript = droppedHeart.GetComponentInChildren<DroppedHeart>();
+
+            if (heartScript != null)
+            {
+                heartScript.isBanillaWhiteHeart = true;
+                // ★ 핵심: 매니저 창고에 등록해 둔 '하얀 하트(banillaWhiteHeart)' 스킨을 주입하여 툭 떨어뜨립니다!
+                heartScript.Initialize(banillaWhiteHeart, dropPos, floorY);
+            }
+        }
+
+        // 5. 연출이 완벽하게 끝났으므로 투명해진 바닐라 본체를 씬에서 완전히 삭제(소멸)합니다.
+        Destroy(banillaObj);
+
+        Debug.Log("바닐라 정화 완료: 페이드아웃 및 하얀 하트 드롭 성공!");
+    }
 
     private void ExitLaserDuel()
     {
         isLaserDuelActive = false;
-        if (playerLaserScript != null) playerLaserScript.ExitCompetitionMode();
-        if (banillaLaserObj != null) banillaLaserObj.SetActive(false);
+
+        // 쇼콜라 레이저 끄기
+        if (playerLaserScript != null)
+        {
+            playerLaserScript.ExitCompetitionMode();
+        }
+
+        // 바닐라 레이저 끄기
+        if (banillaLaserObj != null)
+        {
+            banillaLaserObj.SetActive(false);
+        }
+
+        // 쇼콜라의 공격 애니메이션 상태 해제 (필요시)
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isAttacking", false);
+        }
     }
 }
