@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 대사 출력, 타이핑 연출, 선택지, 씬 전환을 담당
@@ -88,8 +89,11 @@ public class SpongeDialogueManager : MonoBehaviour
     private bool currentTestimonyIsFirst;
     private bool currentTestimonyIsLast;
 
+    private int selectedChoiceIndex = 0;
+
     public bool IsTyping => isTyping;
     public bool IsInDialogueSequence { get; private set; }
+    public bool IsChoiceActive => choicePnl != null && choicePnl.activeSelf;
 
     private void Awake()
     {
@@ -515,8 +519,8 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
 
-        // press_02_12 이후 : press_01(인덱스 0) 추궁 여부에 따라 분기
-        if (currentLine.lineId == "press_02_12" && !SpongeGameManager.Instance.HasPressedTestimony(0))
+        // press_02_12 이후 : 매출영수증 획득 여부에 따라 분기
+        if (currentLine.lineId == "press_02_12" && !SpongeEvidenceManager.Instance.IsUnlocked("receipt"))
         {
             ShowLine("press_need_more");
             return;
@@ -561,11 +565,13 @@ public class SpongeDialogueManager : MonoBehaviour
         choicePnl.SetActive(true);
         arrowImg.gameObject.SetActive(false);
 
+        var noNav = new Navigation { mode = Navigation.Mode.None };
         for (int i = 0; i < choiceBtns.Length; i++)
         {
             // 선택지 수보다 버튼이 많으면 나머지 버튼 숨기기
             bool active = i < line.choices.Length;
             choiceBtns[i].gameObject.SetActive(active);
+            choiceBtns[i].navigation = noNav;
             if (!active) continue;
 
             // 클로저 캡쳐 - 람다 안에서 i를 쓰면 루프 끝난 값으로 고정되므로 idx로 복사해서 사용
@@ -588,6 +594,37 @@ public class SpongeDialogueManager : MonoBehaviour
                 choiceBtns[i].onClick.AddListener(() => ShowLine(line.choices[idx].nextLineId));
             }
         }
+        SelectChoice(0);
+    }
+
+    static readonly Color ChoiceNormalColor    = Color.white;
+    static readonly Color ChoiceHighlightColor = new Color(1f, 0.85f, 0.3f, 1f);
+
+    void SelectChoice(int index)
+    {
+        selectedChoiceIndex = index;
+        for (int i = 0; i < choiceBtns.Length; i++)
+        {
+            if (i < choiceBtnTxts.Length && choiceBtnTxts[i] != null)
+                choiceBtnTxts[i].color = (i == index) ? ChoiceHighlightColor : ChoiceNormalColor;
+        }
+    }
+
+    public void NavigateChoice(int dir)
+    {
+        int activeCount = 0;
+        for (int i = 0; i < choiceBtns.Length; i++)
+            if (choiceBtns[i].gameObject.activeSelf) activeCount++;
+        Debug.Log($"[Choice] NavigateChoice dir={dir} activeCount={activeCount} before={selectedChoiceIndex}");
+        if (activeCount <= 1) return;
+        SelectChoice(Mathf.Clamp(selectedChoiceIndex + dir, 0, activeCount - 1));
+    }
+
+    public void ConfirmChoice()
+    {
+        if (selectedChoiceIndex >= 0 && selectedChoiceIndex < choiceBtns.Length
+            && choiceBtns[selectedChoiceIndex].gameObject.activeSelf)
+            choiceBtns[selectedChoiceIndex].onClick.Invoke();
     }
 
     // ── 대사 시퀀스 종료 → 다음 상태로 전환 ────────────────────
@@ -614,11 +651,19 @@ public class SpongeDialogueManager : MonoBehaviour
                 // ConsumeConditionMet() = "방금 조건이 충족됐어?"
                 if (SpongeGameManager.Instance.ConsumeConditionMet())
                 {
-                    // 첫번째 심문 조건 충족
+                    // 첫번째 심문 조건 충족 — press_02 시퀀스 안에서 끝난 경우에만 재증언 전환
                     if (SpongeGameManager.Instance.CurrentRound == 1)
                     {
-                        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
-                        Instance.ShowLine("before_retestimony_01");
+                        if (currentLine != null && currentLine.lineId.StartsWith("press_02_"))
+                        {
+                            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                            Instance.ShowLine("before_retestimony_01");
+                        }
+                        else
+                        {
+                            SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.CrossExamination);
+                            SpongeCrossExaminationManager.Instance.NextLineOrLoop();
+                        }
                     }
                     // 두번째 심문 조건 충족 -> 엔딩 대사 시작 (Dialogue 상태에서 클릭이 정상 동작하도록)
                     else
