@@ -512,7 +512,7 @@ public class SpongeDialogueManager : MonoBehaviour
         var anim = target?.GetComponent<Animator>();
         if (anim != null)
         {
-            anim.Play(animTrig, 0, 1f);
+            anim.Play(animTrig, 0, 0.999f);
             anim.speed = 0f;
         }
     }

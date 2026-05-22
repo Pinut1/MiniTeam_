@@ -93,7 +93,7 @@ public class SpongeUIManager : MonoBehaviour
             { "recorder",  holderRecorder  },
             { "poster",    holderPoster    },
             { "receipt",   holderReceipt   },
-            { "bankstatement", holderStatement }
+            { "statement", holderStatement }
         };
     }
 

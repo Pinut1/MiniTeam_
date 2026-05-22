@@ -731,7 +731,7 @@
       "txt": "그때 잠시 은행에 볼일이 있어\n은행에 다녀왔습니다.",
       "ispressable": true,
       "firstPressDialogueId": "re_press_01_01",
-      "isRequiredPress": false,
+      "isRequiredPress": true,
       "validEvidenceIds": [],
       "evidenceSuccessDialogueId": "",
       "isRequiredEvidence": false,
@@ -741,9 +741,9 @@
       "txt": "그렇게 멀지않은 거리에 가게가\n통유리라 멀리서도 가게가 잘 보였죠.",
       "ispressable": true,
       "firstPressDialogueId": "re_press_02_01",
-      "isRequiredPress": true,
+      "isRequiredPress": false,
       "validEvidenceIds": [
-        "receipt"
+        "statement"
       ],
       "evidenceSuccessDialogueId": "evidence_00_00",
       "isRequiredEvidence": true,
@@ -1396,7 +1396,7 @@
       "choices": [],
       "nextLineId": "re_press_01_03",
       "alignment": "",
-      "grantEvidenceId": "bankstatement"
+      "grantEvidenceId": "statement"
     },
     {
       "lineId": "re_press_01_03",
@@ -1595,7 +1595,7 @@
       "txt": "은행에서 본 게 아니라\n다른곳에서 보고 있던 건 아닌가요?",
       "animationTrig": "S_talk",
       "backgroundSpr": "Sponge_BG/BG_Prosecutor",
-      "deskSpr": "",
+      "deskSpr": "Sponge_Table/SpongeBob",
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
@@ -1670,19 +1670,6 @@
     },
     {
       "lineId": "re_press_choice_00_07",
-      "speaker": "나",
-      "txt": "<color=#7596B0>(사람들이\n웅성거리기 시작했다...)</color>",
-      "animationTrig": "",
-      "backgroundSpr": "Sponge_BG/BG_Palyer",
-      "deskSpr": "None",
-      "characterType": 2,
-      "characterPos": 1,
-      "choices": [],
-      "nextLineId": "re_press_choice_00_08",
-      "alignment": ""
-    },
-    {
-      "lineId": "re_press_choice_00_08",
       "speaker": "스폰지밥",
       "txt": "(......정말\n비겁하다!......)",
       "animationTrig": "S_shock",
@@ -1691,11 +1678,11 @@
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
-      "nextLineId": "re_press_choice_00_09",
+      "nextLineId": "re_press_choice_00_08",
       "alignment": ""
     },
     {
-      "lineId": "re_press_choice_00_09",
+      "lineId": "re_press_choice_00_08",
       "speaker": "나",
       "txt": "<color=#7596B0>(사람들이\n웅성거리기 시작했다...)</color>",
       "animationTrig": "",
@@ -1704,15 +1691,28 @@
       "characterType": 2,
       "characterPos": 1,
       "choices": [],
+      "nextLineId": "re_press_choice_00_09",
+      "alignment": ""
+    },
+    {
+      "lineId": "re_press_choice_00_09",
+      "speaker": "플랑크톤",
+      "txt": "정숙하시오. 정숙!",
+      "animationTrig": "P_talk",
+      "backgroundSpr": "Sponge_BG/BG_Judge",
+      "deskSpr": "Sponge_Table/Plankton",
+      "characterType": 5,
+      "characterPos": 4,
+      "choices": [],
       "nextLineId": "re_press_choice_00_10",
       "alignment": ""
     },
     {
       "lineId": "re_press_choice_00_10",
       "speaker": "플랑크톤",
-      "txt": "정숙하시오. 정숙!",
+      "txt": "변호인......\n앞으로는 조심해 주십시오.",
       "animationTrig": "P_talk",
-      "backgroundSpr": "Sponge_BG/BG_Judge",
+      "backgroundSpr": "",
       "deskSpr": "Sponge_Table/Plankton",
       "characterType": 5,
       "characterPos": 4,
@@ -1722,19 +1722,6 @@
     },
     {
       "lineId": "re_press_choice_00_11",
-      "speaker": "플랑크톤",
-      "txt": "변호인......\n앞으로는 조심해 주십시오.",
-      "animationTrig": "P_talk",
-      "backgroundSpr": "",
-      "deskSpr": "Sponge_Table/Plankton",
-      "characterType": 5,
-      "characterPos": 4,
-      "choices": [],
-      "nextLineId": "re_press_choice_00_12",
-      "alignment": ""
-    },
-    {
-      "lineId": "re_press_choice_00_12",
       "speaker": "나",
       "txt": "<color=#7596B0>(이런......순식간에\n비열한 놈이 되어 버렸다......)</color>",
       "animationTrig": "",
@@ -2780,7 +2767,7 @@
       "speaker": "나",
       "txt": "<color=#7596B0>(사람들이 웅성거린다...!)</color>",
       "animationTrig": "",
-      "backgroundSpr": "Sponge_BG/BG_Palyer",
+      "backgroundSpr": "Sponge_BG/BG_Player",
       "deskSpr": "None",
       "characterType": 2,
       "characterPos": 1,
@@ -3153,7 +3140,7 @@
       "txt": "당신은 어디에서 무얼 했는지...\n자세히 말해주십시오!",
       "animationTrig": "S_desk",
       "backgroundSpr": "Sponge_BG/BG_Prosecutor",
-      "deskSpr": "",
+      "deskSpr": "Sponge_Table/SpongeBob",
       "characterType": 1,
       "characterPos": 3,
       "choices": [],
