@@ -10,6 +10,30 @@ namespace MiniTeam.Shooting1942
 
         private float destroyY;
 
+        void Awake()
+        {
+            var collider2D = GetComponent<Collider2D>();
+            if (collider2D != null)
+            {
+                Destroy(collider2D);
+            }
+
+            var boxCollider = GetComponent<BoxCollider>();
+            if (boxCollider == null)
+            {
+                boxCollider = gameObject.AddComponent<BoxCollider>();
+            }
+            boxCollider.isTrigger = true;
+
+            var rigidbody = GetComponent<Rigidbody>();
+            if (rigidbody == null)
+            {
+                rigidbody = gameObject.AddComponent<Rigidbody>();
+            }
+            rigidbody.useGravity = false;
+            rigidbody.isKinematic = true;
+        }
+
         void Start()
         {
             gameObject.tag = "EnemyBullet";

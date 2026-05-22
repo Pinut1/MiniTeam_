@@ -45,7 +45,7 @@ namespace MiniTeam.Shooting1942
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
             Vector3 dir = new Vector3(h, v, 0f).normalized;
-            rb.linearVelocity = dir * moveSpeed;
+            rb.velocity = dir * moveSpeed;
         }
 
         void ClampPosition()
