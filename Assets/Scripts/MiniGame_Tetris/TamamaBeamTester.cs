@@ -1,3 +1,4 @@
+using MiniTeam.Tetris;
 using UnityEngine;
 
 public class TamamaBeamTester : MonoBehaviour
@@ -38,6 +39,7 @@ public class TamamaBeamTester : MonoBehaviour
         if (beamObj.TryGetComponent(out TamamaBeam beamScript))
         {
             beamScript.Setup(number);
+            TetrisGameController.Instance.OnTamamaImpactTriggered(true);
             Debug.Log($"[테스트 빔 발사] 키: {number} | 스폰 위치: {spawnPosition} | 타격 거리: {number}");
         }
         else

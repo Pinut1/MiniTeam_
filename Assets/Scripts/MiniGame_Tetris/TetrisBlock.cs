@@ -1,6 +1,7 @@
 using MiniTeam.Tetris;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class TetrisBlock : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class TetrisBlock : MonoBehaviour
     public float lockDelay = 0.5f;
     private float lockTimer = 0f;
 
-    private int rotationState = 0;
+    public int rotationState = 0;
 
     [Header("타마마 임팩트 이펙트")]
     public GameObject tamamaBeamPrefab;
@@ -73,15 +74,17 @@ public class TetrisBlock : MonoBehaviour
                 // ⭐️ I_enable 블록만 상태를 0과 1로 제한
                 bool isTwoStateBlock = (type == BlockType.I_enable);
                 int maxStates = isTwoStateBlock ? 2 : 4;
+              
+                float angle = (isTwoStateBlock && rotationState == 1) ? 90f : -90f;
 
-                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
+                transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), angle);
                 bool rotationSuccess = true;
 
                 if (!ValidMove())
                 {
                     if (!PerformWallKick(rotationState))
                     {
-                        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
+                        transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -angle);
                         rotationSuccess = false;
                     }
                 }
@@ -234,16 +237,18 @@ public class TetrisBlock : MonoBehaviour
                         if (parentBlock.type == BlockType.I_enable)
                         {
                             // 1. 가로/세로 판별
-                            bool isHorizontal = true;
-                            if (parentTransform.childCount >= 2)
-                            {
-                                Transform child1 = parentTransform.GetChild(0);
-                                Transform child2 = parentTransform.GetChild(1);
+                            bool isHorizontal = (parentBlock.rotationState == 0);
 
-                                isHorizontal = Mathf.Abs(child1.position.x - child2.position.x) > Mathf.Abs(child1.position.y - child2.position.y);
-                            }
+                            // 옛날 버전 확인 후 바로 지우자 05222342
+                            //if (parentTransform.childCount >= 2)
+                            //{
+                            //    Transform child1 = parentTransform.GetChild(0);
+                            //    Transform child2 = parentTransform.GetChild(1);
 
-                            // 2. ⭐️ 최하단 파편(bottomCell) 찾기 (가로든 세로든 기준점을 명확히 함)
+                            //    isHorizontal = Mathf.Abs(child1.position.x - child2.position.x) > Mathf.Abs(child1.position.y - child2.position.y);
+                            //}
+
+                            // 2. 최하단 파편(bottomCell) 찾기
                             Transform bottomCell = cell;
                             float minY = cell.position.y;
                             foreach (Transform sibling in parentTransform)
@@ -267,27 +272,31 @@ public class TetrisBlock : MonoBehaviour
                                 }
                             }
 
-                            parentTransform.DetachChildren();
-                            Destroy(parentTransform.gameObject);
-
-                            // 4. 타마마 임팩트 발동
+                            // 4. 타마마 임팩트 발동 (할 일 먼저 완벽하게 끝내기)
                             if (!hasTriggeredEffect)
                             {
-                                // 거리 계산 (해당 파편의 열 인덱스 기준)
-                                float distanceToWall = j;
-
-                                // ⭐️ 계산해둔 최하단 파편(bottomCell)의 위치에서 빔 생성
+                                float distanceToWall;
                                 Vector3 spawnPosition = bottomCell.position;
+                                Quaternion beamRotation;
 
                                 if (isHorizontal)
-                                    Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발!");
-                                else
+                                {
                                     Debug.Log($"[{j}번째 열] ⬇️ [세로] 방향 I_enable 블록 파편 발견! 타마마 임팩트 발동!");
+                                    distanceToWall = j;
+                                    beamRotation = Quaternion.identity;
+                                }
+
+                                else
+                                {
+                                    Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발!");
+                                    distanceToWall = 25f; // 
+                                    beamRotation = Quaternion.Euler(0, 0, -90f);
+                                }
 
                                 // 빔 프리팹 생성 및 세팅
                                 if (tamamaBeamPrefab != null)
                                 {
-                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, spawnPosition, Quaternion.identity);
+                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, spawnPosition, beamRotation);
                                     if (beamObj.TryGetComponent(out TamamaBeam beamScript))
                                     {
                                         beamScript.Setup(distanceToWall);
@@ -296,16 +305,21 @@ public class TetrisBlock : MonoBehaviour
 
                                 if (TetrisGameController.Instance != null)
                                 {
-                                    TetrisGameController.Instance.OnTamamaImpactTriggered();
+                                    Debug.Log("TetrisBlock에서 OnTamamaImpactTriggered 호출");
+                                    TetrisGameController.Instance.OnTamamaImpactTriggered(isHorizontal);
                                 }
 
                                 hasTriggeredEffect = true;
                             }
+
+                            // ⭐️ 5. 모든 연출 생성과 데이터 참조가 끝난 '맨 마지막'에 부모 해체 및 삭제!
+                            parentTransform.DetachChildren();
+                            Destroy(parentTransform.gameObject);
                         }
                     }
                 }
 
-                // 5. 줄이 지워지는 해당 칸 파괴
+                // 6. 줄이 지워지는 해당 칸 파괴
                 Destroy(cell.gameObject);
                 grid[j, i] = null;
             }

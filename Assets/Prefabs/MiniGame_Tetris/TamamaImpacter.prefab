@@ -192,6 +192,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3343162301619755369}
   - component: {fileID: 4861162578285709990}
+  - component: {fileID: 3525707776524207380}
   m_Layer: 0
   m_Name: TamamaImpacter
   m_TagString: Untagged
@@ -230,7 +231,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TamamaBeam
   beamBody: {fileID: 6552778961156987907}
   beamHead: {fileID: 6874492672782962312}
-  destroyTime: 1
+  destroyTime: 0.5
   startX: -0.5
   extraDistance: 2
   baseSpriteLength: 7
+--- !u!114 &3525707776524207380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8504614737765839044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 370075163d8b6884bae9263a5da2e389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectShaker
+  defaultDuration: 0.5
+  defaultMagnitude: 0.1
