@@ -11,7 +11,6 @@ public class JudangChiController : MonoBehaviour
     [Tooltip("인덱스 0: 게임 시작시, 1: 1스테이지 클리어 후...")]
     public DialogueData[] stageDialogues;
 
-    private int dialogueIndex = 0;
 
 
 

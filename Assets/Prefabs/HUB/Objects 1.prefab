@@ -221,6 +221,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28f370a0e382a2b45aab17e231f2fc2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  customWarningMessage: "\uC774 \uB108\uBA38\uB85C \uAC00\uB3C4\\n\uBCFC \uAC74 \uC5C6\uC744
+    \uAC70 \uAC19\uB2E4..."
 --- !u!1001 &4492651517751220822
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -291,7 +293,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 65558903531210868, guid: 145951c76cacc4f4393085a293255411, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

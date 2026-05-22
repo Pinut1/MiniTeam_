@@ -89,6 +89,8 @@ public class StageDoor : MonoBehaviour
 
         isPlayerInRange = false; // 플레이어 이탈 체크
 
+        HubUIManager.Instance?.ToggleWarningUI(false);
+
         // (선택 사항) 자동문일 경우 플레이어가 멀어지면 다시 닫히게 만들고 싶다면 주석 해제
         /*
         if (MiniGameManager.Instance.IsDoorActive(this) && openType == OpenType.Automatic && isOpen)
@@ -113,6 +115,6 @@ public class StageDoor : MonoBehaviour
     private void ShowWarning()
     {
         Debug.Log($"Warning : {warningMessage}");
-        // TODO: 나중에 UI 텍스트 띄우는 로직 여기에 연결
+        HubUIManager.Instance?.ToggleWarningUI(true, warningMessage);
     }
 }

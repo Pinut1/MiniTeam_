@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HubUIManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class HubUIManager : MonoBehaviour
 
     [Header("인게임 UI Panels")]
     [SerializeField] private GameObject warningUI;
+    [SerializeField] private TMP_Text warningText;
 
     [Header("시네마틱 통합 애니메이터 (부모 객체)")]
 
@@ -26,9 +28,7 @@ public class HubUIManager : MonoBehaviour
     [Header("대화창용 큰 주댕치 ")]
     [SerializeField] private Image judangchiBigImage;      // Judanchi_기본의 Image 컴포넌트
 
-    [Header("Animation Settings")]
-    [SerializeField] private float animationDuration = 0.5f; // 애니메이션 재생 대기 시간
-
+    
     #region UNITY LIFE CYCLE
     private void Awake()
     {
@@ -220,9 +220,16 @@ public class HubUIManager : MonoBehaviour
         }
     }
 
-    public void ToggleWarningUI(bool isActive)
+    public void ToggleWarningUI(bool isOn, string message = "")
     {
-        if (warningUI != null) warningUI.SetActive(isActive);
+        
+        if (warningUI != null) warningUI.SetActive(isOn);
+
+        // 창을 켤 때 전달받은 메세지가 비어있지 않다면 텍스트를 업데이트.
+        if (isOn && !string.IsNullOrEmpty(message) && warningText != null)
+        {
+            warningText.text = message;
+        }
     }
     #endregion
 
