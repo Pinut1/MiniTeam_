@@ -85,12 +85,3 @@ Assets/Screenshots/
 Assets/Screenshots.meta
 Packages/com.coplaydev.unity-mcp/
 
-# Unity 샘플/튜토리얼 기본 폴더
-Assets/Image/
-Assets/Image.meta
-Assets/Material/
-Assets/Material.meta
-Assets/Prefab/
-Assets/Prefab.meta
-Assets/TutorialInfo/
-Assets/TutorialInfo.meta
