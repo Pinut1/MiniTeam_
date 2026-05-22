@@ -203,6 +203,9 @@ public class SpongeDialogueManager : MonoBehaviour
         arrowLeftImg.gameObject.SetActive(false);
         arrowRightImg.gameObject.SetActive(false);
 
+        if (!string.IsNullOrEmpty(testimony.animationTrig))
+            TriggerAnimation(testimony.animationTrig, SpongeDialogueLine.CharacterType.JipgeSajang);
+
         int i = 0;
         string fullTxt = testimony.txt;
         while (i < fullTxt.Length)
@@ -219,9 +222,11 @@ public class SpongeDialogueManager : MonoBehaviour
             }
             dialogueTxt.text += fullTxt[i];
             i++;
-            yield return new WaitForSeconds(0.04f);
+            yield return new WaitForSeconds(0.08f);
         }
         isTyping = false;
+        if (!string.IsNullOrEmpty(testimony.animationTrig))
+            ResetAnimation(testimony.animationTrig, SpongeDialogueLine.CharacterType.JipgeSajang);
         arrowLeftImg.gameObject.SetActive(!isFirst);
         arrowRightImg.gameObject.SetActive(!isLast);
     }
@@ -263,6 +268,9 @@ public class SpongeDialogueManager : MonoBehaviour
         arrowLeftImg.gameObject.SetActive(false);
         arrowRightImg.gameObject.SetActive(false);
 
+        if (!string.IsNullOrEmpty(testimony.animationTrig))
+            TriggerAnimation(testimony.animationTrig, SpongeDialogueLine.CharacterType.JipgeSajang);
+
         int i = 0;
         string fullTxt = testimony.txt;
         while (i < fullTxt.Length)
@@ -279,9 +287,11 @@ public class SpongeDialogueManager : MonoBehaviour
             }
             dialogueTxt.text += fullTxt[i];
             i++;
-            yield return new WaitForSeconds(0.04f);
+            yield return new WaitForSeconds(0.08f);
         }
         isTyping = false;
+        if (!string.IsNullOrEmpty(testimony.animationTrig))
+            ResetAnimation(testimony.animationTrig, SpongeDialogueLine.CharacterType.JipgeSajang);
         arrowRightImg.gameObject.SetActive(true);
     }
 
@@ -323,13 +333,9 @@ public class SpongeDialogueManager : MonoBehaviour
             if (textBoxPanel != null) textBoxPanel.SetActive(true);
         }
 
-        // 3. 해당 위치 Animator에 트리거
-        /*if (!string.IsNullOrEmpty(line.animationTrig))
-        {
+        // 3. 캐릭터 애니메이션 재생 (animationTrig가 있을 때만)
+        if (!string.IsNullOrEmpty(line.animationTrig))
             TriggerAnimation(line);
-            yield return new WaitForSeconds(1f);
-        }
-        */
 
         // txt null 또는 빈 문자열이면 대사창 이미지 비활성화하고 타이핑 생략
         bool hasTxt = !string.IsNullOrEmpty(line.txt);
@@ -381,11 +387,11 @@ public class SpongeDialogueManager : MonoBehaviour
             dialogueTxt.text += fullTxt[i];
             i++;
             // 한 글자 추가 후 대기 (타이핑 속도)
-            yield return new WaitForSeconds(0.04f);
+            yield return new WaitForSeconds(0.08f);
         }
         isTyping = false;
+        if (!string.IsNullOrEmpty(line.animationTrig)) ResetAnimation(line);
         arrowImg.gameObject.SetActive(true);
-        // // nextLineAnim?.Play("상태이름"); // 애니메이션 구현 후 사용
 
         // 타이핑 완료 -> 선택지 표시 또는 시퀀스 종료
         OnLineFinished(line);
@@ -465,25 +471,50 @@ public class SpongeDialogueManager : MonoBehaviour
         if (testimonyCharImage != null) testimonyCharImage.gameObject.SetActive(true);
     }
 
-    // ── 캐릭터 위치에 맞는 Animator에 트리거 ────────────────
-    void TriggerAnimation(SpongeDialogueLine line)
+    // ── 캐릭터 Animator에 Play() 호출 ───────────────────────
+    void TriggerAnimation(SpongeDialogueLine line) =>
+        TriggerAnimation(line.animationTrig, line.characterType);
+
+    void TriggerAnimation(string animTrig, SpongeDialogueLine.CharacterType characterType)
     {
-        /*
-        Animator targer = line.characterPos switch
+        if (string.IsNullOrEmpty(animTrig)) return;
+        Image target = characterType switch
         {
-            // 애니메이터 구현후 적을 예정인데 미리 적어두겠습니다^.^
-            
-            SpongeDialogueLine.CharacterPosition.SpongeBob => animSpongeBob,
-            SpongeDialogueLine.CharacterPosition.Player => animPlayer,
-            SpongeDialogueLine.CharacterPosition.Ddungi => animDdungi,
-            SpongeDialogueLine.CharacterPosition.JingJingi => animJingJingi,
-            SpongeDialogueLine.CharacterPosition.Plankton => animPlankton,
-            SpongeDialogueLine.CharacterPosition.JipgeSajang => animJipgeSajang,
+            SpongeDialogueLine.CharacterType.SpongeBob   => characterSpongeBob,
+            SpongeDialogueLine.CharacterType.Player      => characterPlayer,
+            SpongeDialogueLine.CharacterType.Ddungi      => characterDdungi,
+            SpongeDialogueLine.CharacterType.JingJingi   => characterJingJingi,
+            SpongeDialogueLine.CharacterType.Plankton    => characterPlankton,
+            SpongeDialogueLine.CharacterType.JipgeSajang => characterJipgeSajang,
             _ => null
-             
         };
-        targer?.SetTrigger(line.animationTrigger);
-        */
+        var anim = target?.GetComponent<Animator>();
+        if (anim != null) { anim.speed = 1f; anim.Play(animTrig); }
+    }
+
+    // 타이핑 종료 시 Animator를 마지막 프레임에서 정지
+    void ResetAnimation(SpongeDialogueLine line) =>
+        ResetAnimation(line.animationTrig, line.characterType);
+
+    void ResetAnimation(string animTrig, SpongeDialogueLine.CharacterType characterType)
+    {
+        if (string.IsNullOrEmpty(animTrig)) return;
+        Image target = characterType switch
+        {
+            SpongeDialogueLine.CharacterType.SpongeBob   => characterSpongeBob,
+            SpongeDialogueLine.CharacterType.Player      => characterPlayer,
+            SpongeDialogueLine.CharacterType.Ddungi      => characterDdungi,
+            SpongeDialogueLine.CharacterType.JingJingi   => characterJingJingi,
+            SpongeDialogueLine.CharacterType.Plankton    => characterPlankton,
+            SpongeDialogueLine.CharacterType.JipgeSajang => characterJipgeSajang,
+            _ => null
+        };
+        var anim = target?.GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.Play(animTrig, 0, 1f);
+            anim.speed = 0f;
+        }
     }
 
     // ── 클릭 처리 ────────────────────────────────────────────
@@ -512,6 +543,7 @@ public class SpongeDialogueManager : MonoBehaviour
             else
             {
                 dialogueTxt.text = currentLine.txt;
+                if (!string.IsNullOrEmpty(currentLine.animationTrig)) ResetAnimation(currentLine);
                 arrowImg.gameObject.SetActive(true);
                 OnLineFinished(currentLine);
             }
@@ -539,6 +571,13 @@ public class SpongeDialogueManager : MonoBehaviour
         if (!string.IsNullOrEmpty(currentLine.grantEvidenceId))
             SpongeEvidenceManager.Instance.UnlockEvidence(currentLine.grantEvidenceId);
 
+        // RecordPnl 트리거 라인 → 패널 열고 증거 선택 대기
+        if (currentLine.opensRecordPanel)
+        {
+            SpongeUIManager.Instance.OpenRecordPanel(currentLine);
+            return;
+        }
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
@@ -555,6 +594,8 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <param name="line"></param>
     void OnLineFinished(SpongeDialogueLine line)
     {
+        // RecordPnl이 열리는 라인은 클릭 대기만 (선택지 무시)
+        if (line.opensRecordPanel) return;
         // 선택지 있으면 선택지 UI 표시
         if (line.choices != null && line.choices.Length > 0)
         {
