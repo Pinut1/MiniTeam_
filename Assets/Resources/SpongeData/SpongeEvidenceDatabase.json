@@ -31,7 +31,7 @@
       "iconSpr": "Sponge_Evidence/cassette_recorder"
     },
     {
-      "id": "bankstatement",
+      "id": "statement",
       "evidenceName": "명세표",
       "description": "'명세표' 안에 4월 26일이라고 적혀있다.\n자세히 보면 오전 10시 31분이라 적혀있다.\n ",
       "iconSpr": "Sponge_Evidence/statement"
