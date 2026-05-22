@@ -10,6 +10,7 @@ namespace MiniTeam.Shooting1942
         [Header("연출")]
         public GameObject spaceshipRewardObj;
         public GameObject coinSpinObj;         // 이어하기 코인 (씬에 배치된 오브젝트)
+        public ClearCutsceneManager clearCutscene;
 
         [Header("결과 화면 표시 후 허브 복귀까지 대기 시간")]
         public float resultHoldTime = 3f;
@@ -82,8 +83,11 @@ namespace MiniTeam.Shooting1942
 
             var am = AudioManager.Instance;
             if (am != null) am.PlayBGM(am.bgmClear);
-            ShootingUIManager.Instance?.ShowResult(true);
-            Invoke(nameof(ExitToHub), resultHoldTime);
+
+            if (clearCutscene != null)
+                clearCutscene.Play(ExitToHub);
+            else
+                Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         public void OnGameFail()
