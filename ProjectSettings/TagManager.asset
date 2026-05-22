@@ -7,39 +7,43 @@ TagManager:
   - NPC
   - GirlNpc
   - Banilla
+  - Bullet
+  - Enemy
+  - EnemyBullet
+  - Boss
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Background
   - Water
   - UI
+  - Player
+  - Enemy
   - NPC
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
   m_SortingLayers:
   - name: Default
     uniqueID: 0
@@ -67,6 +71,27 @@ TagManager:
     locked: 0
   - name: Magic
     uniqueID: 2572098445
+    locked: 0
+  - name: BG
+    uniqueID: 37507989
+    locked: 0
+  - name: BG_Effect
+    uniqueID: 3354770137
+    locked: 0
+  - name: UI
+    uniqueID: 2043359829
+    locked: 0
+  - name: Enemy
+    uniqueID: 2847219219
+    locked: 0
+  - name: Entity
+    uniqueID: 3087796885
+    locked: 0
+  - name: Bullets
+    uniqueID: 1314381033
+    locked: 0
+  - name: Ground
+    uniqueID: 969792187
     locked: 0
   m_RenderingLayers:
   - Default
