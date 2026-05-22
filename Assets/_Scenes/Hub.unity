@@ -681,6 +681,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object 4
       objectReference: {fileID: 0}
+    - target: {fileID: 4493836459486787220, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Name
+      value: Door_4
+      objectReference: {fileID: 0}
     - target: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -731,6 +735,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
   m_PrefabInstance: {fileID: 569002758}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &569002760 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5085057381685759576, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+  m_PrefabInstance: {fileID: 569002758}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDoor
 --- !u!1 &622138957
 GameObject:
   m_ObjectHideFlags: 0
@@ -1194,7 +1209,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 830558000}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ce1a9e4a08100f4680ff744a2d36994, type: 3}
   m_Name: 
@@ -1608,6 +1623,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object 5
       objectReference: {fileID: 0}
+    - target: {fileID: 4493836459486787220, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Name
+      value: Door_5
+      objectReference: {fileID: 0}
     - target: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1658,6 +1677,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
   m_PrefabInstance: {fileID: 1302730628}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1302730630 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5085057381685759576, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+  m_PrefabInstance: {fileID: 1302730628}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDoor
 --- !u!1 &1371470895
 GameObject:
   m_ObjectHideFlags: 0
@@ -6967,6 +6997,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.MiniGameManager
   currentStage: 0
+  stageDoors:
+  - {fileID: 2165585531680062823}
+  - {fileID: 1639831150}
+  - {fileID: 1789594025}
+  - {fileID: 569002760}
+  - {fileID: 1302730630}
 --- !u!4 &1620732379
 Transform:
   m_ObjectHideFlags: 0
@@ -7074,6 +7110,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4493836459486787220, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Name
+      value: Door_2
+      objectReference: {fileID: 0}
     - target: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -7128,6 +7168,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
   m_PrefabInstance: {fileID: 1639831148}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1639831150 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5085057381685759576, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+  m_PrefabInstance: {fileID: 1639831148}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDoor
 --- !u!1 &1712423292
 GameObject:
   m_ObjectHideFlags: 0
@@ -7450,6 +7501,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4493836459486787220, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Name
+      value: Door_3
+      objectReference: {fileID: 0}
     - target: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -7500,6 +7555,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
   m_PrefabInstance: {fileID: 1789594023}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1789594025 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5085057381685759576, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+  m_PrefabInstance: {fileID: 1789594023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDoor
 --- !u!1 &1863742004
 GameObject:
   m_ObjectHideFlags: 0
@@ -7753,6 +7819,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3152275248016103848, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Size.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488204521430260720, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488204521430260720, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488204521430260720, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488204521430260720, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4488204521430260720, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4493836459486787220, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Name
+      value: Door_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4517659877727392290, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -7810,6 +7908,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+--- !u!114 &2165585531680062823 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5085057381685759576, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
+  m_PrefabInstance: {fileID: 2165585531680062822}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDoor
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -16,6 +16,20 @@ namespace MiniTeam.Core
         [Header("Game Progress")]
         public int currentStage = 1;
 
+        [Header("Door Management")]
+        [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
+        public StageDoor[] stageDoors;
+
+        public bool IsDoorActive(StageDoor door)
+        {
+            // currentStage는 1부터 시작하고 배열 인덱스는 0부터 시작하므로 수 맞춤
+            int stageIndex = currentStage ;
+
+            if (stageDoors == null || stageDoors.Length == 0) return false;
+            if (stageIndex < 0 || stageIndex >= stageDoors.Length) return false;
+
+            return stageDoors[stageIndex] == door;
+        }
   
 
         public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
