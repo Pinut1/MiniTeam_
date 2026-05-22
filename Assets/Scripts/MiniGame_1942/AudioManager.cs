@@ -29,6 +29,9 @@ namespace MiniTeam.Shooting1942
         [Header("이어하기")]
         public AudioClip sfxContinueCoin;
 
+        [Header("파워업")]
+        public AudioClip sfxPowerUp;
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

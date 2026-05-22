@@ -22,6 +22,7 @@ namespace MiniTeam.Shooting1942
         private float minX, maxX, minY, maxY;
         private float nextFireTime = 0f;
         private Rigidbody2D rb;
+        private FormationShooter[] formationShooters;
 
         void Start()
         {
@@ -29,6 +30,7 @@ namespace MiniTeam.Shooting1942
             rb.gravityScale = 0f;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             CalculateBounds();
+            formationShooters = GetComponentsInChildren<FormationShooter>(includeInactive: true);
         }
 
         void Update()
@@ -90,6 +92,9 @@ namespace MiniTeam.Shooting1942
         {
             Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerShoot);
+
+            foreach (var shooter in formationShooters)
+                shooter.TriggerFire();
         }
 
         void CalculateBounds()
