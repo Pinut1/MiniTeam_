@@ -17,6 +17,9 @@ namespace MiniTeam.Shooting1942
 
         public bool DebugRapidFire = false;
 
+        [Header("필살기 파티클")]
+        public GameObject bombParticlePrefab;
+
         [HideInInspector] public float currentSpeedMultiplier = 1f;
 
         private float minX, maxX, minY, maxY;
@@ -67,6 +70,32 @@ namespace MiniTeam.Shooting1942
                 Destroy(bullet);
 
             ShootingUIManager.SetBombActive(false);
+
+            if (bombParticlePrefab != null)
+            {
+                Camera cam   = Camera.main;
+                float depth  = Mathf.Abs(cam.transform.position.z);
+                Vector3 center;
+
+                var wm = FindAnyObjectByType<WaveManager>();
+                if (wm != null && wm.gameAreaRect != null)
+                {
+                    Vector3[] corners = new Vector3[4];
+                    wm.gameAreaRect.GetWorldCorners(corners);
+                    Vector3 screenCenter = new Vector3(
+                        (corners[0].x + corners[2].x) * 0.5f,
+                        (corners[0].y + corners[2].y) * 0.5f,
+                        depth);
+                    center = cam.ScreenToWorldPoint(screenCenter);
+                }
+                else
+                {
+                    center = cam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, depth));
+                }
+
+                var particle = Instantiate(bombParticlePrefab, center, Quaternion.identity);
+                Destroy(particle, 2f);
+            }
 
             AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxPlayerShoot);
         }
