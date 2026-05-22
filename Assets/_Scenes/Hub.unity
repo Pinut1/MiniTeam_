@@ -2396,7 +2396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.SoundManager
   masterVolume: 0.5
   bgmVolume: 0.6
-  sfxVolume: 0.5
+  sfxVolume: 0.88
 --- !u!4 &1371470897
 Transform:
   m_ObjectHideFlags: 0

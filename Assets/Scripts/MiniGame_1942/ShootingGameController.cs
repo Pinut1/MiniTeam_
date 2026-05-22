@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using MiniTeam.Core;
@@ -8,13 +9,52 @@ namespace MiniTeam.Shooting1942
     {
         [Header("연출")]
         public GameObject spaceshipRewardObj;
+        public GameObject coinSpinObj;         // 이어하기 코인 (씬에 배치된 오브젝트)
+        public ClearCutsceneManager clearCutscene;
 
         [Header("결과 화면 표시 후 허브 복귀까지 대기 시간")]
         public float resultHoldTime = 3f;
 
-        private bool isGameOver = false;
-        private bool isCleared  = false;
+        private bool isGameOver        = false;
+        private bool isCleared         = false;
+        private bool isWaitingContinue = false;
         private WaveManager waveManager;
+
+        void Update()
+        {
+            if (isWaitingContinue && Input.GetKeyDown(KeyCode.Return))
+                StartCoroutine(ContinueRoutine());
+        }
+
+        IEnumerator ContinueRoutine()
+        {
+            isWaitingContinue = false;
+
+            var am = AudioManager.Instance;
+            am?.StopBGM();
+            am?.PlaySFX(am.sfxContinueCoin);
+
+            if (coinSpinObj != null)
+            {
+                coinSpinObj.SetActive(true);
+                var anim = coinSpinObj.GetComponent<Animator>();
+                if (anim != null) anim.updateMode = AnimatorUpdateMode.UnscaledTime;
+            }
+
+            yield return new WaitForSecondsRealtime(0.6f);
+
+            isGameOver     = false;
+            Time.timeScale = 1f;
+
+            FindAnyObjectByType<FormationManager>()?.FullRestore();
+
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player != null) player.enabled = true;
+
+            if (coinSpinObj != null) coinSpinObj.SetActive(false);
+            waveManager?.ResumeBGM();
+            ShootingUIManager.Instance?.HideResult();
+        }
 
         void Start()
         {
@@ -43,8 +83,11 @@ namespace MiniTeam.Shooting1942
 
             var am = AudioManager.Instance;
             if (am != null) am.PlayBGM(am.bgmClear);
-            ShootingUIManager.Instance?.ShowResult(true);
-            Invoke(nameof(ExitToHub), resultHoldTime);
+
+            if (clearCutscene != null)
+                clearCutscene.Play(ExitToHub);
+            else
+                Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         public void OnGameFail()
@@ -53,12 +96,14 @@ namespace MiniTeam.Shooting1942
             isGameOver = true;
             isCleared  = false;
 
-            EndGame();
-
+            OptionsUIManager.Instance?.ForceClose();
+            AudioManager.Instance?.StopBGM();
             var am = AudioManager.Instance;
             if (am != null) am.PlayBGM(am.bgmGameOver);
+
+            Time.timeScale        = 0f;
+            isWaitingContinue     = true;
             ShootingUIManager.Instance?.ShowResult(false);
-            Invoke(nameof(ExitToHub), resultHoldTime);
         }
 
         void EndGame()
