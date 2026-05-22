@@ -1924,7 +1924,11 @@
       "characterPos": 1,
       "choices": [],
       "nextLineId": "re_press_choice_02_01",
-      "alignment": ""
+      "alignment": "",
+      "opensRecordPanel": true,
+      "validRecordEvidenceIds": [
+        "recorder"
+      ]
     },
     {
       "lineId": "re_press_choice_02_01",
@@ -2118,7 +2122,7 @@
       "characterType": 4,
       "characterPos": 2,
       "choices": [],
-      "nextLineId": "re_press_chocice_02_16",
+      "nextLineId": "re_press_choice_02_16",
       "alignment": ""
     },
     {
@@ -2983,7 +2987,11 @@
       "characterType": 2,
       "characterPos": 1,
       "choices": [],
-      "nextLineId": "evidence_02_09"
+      "nextLineId": "evidence_02_09",
+      "opensRecordPanel": true,
+      "validRecordEvidenceIds": [
+        "poster"
+      ]
     },
     {
       "lineId": "evidence_02_09",

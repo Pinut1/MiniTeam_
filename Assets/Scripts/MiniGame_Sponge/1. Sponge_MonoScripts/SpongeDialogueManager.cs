@@ -539,6 +539,13 @@ public class SpongeDialogueManager : MonoBehaviour
         if (!string.IsNullOrEmpty(currentLine.grantEvidenceId))
             SpongeEvidenceManager.Instance.UnlockEvidence(currentLine.grantEvidenceId);
 
+        // RecordPnl 트리거 라인 → 패널 열고 증거 선택 대기
+        if (currentLine.opensRecordPanel)
+        {
+            SpongeUIManager.Instance.OpenRecordPanel(currentLine);
+            return;
+        }
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
@@ -555,6 +562,8 @@ public class SpongeDialogueManager : MonoBehaviour
     /// <param name="line"></param>
     void OnLineFinished(SpongeDialogueLine line)
     {
+        // RecordPnl이 열리는 라인은 클릭 대기만 (선택지 무시)
+        if (line.opensRecordPanel) return;
         // 선택지 있으면 선택지 UI 표시
         if (line.choices != null && line.choices.Length > 0)
         {
