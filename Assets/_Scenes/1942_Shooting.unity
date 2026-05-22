@@ -228,10 +228,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 672905951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 6.391, y: 0}
+  m_SizeDelta: {x: 452.782, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &77927507
 MonoBehaviour:
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09bfe3bb3a8f7444e8b8d842a2359e19, type: 3}
+  m_Sprite: {fileID: 440470634, guid: 85ad3a76e0553da43a5fecf166697b4e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1969,8 +1969,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 6.5, y: -0.00001335144}
+  m_SizeDelta: {x: -6.126, y: -18.265}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1147081282
 MonoBehaviour:
@@ -1985,14 +1985,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2, g: 0.7, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -1038341372, guid: 10c5054d797207c4b934e84e5108c15a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2587,6 +2587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Shooting1942.ShootingGameController
   spaceshipRewardObj: {fileID: 0}
   coinSpinObj: {fileID: 210616973}
+  clearCutscene: {fileID: 0}
   resultHoldTime: 3
 --- !u!114 &1465689409
 MonoBehaviour:
@@ -3136,6 +3137,10 @@ MonoBehaviour:
   waveText: {fileID: 0}
   scoreText: {fileID: 0}
   specialGaugeSlider: {fileID: 672905952}
+  specialGaugeFill: {fileID: 1147081282}
+  gaugeSpriteFulll: {fileID: 1678785456, guid: 1a9cc18e57828044cacc52488e7e2121, type: 3}
+  gaugeSpriteMedium: {fileID: -1571211517, guid: 51461814acef24543bf01d9977dfb565, type: 3}
+  gaugeSpriteLow: {fileID: -1038341372, guid: 10c5054d797207c4b934e84e5108c15a, type: 3}
   pausePanel: {fileID: 0}
   resultPanel: {fileID: 1436423090}
   resultTitleText: {fileID: 1295846111}
