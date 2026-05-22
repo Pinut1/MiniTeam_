@@ -11,7 +11,7 @@ namespace MiniTeam.Core
         private string currentScene;
         private GameObject[] hubRootObjects;
 
-        private PlayerMove playerMove;
+        private HubPlayerMove playerMove;
 
         [Header("Game Progress")]
         public int currentStage = 1;
@@ -32,7 +32,7 @@ namespace MiniTeam.Core
         }
         private void Start()
         {
-            playerMove = FindAnyObjectByType<PlayerMove>();
+            playerMove = FindAnyObjectByType<HubPlayerMove>();
 
 
             if (playerMove != null)

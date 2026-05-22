@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMove : MonoBehaviour
+public class HubPlayerMove : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;

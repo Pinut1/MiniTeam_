@@ -12,16 +12,25 @@ EditorBuildSettings:
     path: Assets/_Scenes/Hub.unity
     guid: 1797e7a7da8cbf143bf6325f6ff9b603
   - enabled: 1
+    path: Assets/_Scenes/Pokemon.unity
+    guid: 30c9fdbf2f258e04ba3a54f58b324f63
+  - enabled: 1
     path: Assets/_Scenes/1942_Shooting.unity
     guid: 78bc414013246cf4db9db1b34e71b21b
   - enabled: 1
-    path: Assets/_Scenes/TestMiniScene.unity
-    guid: ce4dd9caed5e31f48ab35ca00e0adbb0
+    path: Assets/_Scenes/Keroris.unity
+    guid: 94641ddc3a8ff8844ab21a8b930b811f
+  - enabled: 1
+    path: Assets/_Scenes/AceSponge.unity
+    guid: 5a55e4e0d7cf9fc4b8646aa2690d62b8
+  - enabled: 1
+    path: Assets/_Scenes/SuSuRunScene.unity
+    guid: ef6aa98380cb5af44b2cb26b4b853ab2
   - enabled: 1
     path: Assets/_Scenes/EndingCut_Test.unity
     guid: de794ff4a7c7e634480a52f321d8a575
   - enabled: 1
-    path: Assets/_Scenes/AceSponge.unity
-    guid: 5a55e4e0d7cf9fc4b8646aa2690d62b8
+    path: Assets/_Scenes/TestMiniScene.unity
+    guid: ce4dd9caed5e31f48ab35ca00e0adbb0
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
