@@ -140,6 +140,8 @@ MonoBehaviour:
   burstDelay: 0.15
   hp: 3
   explosionPrefab: {fileID: 7862446294290157411, guid: 51a47ae2a7f65fd46a835c268fc9cbed, type: 3}
+  powerUpPrefab: {fileID: 7633775831970236131, guid: cd0fbf03100e74245b5ba19bcbdac984, type: 3}
+  powerUpDropChance: 0.15
 --- !u!60 &4105094406748790302
 PolygonCollider2D:
   m_ObjectHideFlags: 0

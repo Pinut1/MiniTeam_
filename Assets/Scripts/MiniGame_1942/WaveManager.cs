@@ -195,6 +195,17 @@ namespace MiniTeam.Shooting1942
             if (waveCoroutine != null) StopCoroutine(waveCoroutine);
         }
 
+        public void ResumeBGM()
+        {
+            var am = AudioManager.Instance;
+            if (am == null) return;
+
+            if (IsBossSpawned)
+                am.PlayBGM(am.bgmBoss);
+            else
+                am.PlayBGM(currentWave == 1 ? am.bgmWave1 : am.bgmWave2);
+        }
+
         // ── 유틸 ─────────────────────────────────
 
         void CalculateSpawnBounds()

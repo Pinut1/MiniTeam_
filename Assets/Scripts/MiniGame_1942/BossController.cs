@@ -248,6 +248,7 @@ namespace MiniTeam.Shooting1942
                         0f);
                     var prefab = smallExplosionPrefabs[UnityEngine.Random.Range(0, smallExplosionPrefabs.Length)];
                     if (prefab != null) Instantiate(prefab, pos, Quaternion.identity);
+                    AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxBossDeathSmall);
                     nextBurst = explosionInterval;
                 }
 
@@ -257,6 +258,7 @@ namespace MiniTeam.Shooting1942
             // 최종 대형 폭발
             if (finalExplosionPrefab != null)
                 Instantiate(finalExplosionPrefab, transform.position, Quaternion.identity);
+            AudioManager.Instance?.PlaySFX(AudioManager.Instance.sfxBossDeathFinal, 2f);
 
             ShootingUIManager.Instance?.AddScore(200);
             OnBossDefeated?.Invoke();

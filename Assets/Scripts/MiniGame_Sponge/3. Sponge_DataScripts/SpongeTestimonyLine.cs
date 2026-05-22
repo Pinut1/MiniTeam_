@@ -16,4 +16,6 @@ public class SpongeTestimonyLine
     [Header("정답 증거 ID 목록")] public string[] validEvidenceIds;
     [Header("올바른 증거 제시 후 대사 ID")] public string evidenceSuccessDialogueId;
     [Header("필수 증거 제시 여부")] public bool isRequiredEvidence;
+
+    [Header("Animator State 이름 - 비우면 이전 유지")] public string animationTrig;
 }
