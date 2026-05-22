@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -38,6 +39,36 @@ public class SpongeUIManager : MonoBehaviour
     [Header("메뉴 이미지")]
     [SerializeField] private GameObject menuDefault;
     [SerializeField] private GameObject menuCrossExam;
+
+    [Header("추궁 힌트 패널")]
+    [SerializeField] private GameObject pressStartPnlLeft;
+    [SerializeField] private GameObject pressStartPnlRight;
+    [SerializeField] private Animator pressStartAnimLeft;
+    [SerializeField] private Animator pressStartAnimRight;
+
+    [Header("심문 중 표시")]
+    [SerializeField] private GameObject pressingImgObj;
+    [SerializeField] private Animator pressingImgAnim;
+
+    [Header("추궁 연출")]
+    [SerializeField] private GameObject whitePnl;
+    [SerializeField] private float flashDuration = 0.1f;
+    [SerializeField] private GameObject holditObj;
+    [SerializeField] private Animator holditAnim;
+
+    [Header("증거 제시 연출")]
+    [SerializeField] private GameObject objectionObj;
+    [SerializeField] private Animator objectionAnim;
+
+    [Header("심문 시작 패널")]
+    [SerializeField] private GameObject questionPnlLeft;
+    [SerializeField] private GameObject questionPnlRight;
+    [SerializeField] private Animator questionAnimLeft;
+    [SerializeField] private Animator questionAnimRight;
+
+    private bool questionPnlShown = false;
+    public bool IsPlayingHoldit { get; private set; }
+    public bool IsPlayingObjection { get; private set; }
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -92,12 +123,97 @@ public class SpongeUIManager : MonoBehaviour
         bool isCrossExam = newState == SpongeGameState.GameState.CrossExamination;
         if (menuDefault != null)  menuDefault.SetActive(!isCrossExam);
         if (menuCrossExam != null) menuCrossExam.SetActive(isCrossExam);
+
+        if (newState == SpongeGameState.GameState.Testifying)
+        {
+            questionPnlShown = false;
+            if (pressStartPnlLeft != null)
+            {
+                pressStartPnlLeft.SetActive(true);
+                pressStartAnimLeft?.Play("UI_PressStartPnlLeft");
+            }
+            if (pressStartPnlRight != null)
+            {
+                pressStartPnlRight.SetActive(true);
+                pressStartAnimRight?.Play("UI_PressStartPnlRight");
+            }
+            if (pressingImgObj != null)
+            {
+                pressingImgObj.SetActive(true);
+                pressingImgAnim?.Play("PressingLoof");
+            }
+        }
+
+        if (newState == SpongeGameState.GameState.CrossExamination)
+        {
+            pressingImgObj?.SetActive(false);
+
+            if (!questionPnlShown)
+            {
+                questionPnlShown = true;
+                if (questionPnlLeft != null)
+                {
+                    questionPnlLeft.SetActive(true);
+                    questionAnimLeft?.Play("UI_QuestionStartPnlLeft");
+                }
+                if (questionPnlRight != null)
+                {
+                    questionPnlRight.SetActive(true);
+                    questionAnimRight?.Play("UI_QuestionStartPnlRight");
+                }
+            }
+        }
+    }
+
+    // ── 추궁 연출 ────────────────────────────────────────────────
+    public IEnumerator PlayHolditAnim()
+    {
+        IsPlayingHoldit = true;
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+        holditObj.SetActive(true);
+        holditAnim.Play("HoldItAnim");
+        yield return null;
+        yield return new WaitForSeconds(holditAnim.GetCurrentAnimatorStateInfo(0).length);
+        holditObj.SetActive(false);
+        IsPlayingHoldit = false;
+    }
+
+    public IEnumerator PlayObjectionAnim()
+    {
+        IsPlayingObjection = true;
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+        objectionObj.SetActive(true);
+        objectionAnim.Play("HoldItAnim");
+        yield return null;
+        yield return new WaitForSeconds(objectionAnim.GetCurrentAnimatorStateInfo(0).length);
+        objectionObj.SetActive(false);
+        IsPlayingObjection = false;
+    }
+
+    IEnumerator PresentEvidenceSequence(string evidenceId)
+    {
+        CloseEvidencePanel();
+        yield return StartCoroutine(PlayObjectionAnim());
+        SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
     }
 
     // ── 키 입력 처리 ─────────────────────────────────────────────
     private void Update()
     {
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
+
+        if (SpongeDialogueManager.Instance.IsChoiceActive)
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow))   SpongeDialogueManager.Instance.NavigateChoice(-1);
+            if (Input.GetKeyDown(KeyCode.DownArrow)) SpongeDialogueManager.Instance.NavigateChoice(1);
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                SpongeDialogueManager.Instance.ConfirmChoice();
+            return;
+        }
 
         if (Input.GetKeyDown(KeyCode.S))
             TryDevSkip();
@@ -201,6 +317,7 @@ public class SpongeUIManager : MonoBehaviour
 
         evidencePnl.transform.SetAsLastSibling();
         evidencePnl.SetActive(true);
+        Time.timeScale = 0f;
         RebuildEvidenceSlots();
         SelectFirstFilledSlot();
     }
@@ -233,7 +350,7 @@ public class SpongeUIManager : MonoBehaviour
                     if (SpongeEvidenceManager.Instance.SelectedEvidenceId == evidenceId)
                     {
                         if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
-                            SpongeEvidenceManager.Instance.PresentEvidence(evidenceId);
+                            StartCoroutine(PresentEvidenceSequence(evidenceId));
                     }
                     else
                         SpongeEvidenceManager.Instance.SelectEvidence(evidenceId);
@@ -289,7 +406,7 @@ public class SpongeUIManager : MonoBehaviour
         if (stateBeforeEvidence != SpongeGameState.GameState.CrossExamination) return;
         string id = SpongeEvidenceManager.Instance.SelectedEvidenceId;
         if (!string.IsNullOrEmpty(id))
-            SpongeEvidenceManager.Instance.PresentEvidence(id);
+            StartCoroutine(PresentEvidenceSequence(id));
     }
 
     void MoveEvidenceSelection(int dir)
@@ -327,6 +444,7 @@ public class SpongeUIManager : MonoBehaviour
     /// </summary>
     public void CloseEvidencePanel()
     {
+        Time.timeScale = 1f;
         evidencePnl.SetActive(false);
         SpongeEvidenceManager.Instance.ClearSelection();
         if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
