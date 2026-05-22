@@ -88,6 +88,10 @@ namespace MiniTeam.Shooting1942
             if (itemNameText != null) itemNameText.text = itemName;
             itemPanel.SetActive(true);
 
+            // Hub에서 아이템 지급 조건으로 사용
+            PlayerPrefs.SetInt("1942_Cleared", 1);
+            PlayerPrefs.Save();
+
             yield return new WaitForSeconds(2.5f);
             itemPanel.SetActive(false);
         }
