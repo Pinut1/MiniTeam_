@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7573491018723853860}
   - component: {fileID: 2124597610606998149}
+  - component: {fileID: 3957253840824319043}
   m_Layer: 0
   m_Name: Blossom
   m_TagString: Player
@@ -29,7 +30,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2659021776226008480}
   m_Father: {fileID: 7157280283343770905}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2124597610606998149
@@ -91,6 +93,23 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &3957253840824319043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657964982560552792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc107f5512e4a9544a1dc40da499eaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Shooting1942.FormationShooter
+  shooterType: 2
+  firePoint: {fileID: 2659021776226008480}
+  fireRate: 0.8
+  bulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
+  piercingBulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
 --- !u!1 &2259321316649967763
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,6 +120,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3755978346483705508}
   - component: {fileID: 4390583300011602953}
+  - component: {fileID: 3491505288791572295}
   m_Layer: 0
   m_Name: Bubble
   m_TagString: Player
@@ -120,7 +140,8 @@ Transform:
   m_LocalPosition: {x: 8, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4570161679192706465}
   m_Father: {fileID: 7157280283343770905}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4390583300011602953
@@ -182,6 +203,54 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &3491505288791572295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2259321316649967763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc107f5512e4a9544a1dc40da499eaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Shooting1942.FormationShooter
+  shooterType: 1
+  firePoint: {fileID: 4570161679192706465}
+  fireRate: 0.7
+  bulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
+  piercingBulletPrefab: {fileID: 0}
+--- !u!1 &3449574910110185824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4570161679192706465}
+  m_Layer: 6
+  m_Name: Bubble_Fire_Point (1)
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4570161679192706465
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3449574910110185824}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3755978346483705508}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3624291313517375209
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,7 +285,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7573491018723853860}
-  - {fileID: 2659021776226008480}
   - {fileID: 3755978346483705508}
   - {fileID: 8896982048490295769}
   - {fileID: 391490224526308951}
@@ -297,6 +365,37 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &3697767775232029460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8009806460689406997}
+  m_Layer: 6
+  m_Name: ButerCup_Fire_Point (2)
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8009806460689406997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3697767775232029460}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8896982048490295769}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4739278400396406607
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,7 +497,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2659021776226008480}
   m_Layer: 6
-  m_Name: Fire_Point
+  m_Name: Blossom_Fire_Point
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -417,7 +516,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7157280283343770905}
+  m_Father: {fileID: 7573491018723853860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5623359564074503041
 GameObject:
@@ -572,6 +671,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8896982048490295769}
   - component: {fileID: 98179322036655054}
+  - component: {fileID: 5799618781961841779}
   m_Layer: 0
   m_Name: ButerCup
   m_TagString: Player
@@ -591,7 +691,8 @@ Transform:
   m_LocalPosition: {x: -8, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8009806460689406997}
   m_Father: {fileID: 7157280283343770905}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &98179322036655054
@@ -653,3 +754,20 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5799618781961841779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8025541364219897218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc107f5512e4a9544a1dc40da499eaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Shooting1942.FormationShooter
+  shooterType: 0
+  firePoint: {fileID: 8009806460689406997}
+  fireRate: 0.5
+  bulletPrefab: {fileID: 7156600308698090942, guid: d9561ab2755a1ad45b2433fedd9dff5d, type: 3}
+  piercingBulletPrefab: {fileID: 0}

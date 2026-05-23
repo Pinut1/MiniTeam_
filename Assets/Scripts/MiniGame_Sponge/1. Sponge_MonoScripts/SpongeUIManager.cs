@@ -70,6 +70,11 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private Animator questionAnimLeft;
     [SerializeField] private Animator questionAnimRight;
 
+    [Header("무죄 판결 연출")]
+    [SerializeField] private GameObject innocencePnl;
+    [SerializeField] private Animator innocenceAnimLeft;
+    [SerializeField] private Animator innocenceAnimRight;
+
     [Header("레코드 패널 (대사 직접 증거 선택)")]
     [SerializeField] private GameObject recordPnl;
 
@@ -79,6 +84,7 @@ public class SpongeUIManager : MonoBehaviour
     public bool IsPlayingHoldit { get; private set; }
     public bool IsPlayingObjection { get; private set; }
     public bool IsPlayingTakeThat { get; private set; }
+    public bool IsPlayingInnocence { get; private set; }
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -203,6 +209,37 @@ public class SpongeUIManager : MonoBehaviour
         yield return new WaitForSeconds(objectionAnim.GetCurrentAnimatorStateInfo(0).length);
         objectionObj.SetActive(false);
         IsPlayingObjection = false;
+    }
+
+    public IEnumerator PlayInnocenceAnim()
+    {
+        IsPlayingInnocence = true;
+        SpongeDialogueManager.Instance.SetTextBox(false);
+        innocencePnl.SetActive(true);
+        innocenceAnimLeft.gameObject.SetActive(true);
+        innocenceAnimRight.gameObject.SetActive(false);
+
+        innocenceAnimLeft.Play("InnocenceLeft");
+        yield return null;
+        yield return new WaitForSeconds(innocenceAnimLeft.GetCurrentAnimatorStateInfo(0).length);
+
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+
+        innocenceAnimRight.gameObject.SetActive(true);
+        innocenceAnimRight.Play("InnocenceRight");
+        yield return null;
+        yield return new WaitForSeconds(innocenceAnimRight.GetCurrentAnimatorStateInfo(0).length);
+
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+
+        yield return new WaitForSeconds(2f);
+        innocencePnl.SetActive(false);
+        SpongeDialogueManager.Instance.SetTextBox(true);
+        IsPlayingInnocence = false;
     }
 
     public IEnumerator PlayTakeThatAnim()

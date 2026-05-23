@@ -57,7 +57,8 @@ public class SpongeGameManager : MonoBehaviour
         (SpongeFadeManager.Instance != null && SpongeFadeManager.Instance.IsFading) ||
         (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingHoldit) ||
         (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingObjection) ||
-        (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingTakeThat);
+        (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingTakeThat) ||
+        (SpongeUIManager.Instance != null && SpongeUIManager.Instance.IsPlayingInnocence);
 
     // Q키(추궁하기)를 누를 수 있는 상태인지
     // CrossExamination(심문) 상태에서만 true

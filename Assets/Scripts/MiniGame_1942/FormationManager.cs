@@ -53,6 +53,15 @@ namespace MiniTeam.Shooting1942
             Debug.Log($"[Formation] 복귀 - 현재 HP: {CurrentHP}");
         }
 
+        public void FullRestore()
+        {
+            CurrentHP = 3;
+            SetActive(blossom,   true);
+            SetActive(bubbles,   true);
+            SetActive(buttercup, true);
+            ShootingUIManager.Instance?.UpdateHpIcons(CurrentHP);
+        }
+
         void GameOver()
         {
             Debug.Log("[Formation] 게임오버");
