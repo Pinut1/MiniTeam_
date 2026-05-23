@@ -578,6 +578,13 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
 
+        // InnocencePnl 애니메이션 재생 후 다음 대사
+        if (currentLine.playInnocenceAnim && !string.IsNullOrEmpty(currentLine.nextLineId))
+        {
+            StartCoroutine(InnocenceSequence(currentLine.nextLineId));
+            return;
+        }
+
         // 다음 대사가 있다면 해당 대사 보여줌
         if (!string.IsNullOrEmpty(currentLine.nextLineId))
             ShowLine(currentLine.nextLineId);
@@ -673,6 +680,12 @@ public class SpongeDialogueManager : MonoBehaviour
         if (selectedChoiceIndex >= 0 && selectedChoiceIndex < choiceBtns.Length
             && choiceBtns[selectedChoiceIndex].gameObject.activeSelf)
             StartCoroutine(ConfirmChoiceSequence());
+    }
+
+    IEnumerator InnocenceSequence(string nextLineId)
+    {
+        yield return StartCoroutine(SpongeUIManager.Instance.PlayInnocenceAnim());
+        ShowLine(nextLineId);
     }
 
     IEnumerator ConfirmChoiceSequence()
