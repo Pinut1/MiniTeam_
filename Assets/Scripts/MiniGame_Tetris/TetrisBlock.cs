@@ -20,8 +20,11 @@ public class TetrisBlock : MonoBehaviour
     public float arr = 0.05f;
     private float horizontalTimer = 0f;
 
+    [Header("고정 제어 (Lock Delay)")]
     public float lockDelay = 0.5f;
     private float lockTimer = 0f;
+    private int moveCount = 0;
+    private const int maxMoveCount = 15; // 바닥에서 최대 15번의 조작만 허용
 
     public int rotationState = 0;
 
@@ -59,6 +62,12 @@ public class TetrisBlock : MonoBehaviour
 
     void Update()
     {
+        // 0순위 : 컷신 중 조작 차단
+        if (TetrisGameController.Instance != null && TetrisGameController.Instance.isCutscenePlaying)
+        {
+            return;
+        }
+
         // 1순위 : HOLD
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -66,7 +75,22 @@ public class TetrisBlock : MonoBehaviour
             return;
         }
 
-        // 2순위 : 회전 (I_enable 블록은 2상태로 제한)
+        // 2순위 : 하드 드롭 (Space)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+            return;
+        }
+
+        // 5순위: 하강 로직
+        transform.position += new Vector3(0, -1, 0);
+        bool canDrop = ValidMove();
+        transform.position += new Vector3(0, 1, 0);
+
+        // [무한 회전 방지 핵심 로직] 바닥에 닿은 상태에서만 조작 횟수를 소모함
+        bool isAtBottom = !canDrop;
+
+        // 3순위 : 회전 (I_enable 블록은 2상태로 제한)
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (type != BlockType.O)
@@ -92,27 +116,81 @@ public class TetrisBlock : MonoBehaviour
                 if (rotationSuccess)
                 {
                     rotationState = (rotationState + 1) % maxStates;
-                    lockTimer = 0f;
+                    
+                    if (isAtBottom)
+                    {
+                        if (moveCount < maxMoveCount)
+                        {
+                            lockTimer = 0f;
+                            moveCount++;
+                        }
+                    }
+                    else
+                    {
+                        lockTimer = 0f; // 공중에선 무제한 초기화 (어차피 떨어지니까)
+                    }
                 }
             }
         }
 
-        // 3순위: 좌우 이동 
+        // 4순위: 좌우 이동 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            MoveHorizontal(-1);
+            if (MoveHorizontal(-1))
+            {
+                if (isAtBottom)
+                {
+                    if (moveCount < maxMoveCount)
+                    {
+                        lockTimer = 0f;
+                        moveCount++;
+                    }
+                }
+                else
+                {
+                    lockTimer = 0f;
+                }
+            }
             horizontalTimer = Time.time + das;
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            MoveHorizontal(1);
+            if (MoveHorizontal(1))
+            {
+                if (isAtBottom)
+                {
+                    if (moveCount < maxMoveCount)
+                    {
+                        lockTimer = 0f;
+                        moveCount++;
+                    }
+                }
+                else
+                {
+                    lockTimer = 0f;
+                }
+            }
             horizontalTimer = Time.time + das;
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
             if (Time.time > horizontalTimer)
             {
-                MoveHorizontal(-1);
+                if (MoveHorizontal(-1))
+                {
+                    if (isAtBottom)
+                    {
+                        if (moveCount < maxMoveCount)
+                        {
+                            lockTimer = 0f;
+                            moveCount++;
+                        }
+                    }
+                    else
+                    {
+                        lockTimer = 0f;
+                    }
+                }
                 horizontalTimer = Time.time + arr;
             }
         }
@@ -120,17 +198,27 @@ public class TetrisBlock : MonoBehaviour
         {
             if (Time.time > horizontalTimer)
             {
-                MoveHorizontal(1);
+                if (MoveHorizontal(1))
+                {
+                    if (isAtBottom)
+                    {
+                        if (moveCount < maxMoveCount)
+                        {
+                            lockTimer = 0f;
+                            moveCount++;
+                        }
+                    }
+                    else
+                    {
+                        lockTimer = 0f;
+                    }
+                }
                 horizontalTimer = Time.time + arr;
             }
         }
 
-        // 4순위: 하강 로직
-        transform.position += new Vector3(0, -1, 0);
-        bool canDrop = ValidMove();
-        transform.position += new Vector3(0, 1, 0);
-
-        if (!canDrop)
+        // 5순위: 하강 처리 (이미 위에서 canDrop 계산함)
+        if (isAtBottom)
         {
             lockTimer += Time.deltaTime;
 
@@ -142,14 +230,26 @@ public class TetrisBlock : MonoBehaviour
         }
         else
         {
-            lockTimer = 0f;
-
             if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10f : fallTime))
             {
                 transform.position += new Vector3(0, -1, 0);
                 previousTime = Time.time;
+                
+                // 아래로 한 칸이라도 내려가면 조작 횟수 및 락 딜레이 초기화
+                lockTimer = 0f;
+                moveCount = 0;
             }
         }
+    }
+
+    private void HardDrop()
+    {
+        while (ValidMove())
+        {
+            transform.position += new Vector3(0, -1, 0);
+        }
+        transform.position -= new Vector3(0, -1, 0);
+        LockBlock();
     }
 
     private void LockBlock()
@@ -238,15 +338,6 @@ public class TetrisBlock : MonoBehaviour
                         {
                             // 1. 가로/세로 판별
                             bool isHorizontal = (parentBlock.rotationState == 0);
-
-                            // 옛날 버전 확인 후 바로 지우자 05222342
-                            //if (parentTransform.childCount >= 2)
-                            //{
-                            //    Transform child1 = parentTransform.GetChild(0);
-                            //    Transform child2 = parentTransform.GetChild(1);
-
-                            //    isHorizontal = Mathf.Abs(child1.position.x - child2.position.x) > Mathf.Abs(child1.position.y - child2.position.y);
-                            //}
 
                             // 2. 최하단 파편(bottomCell) 찾기
                             Transform bottomCell = cell;
@@ -381,17 +472,16 @@ public class TetrisBlock : MonoBehaviour
         return true;
     }
 
-    private void MoveHorizontal(int direction)
+    private bool MoveHorizontal(int direction)
     {
         transform.position += new Vector3(direction, 0, 0);
 
         if (!ValidMove())
         {
             transform.position -= new Vector3(direction, 0, 0);
+            return false;
         }
-        else
-        {
-            lockTimer = 0f;
-        }
+        
+        return true;
     }
 }
