@@ -1,7 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Prefabs/MiniGame_1942/Enemies.meta
+guid: 1797e7a7da8cbf143bf6325f6ff9b603
+folderAsset: yes
+========
 guid: 4b8ec94cd8835e0448fafd4ecfb7254b
+>>>>>>>> 1600931678508a16b25dc9e2dd7c6833578ee4f5:Assets/_Scenes/Hub.unity.meta
 DefaultImporter:
   externalObjects: {}
-  userData:
-  assetBundleName:
-  assetBundleVariant:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
