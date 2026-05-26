@@ -6,14 +6,20 @@ namespace MiniTeam.Sponge
     // 담당: 장한나
     public class SpongeGameController : MonoBehaviour, IMiniGame
     {
-        void Start()
+        private void OnEnable()
         {
-            // TODO: 스폰지밥 게임 초기화
+            SpongeGameManager.OnStateChanged += HandleStateChanged;
         }
 
-        void Update()
+        private void OnDisable()
         {
-            // TODO: 게임 로직
+            SpongeGameManager.OnStateChanged -= HandleStateChanged;
+        }
+
+        void HandleStateChanged(SpongeGameState.GameState state)
+        {
+            if (state == SpongeGameState.GameState.Resolution)
+                OnGameClear();
         }
 
         public void OnGameClear()

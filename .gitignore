@@ -74,11 +74,13 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# Large files managed via Git LFS (psd, wav, mp3, fbx)
-# Do NOT add these to git directly — use git lfs track
-*.psd
-*.fbx
+# Large files → .gitattributes에서 Git LFS로 관리 (psd, wav, mp3, fbx, anim, controller, png, jpg)
 
 # OS
 .DS_Store
 Thumbs.db
+
+# MCP / 디버그 도구
+Assets/Screenshots/
+Assets/Screenshots.meta
+Packages/com.coplaydev.unity-mcp/
