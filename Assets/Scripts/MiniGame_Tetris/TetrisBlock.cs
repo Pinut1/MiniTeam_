@@ -28,9 +28,6 @@ public class TetrisBlock : MonoBehaviour
 
     public int rotationState = 0;
 
-    [Header("타마마 임팩트 이펙트")]
-    public GameObject tamamaBeamPrefab;
-
     // ---  [SRS 하드코딩 데이터] ---
     // [JLSTZ = Normal 블록] 시계 방향 회전 시 벽차기 오프셋 (Test 2 ~ 5)
     private readonly Vector2[,] normalKickData = new Vector2[,] {
@@ -376,28 +373,17 @@ public class TetrisBlock : MonoBehaviour
                                     distanceToWall = j;
                                     beamRotation = Quaternion.identity;
                                 }
-
                                 else
                                 {
                                     Debug.Log($"[{j}번째 열] ➡️ [가로] 방향 I_enable 파편 폭발!");
-                                    distanceToWall = 25f; // 
+                                    distanceToWall = 25f;
                                     beamRotation = Quaternion.Euler(0, 0, -90f);
-                                }
-
-                                // 빔 프리팹 생성 및 세팅
-                                if (tamamaBeamPrefab != null)
-                                {
-                                    GameObject beamObj = Instantiate(tamamaBeamPrefab, spawnPosition, beamRotation);
-                                    if (beamObj.TryGetComponent(out TamamaBeam beamScript))
-                                    {
-                                        beamScript.Setup(distanceToWall);
-                                    }
                                 }
 
                                 if (TetrisGameController.Instance != null)
                                 {
-                                    Debug.Log("TetrisBlock에서 OnTamamaImpactTriggered 호출");
-                                    TetrisGameController.Instance.OnTamamaImpactTriggered(isHorizontal);
+                                    Debug.Log("TetrisBlock에서 OnTamamaImpactTriggered 호출 (데이터 전달)");
+                                    TetrisGameController.Instance.OnTamamaImpactTriggered(isHorizontal, spawnPosition, beamRotation, distanceToWall);
                                 }
 
                                 hasTriggeredEffect = true;

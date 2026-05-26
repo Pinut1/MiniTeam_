@@ -3,15 +3,11 @@ using UnityEngine;
 
 public class TamamaBeamTester : MonoBehaviour
 {
-    [Header("Å×½ºÆ®¿ë ºö ÇÁ¸®ÆÕ ¿¬°á")]
-    public GameObject tamamaBeamPrefab;
-
     void Update()
     {
-        // Å°º¸µå ¼ıÀÚ 0~9 (Å°º¸µå À§ÂÊ ¼ıÀÚÅ°) ÀÔ·Â °¨Áö
+        // í‚¤ë³´ë“œ ìˆ«ì 0~9 ì…ë ¥ ê°ì§€
         for (int i = 0; i <= 9; i++)
         {
-            // KeyCode.Alpha1 Àº ¼ıÀÚ 1, Alpha9´Â ¼ıÀÚ 9
             KeyCode key = KeyCode.Alpha0 + i;
 
             if (Input.GetKeyDown(key))
@@ -23,28 +19,18 @@ public class TamamaBeamTester : MonoBehaviour
 
     private void FireTestBeam(int number)
     {
-        if (tamamaBeamPrefab == null)
-        {
-            Debug.LogError("¿¡·¯: ÀÎ½ºÆåÅÍ¿¡ Å¸¸¶¸¶ ºö ÇÁ¸®ÆÕÀ» ¾È ³Ö¾ú½À´Ï´Ù!");
-            return;
-        }
-
-        // 1. ¹ß»ç ÁÂÇ¥ ¼¼ÆÃ: ¼ıÀÚ ÀÔ·Â°ª¿¡ µû¶ó (1,1,0), (2,1,0)... À¸·Î ¼³Á¤
+        // 1. ë°œì‚¬ ì¢Œí‘œ ì„¤ì •
         Vector3 spawnPosition = new Vector3(number, 1, 0);
 
-        // 2. ÇÁ¸®ÆÕ »ı¼º
-        GameObject beamObj = Instantiate(tamamaBeamPrefab, spawnPosition, Quaternion.identity);
-
-        // 3. Setup ÇÔ¼ö È£Ãâ (distance¿¡ ¼ıÀÚ°ª ±×´ë·Î Àü´Ş)
-        if (beamObj.TryGetComponent(out TamamaBeam beamScript))
+        // 2. ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ í†µí•´ ì„íŒ©íŠ¸ ë°œë™ ìš”ì²­ (ë¹” ìƒì„± ë° ì»·ì”¬ í¬í•¨)
+        if (TetrisGameController.Instance != null)
         {
-            beamScript.Setup(number);
-            TetrisGameController.Instance.OnTamamaImpactTriggered(true);
-            Debug.Log($"[Å×½ºÆ® ºö ¹ß»ç] Å°: {number} | ½ºÆù À§Ä¡: {spawnPosition} | Å¸°İ °Å¸®: {number}");
+            TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number);
+            Debug.Log($"[í…ŒìŠ¤íŠ¸ ë¹” ìš”ì²­] í‚¤: {number} | ìš”ì²­ ìœ„ì¹˜: {spawnPosition} | íƒ€ê²© ê±°ë¦¬: {number}");
         }
         else
         {
-            Debug.LogError("¿¡·¯: ÇÁ¸®ÆÕ¿¡ TamamaBeam ½ºÅ©¸³Æ®°¡ ¾ø½À´Ï´Ù!");
+            Debug.LogError("ì˜¤ë¥˜: TetrisGameController ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤!");
         }
     }
 }
