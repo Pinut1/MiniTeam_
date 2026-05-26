@@ -2828,6 +2828,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Tetris.TetrisGameController
   isCutscenePlaying: 0
   targetImpactCount: 4
+  bgmClip: {fileID: 8300000, guid: 62f79cfe9e506bd44a62f54469ba151f, type: 3}
 --- !u!4 &1588115707
 Transform:
   m_ObjectHideFlags: 0
@@ -3459,6 +3460,53 @@ Transform:
   - {fileID: 2063645568}
   m_Father: {fileID: 915678186}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1990803748
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1990803750}
+  - component: {fileID: 1990803749}
+  m_Layer: 0
+  m_Name: SoundManager_TEST
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1990803749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990803748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 663f3d38826c2c14baa34349ebbf6f12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.SoundManager
+  masterVolume: 1
+  bgmVolume: 0.6
+  sfxVolume: 1
+--- !u!4 &1990803750
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990803748}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.71133, y: 2.66892, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2008661765
 GameObject:
   m_ObjectHideFlags: 0
@@ -3766,3 +3814,4 @@ SceneRoots:
   - {fileID: 600367242}
   - {fileID: 1172805054}
   - {fileID: 1408152094}
+  - {fileID: 1990803750}

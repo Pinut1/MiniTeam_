@@ -15,6 +15,9 @@ namespace MiniTeam.Tetris
         public int targetImpactCount = 4;
         private int currentImpactCount = 0;
 
+        [Header("사운드 세팅")]
+        public AudioClip bgmClip;
+
         private void Awake()
         {
             if (Instance == null) Instance = this;
@@ -24,6 +27,8 @@ namespace MiniTeam.Tetris
         void Start()
         {
             currentImpactCount = 0;
+
+          
 
             // 오프닝 컷씬 자동 시작
             if (TetrisCutsceneManager.Instance != null)
@@ -35,6 +40,12 @@ namespace MiniTeam.Tetris
                     Debug.Log("[Tetris] 오프닝 컷씬 완료. 첫 테트로미노 스폰!");
                     if (SpawnTetromino.Instance != null)
                         SpawnTetromino.Instance.NewTetromino();
+
+                    // BGM 재생 연동
+                    if (bgmClip != null && SoundManager.Instance != null)
+                    {
+                        SoundManager.Instance.PlayBGM(bgmClip);
+                    }
                 }));
             }
             else
@@ -110,11 +121,19 @@ namespace MiniTeam.Tetris
         public void OnGameClear()
         {
             Debug.Log("[Tetris] Game Clear!");
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
+            }
             MiniGameManager.Instance?.OnMiniGameClear();
         }
 
         public void OnGameFail()
         {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
+            }
             MiniGameManager.Instance?.OnMiniGameFail();
         }
     }
