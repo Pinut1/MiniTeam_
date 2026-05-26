@@ -19,14 +19,13 @@ public class TamamaBeamTester : MonoBehaviour
 
     private void FireTestBeam(int number)
     {
-        // 1. 발사 좌표 설정
-        Vector3 spawnPosition = new Vector3(number, 1, 0);
+        // 발사 좌표 및 거리 설정
+        Vector3 spawnPosition = new Vector3(number, 7, 0);
 
-        // 2. 컨트롤러를 통해 임팩트 발동 요청 (빔 생성 및 컷씬 포함)
+        // 컨트롤러를 통해 임팩트 발동 요청
         if (TetrisGameController.Instance != null)
         {
             TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number);
-            Debug.Log($"[테스트 빔 요청] 키: {number} | 요청 위치: {spawnPosition} | 타격 거리: {number}");
         }
         else
         {

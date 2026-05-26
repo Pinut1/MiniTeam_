@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace MiniTeam.Tetris
 {
-    // 담당: 김기욱
+    
     public class TetrisGameController : MonoBehaviour, IMiniGame
     {
         public static TetrisGameController Instance { get; private set; }
@@ -31,30 +31,53 @@ namespace MiniTeam.Tetris
             if (isCutscenePlaying) return; 
             isCutscenePlaying = true;
 
-            // 컷씬 매니저에게 연출 위임
+            // 1. 타격 지점 및 유효 범위 체크 (Y: 7.0 ~ 9.0)
+            bool isValidRange = spawnPos.y >= 7.0f && spawnPos.y <= 9.0f;
+
+            // 시각적 디졸브 좌표는 Y: 8.0으로 고정
+            Vector3 impactPoint = new Vector3(-2.3f, 8.0f, 0f);
+
+            if (isHorizontal && isValidRange) 
+            {
+                currentImpactCount++;
+            }
+
+            // 2. 연출 데이터 패키징 (구조체 활용)
+            TamamaImpactData impactData = new TamamaImpactData
+            {
+                isHorizontal = isHorizontal && isValidRange, // 범위 밖이면 실패 연출을 하도록 설정 가능
+                spawnPos = spawnPos,
+                rot = rot,
+                distance = distance,
+                hitCount = currentImpactCount,
+                impactPoint = impactPoint
+            };
+
+            // 4. 컷씬 매니저에게 연출 위임
             if (TetrisCutsceneManager.Instance != null)
             {
-                StartCoroutine(TetrisCutsceneManager.Instance.PlayTamamaImpact(isHorizontal, spawnPos, rot, distance, () => 
+                StartCoroutine(TetrisCutsceneManager.Instance.PlayTamamaImpact(impactData, () => 
                 {
-                    // 컷씬 종료 후 실행될 로직 (Callback)
+                    // 연출 종료 후 콜백
                     isCutscenePlaying = false;
 
                     if (isHorizontal)
-                    {
-                        currentImpactCount++;
-                        Debug.Log($"[Tetris] 타마마 임팩트 성공! ({currentImpactCount}/{targetImpactCount})");
-                    }
+                        Debug.Log($"[Tetris] 타마마 임팩트 완료! ({currentImpactCount}/{targetImpactCount})");
 
-                    // 컷신 동안 미뤄졌던 새로운 블록 생성 호출
-                    if (SpawnTetromino.Instance != null)
-                    {
-                        SpawnTetromino.Instance.NewTetromino();
-                    }
-
-                    // 목표 횟수에 도달하면 게임 클리어!
                     if (currentImpactCount >= targetImpactCount)
                     {
-                        OnGameClear();
+                        // 클리어 횟수 도달 시 클리어 애니메이션 재생 후 게임 클리어로 진행
+                        isCutscenePlaying = true; // 연출 동안 다른 입력 차단
+                        StartCoroutine(TetrisCutsceneManager.Instance.PlayClearAnimation(() => 
+                        {
+                            isCutscenePlaying = false;
+                            OnGameClear();
+                        }));
+                    }
+                    else
+                    {
+                        if (SpawnTetromino.Instance != null)
+                            SpawnTetromino.Instance.NewTetromino();
                     }
                 }));
             }

@@ -499,7 +499,7 @@ Transform:
   m_GameObject: {fileID: 547203846}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.28683, y: 1.01115, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1230,13 +1230,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 915678185}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 18, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.945883, y: 5.3666677, z: 1}
+  m_LocalScale: {x: 1.9607844, y: 1.9607844, z: 1.9607844}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1969709187}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1403914543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &961283725 stripped
 Transform:
@@ -1383,10 +1383,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1748,9 +1748,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1172805054}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: DissolvePoint(Dummy)
   m_TagString: Untagged
-  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3306451490063965843, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2099,6 +2099,7 @@ GameObject:
   - component: {fileID: 1403914543}
   - component: {fileID: 1403914542}
   - component: {fileID: 1403914544}
+  - component: {fileID: 1403914545}
   m_Layer: 0
   m_Name: "\uCF00\uB85C\uB9AC\uC2A4_UI_LeftUp_Top"
   m_TagString: Untagged
@@ -2177,7 +2178,8 @@ Transform:
   m_LocalPosition: {x: -7, y: 11.3, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 915678186}
   m_Father: {fileID: 1500306155}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1403914544
@@ -2192,6 +2194,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b15e0e236e24f24896f80a4c0776268, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Tetris.WallDissolveController
+--- !u!95 &1403914545
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403914541}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3d430f00c03e7df4f912bef7d78cdb5e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1408152092
 GameObject:
   m_ObjectHideFlags: 0
@@ -2225,6 +2249,10 @@ MonoBehaviour:
   tamamaAnim: {fileID: 591125239}
   tamamaBeamPrefab: {fileID: 8504614737765839044, guid: 548187b66dee4714a873f53713ae3738, type: 3}
   leftWall: {fileID: 1500306154}
+  wallTop: {fileID: 1403914544}
+  wallBottom: {fileID: 1520744764}
+  clearAnimationStateName: Clear
+  clearAnimationDuration: 1.5
 --- !u!4 &1408152094
 Transform:
   m_ObjectHideFlags: 0
@@ -2564,7 +2592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Tetris.TetrisGameController
   isCutscenePlaying: 0
-  targetImpactCount: 10
+  targetImpactCount: 4
 --- !u!4 &1588115707
 Transform:
   m_ObjectHideFlags: 0
@@ -3259,7 +3287,7 @@ GameObject:
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2103015376
 Transform:
   m_ObjectHideFlags: 0
@@ -3417,7 +3445,6 @@ SceneRoots:
   - {fileID: 2103015376}
   - {fileID: 1091277725}
   - {fileID: 1345410493}
-  - {fileID: 915678186}
   - {fileID: 3418084660328771773}
   - {fileID: 1165498067}
   - {fileID: 1170167931}
