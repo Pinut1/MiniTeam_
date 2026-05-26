@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using MiniTeam.Pokemon;
 
 namespace MiniTeam.Tetris
 {
@@ -23,6 +24,7 @@ namespace MiniTeam.Tetris
 
         [Header("공용 연출 요소")]
         public GameObject backgroundPnl;
+        public GameObject DialogueCutScenePnl;
         public Animator tamamaAnim;
 
         [Header("타마마 임팩트 관련")]
@@ -33,9 +35,8 @@ namespace MiniTeam.Tetris
         public WallDissolveController wallTop;
         public WallDissolveController wallBottom;
 
-        [Header("클리어 애니메이션 설정")]
-        public string clearAnimationStateName = "Clear";
-        public float clearAnimationDuration = 1.5f;
+        [Header("벽 애니메이션 설정")]
+        public Animator WallAnim;
 
         private void Awake()
         {
@@ -81,6 +82,7 @@ namespace MiniTeam.Tetris
             // 🌟 4. 바로 이 타이밍에 벽 디졸브 진행 (빔 발사 직후)
             if (data.isHorizontal)
             {
+                WallAnim.SetTrigger("NextDissolve");
                 if (wallTop != null)
                 {
                     wallTop.SetImpactPosition(data.impactPoint);
@@ -115,29 +117,101 @@ namespace MiniTeam.Tetris
         }
 
         /// <summary>
-        /// wallTop(케로리스_UI_LeftUp_Top)의 Animator를 이용해 클리어 애니메이션을 재생합니다.
+        /// 게임 클리어 시 벽 애니메이션을 재생하고 엔딩 대화를 출력합니다.
         /// </summary>
-        public IEnumerator PlayClearAnimation(Action onComplete)
+        public IEnumerator PlayEndingCutscene(Action onComplete)
         {
-            if (wallTop != null)
+            // 1. WallAnim의 Clear 트리거 호출
+            if (WallAnim != null)
             {
-                Animator anim = wallTop.GetComponent<Animator>();
-                if (anim != null)
-                {
-                    anim.Play(clearAnimationStateName);
-                    Debug.Log($"[Cutscene] 케로리스_UI_LeftUp_Top 클리어 애니메이션 재생 시작 (State: {clearAnimationStateName})");
-                }
-                else
-                {
-                    Debug.LogWarning("[Cutscene] wallTop(케로리스_UI_LeftUp_Top)에 Animator가 없습니다.");
-                }
+                WallAnim.SetTrigger("Clear");
+                yield return null; // 트리거 반영을 위해 1프레임 대기
+                
+                // 애니메이션 완료 대기
+                var stateInfo = WallAnim.GetCurrentAnimatorStateInfo(0);
+                yield return new WaitForSeconds(stateInfo.length);
             }
             else
             {
-                Debug.LogWarning("[Cutscene] wallTop(케로리스_UI_LeftUp_Top) 오브젝트 레퍼런스가 할당되지 않았습니다.");
+                yield return new WaitForSeconds(1.0f);
             }
 
-            yield return new WaitForSeconds(clearAnimationDuration);
+            // 2. DialogueDB 로드 검사
+            if (DialogueDB.Instance == null)
+            {
+                GameObject dbObj = new GameObject("DialogueDB");
+                dbObj.AddComponent<DialogueDB>();
+            }
+            DialogueDB.Instance.Load("Tetris");
+
+            // 3. 캐릭터 컷신 활성화
+            if (DialogueCutScenePnl != null)
+            {
+                DialogueCutScenePnl.SetActive(true);
+            }
+
+            // 4. 엔딩 대사 출력 (스프라이트 1번: 케로로)
+            if (Keroris_DialogueUI.Instance != null)
+            {
+                string text = DialogueDB.Instance.Get("keroro_ed_1");
+                yield return StartCoroutine(Keroris_DialogueUI.Instance.Show(text, 1));
+                Keroris_DialogueUI.Instance.Close();
+            }
+
+            // 5. 캐릭터 컷신 비활성화
+            if (DialogueCutScenePnl != null)
+            {
+                DialogueCutScenePnl.SetActive(false);
+            }
+
+            onComplete?.Invoke();
+        }
+
+        /// <summary>
+        /// 게임 시작 시 타마마 캐릭터 컷신과 대화창을 띄우고 사용자의 키/마우스 입력을 대기합니다.
+        /// </summary>
+        public IEnumerator PlayOpeningCutscene(Action onComplete)
+        {
+            // 1. 에디터 개별 씬 테스트를 대비해 DialogueDB 인스턴스가 없을 시 동적 생성
+            if (DialogueDB.Instance == null)
+            {
+                GameObject dbObj = new GameObject("DialogueDB");
+                dbObj.AddComponent<DialogueDB>();
+            }
+
+            // 2. 테트리스용 대사 데이터 로드
+            DialogueDB.Instance.Load("Tetris");
+
+            // 3. 캐릭터 컷신 활성화
+            if (DialogueCutScenePnl != null)
+            {
+                DialogueCutScenePnl.SetActive(true);
+              
+            } 
+
+            // 4. 대사 순차 출력 (Z, Space, Enter 또는 마우스 클릭으로 진행, 이미지 인덱스 매핑)
+            string[] dialogueKeys = { "tamama_op_1", "tamama_op_2", "tamama_op_3", "tamama_op_4", "tamama_op_5" };
+           
+
+            if (Keroris_DialogueUI.Instance != null)
+            {
+                for (int i = 0; i < dialogueKeys.Length; i++)
+                {
+                    string text = DialogueDB.Instance.Get(dialogueKeys[i]);
+                    yield return StartCoroutine(Keroris_DialogueUI.Instance.Show(text, 0));
+                }
+                Keroris_DialogueUI.Instance.Close();
+            }
+            else
+            {
+                Debug.LogWarning("[Cutscene] Keroris_DialogueUI.Instance를 찾을 수 없습니다. 대사창 출력 없이 배경 컷신만 1.5초 노출 후 진행합니다.");
+                yield return new WaitForSeconds(1.5f);
+            }
+
+            // 5. 컷신 연출 종료 및 복구
+            if (DialogueCutScenePnl != null) DialogueCutScenePnl.SetActive(false);
+           
+
             onComplete?.Invoke();
         }
     }

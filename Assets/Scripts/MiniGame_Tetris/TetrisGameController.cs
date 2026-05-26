@@ -9,7 +9,7 @@ namespace MiniTeam.Tetris
     {
         public static TetrisGameController Instance { get; private set; }
 
-        public bool isCutscenePlaying = false;
+        public bool isCutscenePlaying = true; // 오프닝 컷씬 재생을 위해 true로 시작
 
         [Header("클리어 조건 세팅")]
         public int targetImpactCount = 4;
@@ -24,6 +24,25 @@ namespace MiniTeam.Tetris
         void Start()
         {
             currentImpactCount = 0;
+
+            // 오프닝 컷씬 자동 시작
+            if (TetrisCutsceneManager.Instance != null)
+            {
+                isCutscenePlaying = true;
+                StartCoroutine(TetrisCutsceneManager.Instance.PlayOpeningCutscene(() => 
+                {
+                    isCutscenePlaying = false;
+                    Debug.Log("[Tetris] 오프닝 컷씬 완료. 첫 테트로미노 스폰!");
+                    if (SpawnTetromino.Instance != null)
+                        SpawnTetromino.Instance.NewTetromino();
+                }));
+            }
+            else
+            {
+                isCutscenePlaying = false;
+                if (SpawnTetromino.Instance != null)
+                    SpawnTetromino.Instance.NewTetromino();
+            }
         }
 
         public void OnTamamaImpactTriggered(bool isHorizontal, Vector3 spawnPos, Quaternion rot, float distance)
@@ -68,7 +87,7 @@ namespace MiniTeam.Tetris
                     {
                         // 클리어 횟수 도달 시 클리어 애니메이션 재생 후 게임 클리어로 진행
                         isCutscenePlaying = true; // 연출 동안 다른 입력 차단
-                        StartCoroutine(TetrisCutsceneManager.Instance.PlayClearAnimation(() => 
+                        StartCoroutine(TetrisCutsceneManager.Instance.PlayEndingCutscene(() => 
                         {
                             isCutscenePlaying = false;
                             OnGameClear();
