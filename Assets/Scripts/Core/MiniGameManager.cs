@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,11 +14,14 @@ namespace MiniTeam.Core
         private HubPlayerMove playerMove;
 
         [Header("Game Progress")]
-        public int currentStage = 1;
+        public int currentStage = 0;
+        public bool isCutscenePlayed = false;
 
         [Header("Door Management")]
         [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
         public StageDoor[] stageDoors;
+
+        private const string SAVE_STAGE_KEY = "SavedCurrentStage";
 
         public bool IsDoorActive(StageDoor door)
         {
@@ -46,6 +49,9 @@ namespace MiniTeam.Core
         }
         private void Start()
         {
+            // 저장된 스테이지 정보 로드
+            LoadGame();
+
             playerMove = FindAnyObjectByType<HubPlayerMove>();
 
 
@@ -95,20 +101,33 @@ namespace MiniTeam.Core
         private void RestoreHub()
         {
             if (hubRootObjects == null) return;
+
+            // 1. 플레이어 위치를 먼저 안전한 원점으로 이동 (CharacterController 일시 정지)
+            if (playerMove != null)
+            {
+                CharacterController cc = playerMove.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false; // 물리 씹힘 방지
+                
+                playerMove.gameObject.transform.position = new Vector3(0, 0f, 0);
+                
+                if (cc != null) cc.enabled = true;
+            }
+
+            // 2. 그 후 허브 오브젝트 복원
             foreach (var go in hubRootObjects)
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
-            playerMove.gameObject.transform.position = new Vector3(0, 0f, 0) ;
-
-
-            // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시.
+            // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시. (일단 주석 처리하여 일시 정지)
             JudangChiController.Instance?.PlaySequenceForGameClear();
+            
         }
 
         public void OnMiniGameClear()
         {
             currentStage++;
+            isCutscenePlayed = false; // 새로운 스테이지 진입으로 컷신 미재생 초기화
+            SaveGame(); // 스테이지 증가 및 컷신 미재생 상태 저장
             ExitMiniGame();
         }
 
@@ -139,6 +158,41 @@ namespace MiniTeam.Core
         internal void LoadEndingScene()
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
+        }
+
+        // ── 세이브/로드 시스템 ──────────────────────────────────
+
+        public void SaveGame()
+        {
+            PlayerPrefs.SetInt(SAVE_STAGE_KEY, currentStage);
+            PlayerPrefs.SetInt("SavedCutscenePlayed", isCutscenePlayed ? 1 : 0);
+            PlayerPrefs.Save();
+            Debug.Log($"[SaveSystem] Game Saved. Current Stage: {currentStage}, Cutscene Played: {isCutscenePlayed}");
+        }
+
+        public void LoadGame()
+        {
+            // 기본 스테이지는 0으로 설정
+            currentStage = PlayerPrefs.GetInt(SAVE_STAGE_KEY, 0);
+            isCutscenePlayed = PlayerPrefs.GetInt("SavedCutscenePlayed", 0) == 1;
+            Debug.Log($"[SaveSystem] Game Loaded. Current Stage: {currentStage}, Cutscene Played: {isCutscenePlayed}");
+        }
+
+        public void ResetSaveData()
+        {
+            PlayerPrefs.DeleteKey(SAVE_STAGE_KEY);
+            PlayerPrefs.DeleteKey("SavedCutscenePlayed");
+            PlayerPrefs.Save();
+            currentStage = 0;
+            isCutscenePlayed = false;
+            Debug.Log("[SaveSystem] Save Data Reset.");
+        }
+
+        public void SetCutscenePlayed(bool played)
+        {
+            isCutscenePlayed = played;
+            SaveGame(); // 컷신 상태 즉시 저장
+            HubUIManager.Instance?.UpdateExclamationMark(); // 느낌표 UI 실시간 업데이트
         }
 
 

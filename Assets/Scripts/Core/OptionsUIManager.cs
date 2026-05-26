@@ -12,12 +12,19 @@ namespace MiniTeam.Core
         [Header("패널")]
         public GameObject optionsPanel;
 
+        [Header("애니메이션")]
+        [Tooltip("옵션 패널의 애니메이터")]
+        public Animator optionsAnimator;
+        [Tooltip("닫기(TurnOff) 애니메이션이 완료될 때까지 대기할 시간 (초)")]
+        public float closeDelay = 0.5f;
+
         [Header("옵션 내부 슬라이더 (선택)")]
         public Slider masterVolumeSlider;
         public Slider bgmVolumeSlider;
         public Slider sfxVolumeSlider;
 
         private bool isOpen = false;
+        private Coroutine closeCoroutine;
 
         void Awake()
         {
@@ -48,22 +55,55 @@ namespace MiniTeam.Core
 
         public void Open()
         {
+            if (closeCoroutine != null)
+            {
+                StopCoroutine(closeCoroutine);
+                closeCoroutine = null;
+            }
+
             isOpen = true;
             Time.timeScale = 0f;
             if (optionsPanel != null) optionsPanel.SetActive(true);
+            if (optionsAnimator != null) optionsAnimator.SetTrigger("TurnOn");
         }
 
         public void Close()
         {
             isOpen = false;
             Time.timeScale = 1f;
-            if (optionsPanel != null) optionsPanel.SetActive(false);
+
+            if (optionsAnimator != null)
+            {
+                optionsAnimator.SetTrigger("TurnOff");
+                if (closeCoroutine != null) StopCoroutine(closeCoroutine);
+                closeCoroutine = StartCoroutine(DisablePanelAfterAnimation());
+            }
+            else
+            {
+                if (optionsPanel != null) optionsPanel.SetActive(false);
+            }
+        }
+
+        private System.Collections.IEnumerator DisablePanelAfterAnimation()
+        {
+            // Time.timeScale이 0인 상태에서 동작했을 수 있으므로 Realtime으로 대기합니다.
+            yield return new WaitForSecondsRealtime(closeDelay);
+            if (!isOpen && optionsPanel != null)
+            {
+                optionsPanel.SetActive(false);
+            }
+            closeCoroutine = null;
         }
 
         // 게임 종료/클리어 시 강제로 닫기
         public void ForceClose()
         {
             isOpen = false;
+            if (closeCoroutine != null)
+            {
+                StopCoroutine(closeCoroutine);
+                closeCoroutine = null;
+            }
             if (optionsPanel != null) optionsPanel.SetActive(false);
         }
 

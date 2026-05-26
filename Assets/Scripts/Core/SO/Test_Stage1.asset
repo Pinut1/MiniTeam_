@@ -13,6 +13,12 @@ MonoBehaviour:
   m_Name: Test_Stage1
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   sentences:
-  - text: "\uC2A4\uD14C\uC774\uC9C0 1 \uD074\uB9AC\uC5B4 \uB300\uC0AC"
-    expressionSprite: {fileID: 0}
+  - text: "\uC815\uB9D0 \uACE0\uB9C8\uC6CC\uCE58!\n"
+    expressionSprite: {fileID: 21300000, guid: 028b17245c0f7b242a54342df81b017d, type: 3}
+  - text: "\uB098\uB97C \uB3C4\uC640\uC8FC\uB294 \uB108\uB97C \uC704\uD574\uC11C\n\uC7A0\uC2DC
+      \uB108\uB3C4 \uAC19\uC774 \uC0AC\uC6A9\uD558\uAC8C \uD574\uC8FC\uACA0\uB2E4\uCE58!"
+    expressionSprite: {fileID: 21300000, guid: 028b17245c0f7b242a54342df81b017d, type: 3}
+  - text: "\uADF8\uB7F0\uB370... \uC9C0\uAE08 \uB098\n\uB108\uBB34 \uB354\uB7FD\uC9C0
+      \uC54A\uB0D0\uCE58?"
+    expressionSprite: {fileID: 21300000, guid: cd3e4518bc18dca4b8a5d568030e687b, type: 3}
   nextInteractableIndex: 0

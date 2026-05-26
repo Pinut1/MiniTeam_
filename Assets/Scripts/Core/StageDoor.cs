@@ -9,7 +9,8 @@ public class StageDoor : MonoBehaviour
 
     [Header("Flow Control")]
     public OpenType openType = OpenType.Manual;
-    public string warningMessage = "¾ÆÁ÷ µé¾î°¥ ¼ö ¾ø´Â °÷ÀÌ´Ù. ´Ù¸¥ ¹®¿¡ °¡ º¸ÀÚ.";
+    public string warningMessage = "ì•„ì§ ë“¤ì–´ê°ˆ ìˆ˜ ì—†ëŠ” ê³³ì´ë‹¤. ë‹¤ë¥¸ ë¬¸ì— ê°€ ë³´ì.";
+    public string warningMessage2 = "ì£¼ëŒ•ì¹˜ì˜ ì´ì•¼ê¸°ë¥¼\n ë“¤ì–´ë´ì•¼ í•  ê²ƒ ê°™ë‹¤";
 
     [Header("Door Animation")]
     public Transform doorTransform;
@@ -24,7 +25,7 @@ public class StageDoor : MonoBehaviour
     public AudioClip closeDoorSound;
 
     private bool isOpen = false;
-    private bool isPlayerInRange = false; // ÇÃ·¹ÀÌ¾î°¡ ¹® ¾Õ ¹üÀ§¿¡ ÀÖ´ÂÁö ÃßÀûÇÏ´Â º¯¼ö Ãß°¡
+    private bool isPlayerInRange = false; // í”Œë ˆì´ì–´ê°€ ë¬¸ ì• ë²”ìœ„ì— ìˆëŠ”ì§€ ì¶”ì í•˜ëŠ” ë³€ìˆ˜ ì¶”ê°€
 
     private void Awake()
     {
@@ -44,22 +45,29 @@ public class StageDoor : MonoBehaviour
     {
         if (doorTransform == null) return;
 
-        // ¸ñÇ¥ °¢µµ ¼³Á¤
+        // ëª©í‘œ ê°ë„ ì„¤ì •
         float targetAngle = isOpen ? doorOpenAngle : doorCloseAngle;
         float rotationSpeed = 150f * smooth;
 
-        // 2. ÄõÅÍ´Ï¾ğÀÌ ¾Æ´Ï¶ó, ±×³É ¼ø¼ö ¼ıÀÚ(float)¸¦ ¸ñÇ¥Ä¡±îÁö ÀÏÁ¤ÇÏ°Ô ´õÇÏ°Å³ª »®´Ï´Ù. 
-        // ¹«Á¶°Ç 0¿¡¼­ -90±îÁö Á¤È®ÇÏ°Ô µµ´ŞÇÕ´Ï´Ù.
+        // 2. ì¿¼í„°ë‹ˆì–¸ì´ ì•„ë‹ˆë¼, ê·¸ëƒ¥ ìˆœìˆ˜ ìˆ«ì(float)ë¥¼ ëª©í‘œì¹˜ê¹Œì§€ ì¼ì •í•˜ê²Œ ë”í•˜ê±°ë‚˜ ëºë‹ˆë‹¤. 
+        // ë¬´ì¡°ê±´ 0ì—ì„œ -90ê¹Œì§€ ì •í™•í•˜ê²Œ ë„ë‹¬í•©ë‹ˆë‹¤.
         currentYAngle = Mathf.MoveTowards(currentYAngle, targetAngle, Time.deltaTime * rotationSpeed);
 
-        // 3. °è»êµÈ ±ò²ûÇÑ ¼ıÀÚ¸¦ ¸¶Áö¸·¿¡ µü ÇÑ ¹ø¸¸ È¸Àü°ªÀ¸·Î µ¤¾î¾º¿ó´Ï´Ù.
+        // 3. ê³„ì‚°ëœ ê¹”ë”í•œ ìˆ«ìë¥¼ ë§ˆì§€ë§‰ì— ë”± í•œ ë²ˆë§Œ íšŒì „ê°’ìœ¼ë¡œ ë®ì–´ì”Œì›ë‹ˆë‹¤.
         doorTransform.localRotation = Quaternion.Euler(0, currentYAngle, 0);
         if (isPlayerInRange && openType == OpenType.Manual && MiniGameManager.Instance.IsDoorActive(this))
         {
             if (Input.GetKeyDown(KeyCode.F))
             {
-                Debug.Log($"[StageDoor - {gameObject.name}] ¼öµ¿¹® FÅ° ÀÔ·Â °¨Áö! (ToggleDoor È£Ãâ)");
-                ToggleDoor();
+                if (MiniGameManager.Instance.isCutscenePlayed)
+                {
+                    Debug.Log($"[StageDoor - {gameObject.name}] Fí‚¤ ì…ë ¥ìœ¼ë¡œ ë¬¸ í† ê¸€");
+                    ToggleDoor();
+                }
+                else
+                {
+                    ShowCustomWarning("ì£¼ëŒ•ì¹˜ì˜ ì´ì•¼ê¸°ë¥¼ ë“¤ì–´ë´ì•¼ í•  ê²ƒ ê°™ë‹¤");
+                }
             }
         }
     }
@@ -68,13 +76,20 @@ public class StageDoor : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        isPlayerInRange = true; // ÇÃ·¹ÀÌ¾î ÁøÀÔ Ã¼Å©
+        isPlayerInRange = true; // í”Œë ˆì´ì–´ ì§„ì… ì²´í¬
 
         if (MiniGameManager.Instance.IsDoorActive(this))
         {
-            if (openType == OpenType.Automatic && !isOpen)
+            if (MiniGameManager.Instance.isCutscenePlayed)
             {
-                ToggleDoor(); // ÀÚµ¿¹® ¿­±â
+                if (openType == OpenType.Automatic && !isOpen)
+                {
+                    ToggleDoor(); // ìë™ë¬¸ ì—´ê¸°
+                }
+            }
+            else
+            {
+                ShowCustomWarning("ì£¼ëŒ•ì¹˜ì˜ ì´ì•¼ê¸°ë¥¼ ë“¤ì–´ë´ì•¼ í•  ê²ƒ ê°™ë‹¤");
             }
         }
         else
@@ -83,19 +98,25 @@ public class StageDoor : MonoBehaviour
         }
     }
 
+    private void ShowCustomWarning(string message)
+    {
+        Debug.Log($"Warning : {message}");
+        HubUIManager.Instance?.ToggleWarningUI(true, message);
+    }
+
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        isPlayerInRange = false; // ÇÃ·¹ÀÌ¾î ÀÌÅ» Ã¼Å©
+        isPlayerInRange = false; // í”Œë ˆì´ì–´ ì´íƒˆ ì²´í¬
 
         HubUIManager.Instance?.ToggleWarningUI(false);
 
-        // (¼±ÅÃ »çÇ×) ÀÚµ¿¹®ÀÏ °æ¿ì ÇÃ·¹ÀÌ¾î°¡ ¸Ö¾îÁö¸é ´Ù½Ã ´İÈ÷°Ô ¸¸µé°í ½Í´Ù¸é ÁÖ¼® ÇØÁ¦
+        // (ì„ íƒ ì‚¬í•­) ìë™ë¬¸ì¼ ê²½ìš° í”Œë ˆì´ì–´ê°€ ë©€ì–´ì§€ë©´ ë‹¤ì‹œ ë‹«íˆê²Œ ë§Œë“¤ê³  ì‹¶ë‹¤ë©´ ì£¼ì„ í•´ì œ
         /*
         if (MiniGameManager.Instance.IsDoorActive(this) && openType == OpenType.Automatic && isOpen)
         {
-            ToggleDoor(); // ÀÚµ¿¹® ´İ±â
+            ToggleDoor(); // ìë™ë¬¸ ë‹«ê¸°
         }
         */
     }

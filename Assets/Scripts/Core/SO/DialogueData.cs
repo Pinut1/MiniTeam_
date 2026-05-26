@@ -9,6 +9,7 @@ public class DialogueData : ScriptableObject
     {
         [TextArea(2, 4)] public string text;
         public Sprite expressionSprite;
+        public string animationTriggerName;
     }
 
     [Header("대사 및 표정 데이터")]
