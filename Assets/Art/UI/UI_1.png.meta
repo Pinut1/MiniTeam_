@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 47aabc25b86b16f409911c1e6647f679
+guid: 55eddf504163b82468b302686c763081
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: UI_BG_Banila_0
+      name: UI_1_0
       rect:
         serializedVersion: 2
-        x: 879
-        y: 995
-        width: 8
-        height: 13
+        x: 1124
+        y: 140
+        width: 755
+        height: 721
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,74 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d0f3d14ee9023f746b45bbaf30162834
-      internalID: 1411168986
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UI_BG_Banila_1
-      rect:
-        serializedVersion: 2
-        x: 1915
-        y: 0
-        width: 5
-        height: 1080
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7da476b585f37c14eba89c88a110cfc1
-      internalID: 2098083343
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UI_BG_Banila_2
-      rect:
-        serializedVersion: 2
-        x: 67
-        y: 207
-        width: 1777
-        height: 666
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e14dfd377ae8d064d88fd4c7f3a9f39f
-      internalID: 1878444319
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UI_BG_Banila_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6800549c16020164da885b299cc67537
-      internalID: 1219190207
+      spriteID: 0c8adba6f689f80408733e92962b3046
+      internalID: 1321788782
       vertices: []
       indices: 
       edges: []
@@ -201,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 8c6d70ea8e9a096469078c3008a1741a
+    spriteID: 6afd67423d002e44b80db5b388680669
     internalID: 0
     vertices: []
     indices: 
@@ -213,10 +147,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      UI_BG_Banila_0: 1411168986
-      UI_BG_Banila_1: 2098083343
-      UI_BG_Banila_2: 1878444319
-      UI_BG_Banila_3: 1219190207
+      UI_1_0: 1321788782
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

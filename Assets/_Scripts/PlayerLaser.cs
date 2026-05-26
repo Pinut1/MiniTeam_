@@ -44,6 +44,12 @@ public class PlayerLaser : MonoBehaviour
     private Camera mainCam;
     private bool isClashMode = false;
 
+    [Header("Difficulty by Girls (여학생 난이도 설정)")]
+    public float difficultyRadius = 3.0f; // 주변 여학생을 탐색할 반경
+    public float penaltyFillSpeedPerGirl = 0.1f; // 여학생 1명당 '홀드 채우기' 속도 감소량
+    public float minHeartFillSpeed = 0.05f; // 아무리 여학생이 많아도 최소한 보장되는 채우기 속도
+    public float penaltyDrainSpeedPerGirl = 0.1f; // 여학생 1명당 '연타 방어(게이지 깎임)' 속도 증가량
+
     [Header("Player Knockback Settings")]
     public float playerKnockbackDistance = 3f;
     public float playerKnockbackHeight = 1.5f;
@@ -87,11 +93,10 @@ public class PlayerLaser : MonoBehaviour
 
     void Update()
     {
-        // ★ 대결 모드 중일 때는 마우스 클릭을 무시하고 중앙으로만 레이저를 쏩니다.
         if (isInCompetitionMode)
         {
             DrawLaser(competitionTarget);
-            return; 
+            return;
         }
 
         if (isPlayerKnockedBack)
@@ -133,7 +138,14 @@ public class PlayerLaser : MonoBehaviour
 
                 if (playerPinkGauge != null)
                 {
-                    playerPinkGauge.fillAmount -= clashDrainSpeed * Time.deltaTime;
+                    // =======================================================
+                    // ★ [난이도 적용] 주변 여학생 수만큼 연타 게이지 깎이는 속도가 빨라집니다! (어려워짐)
+                    int girlCount = GetNearbyGirlCount();
+                    float currentDrainSpeed = clashDrainSpeed + (penaltyDrainSpeedPerGirl * girlCount);
+
+                    playerPinkGauge.fillAmount -= currentDrainSpeed * Time.deltaTime;
+                    // =======================================================
+
                     if (playerPinkGauge.fillAmount <= 0f)
                     {
                         LetGirlWinAndLeave();
@@ -168,7 +180,17 @@ public class PlayerLaser : MonoBehaviour
 
                         if (currentFillImage != null)
                         {
-                            currentFillImage.fillAmount += heartFillSpeed * Time.deltaTime;
+                            // =======================================================
+                            // ★ [난이도 적용] 주변 여학생 수만큼 홀드 게이지 차오르는 속도가 느려집니다! (어려워짐)
+                            int girlCount = GetNearbyGirlCount();
+                            float currentFillSpeed = heartFillSpeed - (penaltyFillSpeedPerGirl * girlCount);
+
+                            // 아무리 여학생이 많아도 속도가 마이너스가 되거나 멈추지 않게 최소 속도(minHeartFillSpeed)를 보장합니다.
+                            currentFillSpeed = Mathf.Max(minHeartFillSpeed, currentFillSpeed);
+
+                            currentFillImage.fillAmount += currentFillSpeed * Time.deltaTime;
+                            // =======================================================
+
                             if (currentFillImage.fillAmount >= 1f) SuccessAndDropHeart();
                         }
                     }
@@ -182,11 +204,40 @@ public class PlayerLaser : MonoBehaviour
         }
     }
 
+    // 타겟 주변의 여학생 수를 계산하는 함수
+    private int GetNearbyGirlCount()
+    {
+        if (currentBurningNpc == null) return 0;
+
+        int count = 0;
+        // 타겟을 중심으로 difficultyRadius 반경 내의 모든 콜라이더를 찾습니다.
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(currentBurningNpc.transform.position, difficultyRadius);
+
+        foreach (Collider2D col in colliders)
+        {
+            // GirlNpcReaction 컴포넌트가 있는지 확인하여 여학생인지 판별합니다.
+            GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
+            if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
+            if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
+
+            if (girl != null)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // ★ 매니저에서 넉백을 호출할 수 있도록 public으로 열고, 공격자(바닐라)의 위치를 받을 수 있게 수정했습니다.
     public void StartPlayerKnockback(Transform attacker = null)
     {
         if (isPlayerKnockedBack) return;
         isPlayerKnockedBack = true;
+
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetKnockbackPortrait();
+        }
 
         float pushDirection = -1f;
 
@@ -200,6 +251,12 @@ public class PlayerLaser : MonoBehaviour
         }
 
         if (anim != null) anim.SetTrigger("isKnockback");
+
+        if (currentHoveredNpc != null)
+        {
+            HideHeart(currentHoveredNpc);
+            currentHoveredNpc = null;
+        }
 
         StopFiring();
         ResumeAllGirls();
@@ -245,9 +302,16 @@ public class PlayerLaser : MonoBehaviour
         transform.position = targetPos;
         if (rb != null) rb.position = targetPos;
 
+        // 기절해서 누워있는 시간 대기
         yield return new WaitForSeconds(playerGroundStunDuration);
 
         isPlayerKnockedBack = false;
+
+        // 넉백 스턴 시간이 끝나고 일어났으니 초상화를 다시 평소 표정(UI_IDLE)으로 복구합니다.
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetIdlePortrait();
+        }
 
         Vector3 wakeUpPos = new Vector3(transform.position.x, startPos.y, transform.position.z);
         transform.position = wakeUpPos;
@@ -358,6 +422,20 @@ public class PlayerLaser : MonoBehaviour
             }
         }
 
+        // =======================================================
+        // ★ [추가] 하트를 성공적으로 뽑아냈으니 UI 하트 이미지를 강제로 지웁니다!
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.HideUIHeart();
+        }
+
+        // NPC가 삭제될 예정이므로 마우스 오버(Hover) 타겟도 비워줍니다.
+        if (currentHoveredNpc == npcToDestroy)
+        {
+            currentHoveredNpc = null;
+        }
+        // =======================================================
+
         StopFiring();
         ResumeAllGirls();
 
@@ -387,6 +465,11 @@ public class PlayerLaser : MonoBehaviour
 
     void UpdateHovering()
     {
+        // =======================================================
+        // ★ [추가 1] 넉백 중일 때는 마우스 감지를 아예 건너뛰어서 표정(UI_2)을 유지합니다.
+        if (isPlayerKnockedBack) return;
+        // =======================================================
+
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
@@ -398,6 +481,25 @@ public class PlayerLaser : MonoBehaviour
                 targetPoint.SetActive(true);
                 targetPoint.transform.position = hitNpc.transform.position;
             }
+
+            if (PlayerUIScene.instance != null)
+            {
+                // 배경 교체
+                if (hit.collider.CompareTag("Banilla"))
+                {
+                    PlayerUIScene.instance.SetBanillaBG();
+                }
+                else if (hit.collider.CompareTag("NPC"))
+                {
+                    PlayerUIScene.instance.SetExtraBG();
+                }
+
+                // =======================================================
+                // ★ [추가 2] 타겟에 커서를 댔으니 초상화를 Checking(UI_Chacking)으로 바꿉니다.
+                PlayerUIScene.instance.SetCheckingPortrait();
+                // =======================================================
+            }
+
             if (currentHoveredNpc != hitNpc)
             {
                 if (currentHoveredNpc != null) HideHeart(currentHoveredNpc);
@@ -412,6 +514,17 @@ public class PlayerLaser : MonoBehaviour
             {
                 HideHeart(currentHoveredNpc);
                 currentHoveredNpc = null;
+            }
+
+            if (PlayerUIScene.instance != null)
+            {
+                // 허공에 커서를 두면 배경 복구
+                PlayerUIScene.instance.SetNormalBG();
+
+                // =======================================================
+                // ★ [추가 3] 허공에 커서를 두면 초상화도 기본(UI_IDLE)으로 복구합니다.
+                PlayerUIScene.instance.SetIdlePortrait();
+                // =======================================================
             }
         }
     }
@@ -446,6 +559,11 @@ public class PlayerLaser : MonoBehaviour
         if (existingHeart != null && !npc.CompareTag("Banilla"))
         {
             existingHeart.gameObject.SetActive(true);
+            if (PlayerUIScene.instance != null)
+            {
+                SpriteRenderer sr = existingHeart.GetComponent<SpriteRenderer>();
+                if (sr != null) PlayerUIScene.instance.SetUIHeart(sr.sprite);
+            }
             return;
         }
 
@@ -525,8 +643,16 @@ public class PlayerLaser : MonoBehaviour
                     }
                 }
             }
+            if (pickedSprite != null)
+            {
+                heartSR.sprite = pickedSprite; // NPC 머리 위 하트에 이미지 적용
 
-            if (pickedSprite != null) heartSR.sprite = pickedSprite;
+                // UI 하트 연동
+                if (PlayerUIScene.instance != null)
+                {
+                    PlayerUIScene.instance.SetUIHeart(pickedSprite);
+                }
+            }
             heartSR.color = new Color(1f, 1f, 1f, 1f);
             heartSR.sortingOrder = 0;
         }
@@ -536,6 +662,14 @@ public class PlayerLaser : MonoBehaviour
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
         if (existingHeart != null) existingHeart.gameObject.SetActive(false);
+
+        // ==========================================
+        // ★ NPC 머리 위 하트가 꺼질 때 UI 하트도 같이 숨김
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.HideUIHeart();
+        }
+        // ==========================================
     }
 
     public void CheckAndLockTarget()
@@ -578,13 +712,34 @@ public class PlayerLaser : MonoBehaviour
             var move = currentBurningNpc.GetComponent<NpcRandomPatrol>();
             if (move != null) move.enabled = false;
 
-            Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
-            foreach (Collider2D col in overlappingColliders)
+            // ★ [수정] 피에르(보스)일 때와 일반 NPC일 때 방해꾼 호출 방식을 나눕니다.
+            if (currentBurningNpc.name.Contains("Pierre"))
             {
-                GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
-                if (girl != null && girl.gameObject != hit.collider.gameObject)
+                // 1. 타겟이 피에르인 경우: 거리 무시하고 컷신에 스폰된 7명 전원 호출!
+                CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+                if (npcManager != null)
                 {
-                    girl.LookAtAttackedNpc(currentBurningNpc);
+                    foreach (GameObject girlObj in npcManager.spawnedGirls)
+                    {
+                        if (girlObj != null)
+                        {
+                            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+                            if (girl != null) girl.LookAtAttackedNpc(currentBurningNpc);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // 2. 일반 남학생인 경우: 기존처럼 클릭한 주변(0.5f 반경)의 여학생만 감지!
+                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
+                foreach (Collider2D col in overlappingColliders)
+                {
+                    GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
+                    if (girl != null && girl.gameObject != hit.collider.gameObject)
+                    {
+                        girl.LookAtAttackedNpc(currentBurningNpc);
+                    }
                 }
             }
         }
@@ -644,6 +799,14 @@ public class PlayerLaser : MonoBehaviour
         }
         if (laserObject != null && !isInCompetitionMode) laserObject.SetActive(false);
         if (targetPoint != null) targetPoint.SetActive(false);
+
+        // =======================================================
+        // ★ [추가] 행동이 끝나고 타겟팅이 풀리면 무조건 기본 배경으로 복구
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetNormalBG();
+        }
+        // =======================================================
     }
 
     public void TriggerAllNpcsExit()

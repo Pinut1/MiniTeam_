@@ -32,6 +32,9 @@ public class CutsceneNpcManager : MonoBehaviour
 
     [Header("여학생 이동 설정")]
     public float girlWalkSpeed = 3f;
+    public float girlStopSpacing = 1.0f;
+    public float girlYSpread = 0.3f;
+    public float distanceToPierre = 1.5f;
 
     [Header("레이저 경쟁 설정")]
     public Color playerCompetitionLaserColor = new Color(1f, 0.4f, 0.7f);
@@ -42,7 +45,8 @@ public class CutsceneNpcManager : MonoBehaviour
     public float banillaPushSpeed = 0.15f;
 
     private GameObject banillaLaserObj;
-    private List<GameObject> spawnedGirls = new List<GameObject>();
+    private List<GameObject> banillaLaserEffects = new List<GameObject>();
+    public List<GameObject> spawnedGirls = new List<GameObject>();
     private GameObject instanceBanilla;
     private Animator banillaAnimator;
     private Transform banillaTransform;
@@ -69,6 +73,12 @@ public class CutsceneNpcManager : MonoBehaviour
     // 대결 중일 때 실시간으로 레이저 줄다리기 계산 및 애니메이션 트리거 감지
     void Update()
     {
+        // ★ 대결 중이 아닐 때는 레이저가 켜져 있다면 애니메이션이 켜더라도 무조건 강제로 끕니다.
+        if (!isLaserDuelActive && banillaLaserObj != null && banillaLaserObj.activeSelf)
+        {
+            banillaLaserObj.SetActive(false);
+        }
+
         if (!isLaserDuelActive) return;
 
         // 1. 가만히 있으면 바닐라가 플레이어(쇼콜라) 쪽으로 점점 밀고 들어옴 (진행도 감소)
@@ -86,15 +96,42 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        if (!isLaserDuelActive)
+        {
+            // 1. 대결 상태가 아닐 때: 레이저 본체와 스파크(44, 54) 무조건 숨김
+            if (banillaLaserObj != null && banillaLaserObj.activeSelf)
+                banillaLaserObj.SetActive(false);
+
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null && effect.activeSelf)
+                    effect.SetActive(false);
+            }
+        }
+        else
+        {
+            // 2. ★ 대결 중일 때: 애니메이터의 위치 고정을 무시하고 매 프레임 레이저 충돌 지점으로 강제 멱살캐리!
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null)
+                {
+                    Vector3 newPos = duelMidwayPoint;
+                    newPos.z = effect.transform.position.z;
+                    effect.transform.position = newPos;
+                }
+            }
+        }
+    }
+
     private void UpdateDuelLasers()
     {
         if (banillaTransform == null || playerRb == null) return;
 
-        // 시작 지점들 확보
         Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null ? playerLaserScript.firePoint.position : playerRb.transform.position;
         Vector3 banillaFirePos = banillaLaserObj != null ? banillaLaserObj.transform.position : banillaTransform.position;
 
-        // duelProgress 비율에 따라 실시간 충돌점 동적 이동 (Lerp)
         duelMidwayPoint = Vector2.Lerp(playerFirePos, banillaFirePos, duelProgress);
 
         // 플레이어 레이저 실시간 갱신
@@ -108,15 +145,34 @@ public class CutsceneNpcManager : MonoBehaviour
         {
             FireBanillaLaser(banillaFirePos, duelMidwayPoint);
         }
+
+        // ★ [추가] 44x_0, 54x_0 이펙트들을 실시간 충돌 지점(가운데)으로 위치 이동
+        if (banillaLaserEffects != null)
+        {
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null)
+                {
+                    // 2D 환경에서 기존 Z축(깊이) 값은 유지하면서 X, Y 좌표만 충돌 지점으로 따라가게 합니다.
+                    Vector3 newPos = duelMidwayPoint;
+                    newPos.z = effect.transform.position.z;
+                    effect.transform.position = newPos;
+                }
+            }
+        }
     }
 
     private void ForceHideBanillaLaser()
     {
-        GameObject banillaObj = GameObject.FindWithTag("Banilla");
+        GameObject banillaObj = instanceBanilla;
+        if (banillaObj == null) banillaObj = GameObject.FindWithTag("Banilla");
+
         if (banillaObj != null)
         {
             banillaTransform = banillaObj.transform;
             if (banillaAnimator == null) banillaAnimator = banillaObj.GetComponentInChildren<Animator>();
+
+            banillaLaserEffects.Clear(); // 리스트 초기화
 
             Transform[] allChildren = banillaObj.GetComponentsInChildren<Transform>(true);
             foreach (Transform child in allChildren)
@@ -125,7 +181,12 @@ public class CutsceneNpcManager : MonoBehaviour
                 {
                     banillaLaserObj = child.gameObject;
                     banillaLaserObj.SetActive(false);
-                    break;
+                }
+                // ★ [추가] 44x_0, 54x_0 이름이 보이면 끄고 리스트에 보관
+                else if (child.name == "44x_0" || child.name == "54x_0")
+                {
+                    child.gameObject.SetActive(false);
+                    banillaLaserEffects.Add(child.gameObject);
                 }
             }
         }
@@ -151,7 +212,16 @@ public class CutsceneNpcManager : MonoBehaviour
         {
             for (int i = 0; i < newGirlPrefabs.Length; i++)
             {
-                Vector3 spawnPos = new Vector3(banillaSpawnPosition.x + ((i + 1) * girlSpawnSpacing), pierreSpawnPosition.y - 1.1f, 0);
+                float zigzagY = 0f;
+                if (i != 0)
+                {
+                    zigzagY = (i % 2 == 0) ? girlYSpread : -girlYSpread;
+                }
+
+                float yOffset = -1.5f;
+
+                Vector3 spawnPos = new Vector3(banillaSpawnPosition.x + ((i + 1) * girlSpawnSpacing), pierreSpawnPosition.y + yOffset + zigzagY, 0);
+
                 GameObject girl = Instantiate(newGirlPrefabs[i], spawnPos, Quaternion.identity);
                 SetGirlAIEnabled(girl, false);
                 spawnedGirls.Add(girl);
@@ -191,12 +261,12 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamPierre.gameObject.SetActive(true);
         vcamPlayer.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(4f);
 
         vcamBanilla.gameObject.SetActive(true);
         vcamPierre.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(3f);
 
         if (spawnedGirls.Count > 0 && spawnedGirls[0] != null)
         {
@@ -270,19 +340,34 @@ public class CutsceneNpcManager : MonoBehaviour
         while (!allArrived)
         {
             allArrived = true;
-            foreach (GameObject girl in spawnedGirls)
+            // foreach 대신 for문을 사용해 각 여학생의 번호(i)를 파악합니다.
+            for (int i = 0; i < spawnedGirls.Count; i++)
             {
+                GameObject girl = spawnedGirls[i];
                 if (girl != null)
                 {
-                    Vector3 targetPos = new Vector3(pierreSpawnPosition.x, girl.transform.position.y, 0);
+                    // ★ 핵심: 피에르의 위치에서 학생 수와 인덱스를 계산해 자기만의 자리를 찾습니다.
+                    // 이렇게 하면 서로 뚫고 지나가지 않고 원래 줄 서있던 순서대로 간격을 두고 멈춥니다.
+                    float targetX = pierreSpawnPosition.x - distanceToPierre - ((spawnedGirls.Count - 1 - i) * girlStopSpacing);
+
+                    Vector3 targetPos = new Vector3(targetX, girl.transform.position.y, 0);
+
                     girl.transform.position = Vector3.MoveTowards(
                         girl.transform.position,
                         targetPos,
                         girlWalkSpeed * Time.deltaTime
                     );
+
+                    // 아직 도착하지 않은 학생이 있다면 루프를 계속 돕니다.
                     if (Mathf.Abs(girl.transform.position.x - targetPos.x) > 0.05f)
                     {
                         allArrived = false;
+                    }
+                    else
+                    {
+                        // ★ [추가] 자기 자리에 완벽히 도착한 학생은 제자리걸음을 하지 않게 애니메이션을 끕니다.
+                        Animator anim = girl.GetComponent<Animator>();
+                        if (anim != null) anim.SetBool("isWalking", false);
                     }
                 }
             }
@@ -373,13 +458,13 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamGirlsWalk.gameObject.SetActive(false);
 
         vcamPlayer.gameObject.SetActive(true);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(4f);
 
         SetBanillaCrying(true);
 
         vcamPlayer.gameObject.SetActive(false);
         vcamBanilla.gameObject.SetActive(true);
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSeconds(3.5f);
 
         vcamBanilla.gameObject.SetActive(false);
         vcamPlayer.gameObject.SetActive(true);
@@ -473,21 +558,29 @@ public class CutsceneNpcManager : MonoBehaviour
     {
         if (banillaLaserObj == null) return;
 
+        // 대결 시작 시 레이저와 스파크 이펙트들을 켭니다.
         banillaLaserObj.SetActive(true);
+        foreach (GameObject effect in banillaLaserEffects)
+        {
+            if (effect != null) effect.SetActive(true);
+        }
 
+        // 레이저 본체의 SpriteRenderer 컴포넌트를 가져옵니다.
         SpriteRenderer sr = banillaLaserObj.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
+            // ★ [수정] sortingLayerName과 sortingOrder를 변경하던 코드를 완전히 삭제합니다.
+            // 이제 유니티 에디터에서 설정한 BurnEffect / Order 0 설정을 그대로 사용합니다.
             sr.enabled = true;
-            sr.sortingLayerName = "Objects";
-            sr.sortingOrder = 999;
         }
 
+        // --- (아래쪽 레이저 각도/길이 조절 코드는 그대로 유지) ---
         Vector2 direction = targetPos - startPos;
         float distance = direction.magnitude;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         banillaLaserObj.transform.rotation = Quaternion.Euler(0, 0, angle);
 
+        // 이미지 길이에 따른 X 스케일 계산 (스프라이트 Pivot이 Left일 때 기준)
         float baseWidth = sr != null && sr.sprite != null ? sr.sprite.bounds.size.x : 1f;
         float currentYScale = banillaLaserObj.transform.localScale.y;
 
@@ -498,7 +591,10 @@ public class CutsceneNpcManager : MonoBehaviour
         }
 
         float finalXScale = (distance / baseWidth) / parentScaleX;
-        banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, 1f);
+
+        // Z축은 그대로 유지
+        float currentZScale = banillaLaserObj.transform.localScale.z;
+        banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, currentZScale);
     }
 
     public void StartBanillaCompetition() { SetBanillaCrying(false); }
@@ -627,19 +723,22 @@ public class CutsceneNpcManager : MonoBehaviour
     {
         isLaserDuelActive = false;
 
-        // 쇼콜라 레이저 끄기
         if (playerLaserScript != null)
         {
             playerLaserScript.ExitCompetitionMode();
         }
 
-        // 바닐라 레이저 끄기
         if (banillaLaserObj != null)
         {
             banillaLaserObj.SetActive(false);
         }
 
-        // 쇼콜라의 공격 애니메이션 상태 해제 (필요시)
+        // ★ [추가] 대결 종료 시 44x_0, 54x_0 끄기
+        foreach (GameObject effect in banillaLaserEffects)
+        {
+            if (effect != null) effect.SetActive(false);
+        }
+
         if (playerAnim != null)
         {
             playerAnim.SetBool("isAttacking", false);

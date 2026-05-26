@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c028fd54bc626094a80732f536e52cdf
+guid: 14722840be651eb45a03c14d79be3ce6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: UI_BG__0
+      name: f9a4eeee4bfa475b_0
       rect:
         serializedVersion: 2
-        x: 68
-        y: 206
-        width: 1776
-        height: 667
+        x: 80
+        y: 160
+        width: 704
+        height: 704
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,30 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b8a775fb4aed952409109c81d1699659
-      internalID: 1011256238
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UI_BG__1
-      rect:
-        serializedVersion: 2
-        x: 1915
-        y: 0
-        width: 5
-        height: 1080
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a31c158607da75449974a62bc3757b7b
-      internalID: 1306247323
+      spriteID: ad58722d61b92744ba70d258ec76230a
+      internalID: 1349168221
       vertices: []
       indices: 
       edges: []
@@ -157,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ce1207e77aaf9ea4ab8c56308f44a44b
+    spriteID: 856421a8ac51c56488cf3c06aff75fc9
     internalID: 0
     vertices: []
     indices: 
@@ -169,9 +147,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      UI_BG__0: 1011256238
-      UI_BG__1: 1306247323
-      UI_BG__2: 1708202337
+      f9a4eeee4bfa475b_0: 1349168221
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

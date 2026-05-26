@@ -952,11 +952,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04cdcb1db3c5ae4482c2d153590d571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcPatrol
-  patrolDistance: 6
+  patrolDistance: 3
   minSpeed: 1
   maxSpeed: 2.5
   minIdleTime: 1
-  maxIdleTime: 7
+  maxIdleTime: 5
   isPierre: 1
   heartPrefab: {fileID: 0}
   pierreHeartSprite: {fileID: -1794803874, guid: 17b2f404853f3564c86608f116c93754, type: 3}
