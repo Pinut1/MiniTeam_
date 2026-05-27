@@ -44,7 +44,7 @@ public class JudangChiDialogueManager : MonoBehaviour
             // 해당 문장 전용 보이스/효과음이 있다면 시작 시 재생
             if (sentenceData.voiceClip != null)
             {
-                MiniTeam.Core.SoundManager.Instance?.PlayVoice(sentenceData.voiceClip);
+                MiniTeam.Core.AudioManager.Instance?.PlayVoice(sentenceData.voiceClip);
             }
 
             dialogueText.text = "";

@@ -34,5 +34,6 @@ namespace MiniTeam.Core
         public void StopBGM()                                  => SoundManager.Instance?.StopBGM();
         public void PlaySFX(AudioClip clip)                    => SoundManager.Instance?.PlaySFX(clip);
         public void PlaySFX(AudioClip clip, float volumeScale) => SoundManager.Instance?.PlaySFX(clip, volumeScale);
+        public void PlayVoice(AudioClip clip)                  => SoundManager.Instance?.PlayVoice(clip);
     }
 }
