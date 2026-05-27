@@ -22,10 +22,10 @@ public class TamamaBeamTester : MonoBehaviour
         // 발사 좌표 및 거리 설정
         Vector3 spawnPosition = new Vector3(number, 7, 0);
 
-        // 컨트롤러를 통해 임팩트 발동 요청
+        // 컨트롤러를 통해 임팩트 발동 요청 (마지막 인자로 isDebug = true 전달)
         if (TetrisGameController.Instance != null)
         {
-            TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number);
+            TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number, true);
         }
         else
         {
