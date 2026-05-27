@@ -10,6 +10,7 @@ namespace MiniTeam.Shooting1942
         [Header("연출")]
         public GameObject spaceshipRewardObj;
         public GameObject coinSpinObj;         // 이어하기 코인 (씬에 배치된 오브젝트)
+        public EntryCutsceneManager entryCutscene;
         public ClearCutsceneManager clearCutscene;
 
         [Header("결과 화면 표시 후 허브 복귀까지 대기 시간")]
@@ -66,6 +67,9 @@ namespace MiniTeam.Shooting1942
             waveManager = GetComponent<WaveManager>();
             if (waveManager == null)
                 waveManager = FindAnyObjectByType<WaveManager>();
+
+            if (entryCutscene != null)
+                entryCutscene.Play(() => waveManager?.BeginGame());
         }
 
         // ── IMiniGame ─────────────────────────────
