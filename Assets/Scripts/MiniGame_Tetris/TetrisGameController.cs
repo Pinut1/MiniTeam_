@@ -26,6 +26,7 @@ namespace MiniTeam.Tetris
 
         void Start()
         {
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
             currentImpactCount = 0;
 
           
@@ -56,7 +57,7 @@ namespace MiniTeam.Tetris
             }
         }
 
-        public void OnTamamaImpactTriggered(bool isHorizontal, Vector3 spawnPos, Quaternion rot, float distance)
+        public void OnTamamaImpactTriggered(bool isHorizontal, Vector3 spawnPos, Quaternion rot, float distance, bool isDebug = false)
         {
             if (isCutscenePlaying) return; 
             isCutscenePlaying = true;
@@ -83,7 +84,7 @@ namespace MiniTeam.Tetris
                 impactPoint = impactPoint
             };
 
-            // 4. 컷씬 매니저에게 연출 위임
+            // 4. 컷신 매니저에게 연출 위임
             if (TetrisCutsceneManager.Instance != null)
             {
                 StartCoroutine(TetrisCutsceneManager.Instance.PlayTamamaImpact(impactData, () => 
@@ -106,7 +107,8 @@ namespace MiniTeam.Tetris
                     }
                     else
                     {
-                        if (SpawnTetromino.Instance != null)
+                        // 디버그 모드가 아닐 때만 새로운 테트로미노를 스폰
+                        if (!isDebug && SpawnTetromino.Instance != null)
                             SpawnTetromino.Instance.NewTetromino();
                     }
                 }));
@@ -121,6 +123,7 @@ namespace MiniTeam.Tetris
         public void OnGameClear()
         {
             Debug.Log("[Tetris] Game Clear!");
+            CleanupRemainingBlocks();
             if (SoundManager.Instance != null)
             {
                 SoundManager.Instance.StopBGM();
@@ -130,11 +133,31 @@ namespace MiniTeam.Tetris
 
         public void OnGameFail()
         {
+            CleanupRemainingBlocks();
             if (SoundManager.Instance != null)
             {
                 SoundManager.Instance.StopBGM();
             }
             MiniGameManager.Instance?.OnMiniGameFail();
+        }
+
+        private void CleanupRemainingBlocks()
+        {
+            // 1. Clear static grid and destroy block tiles in the grid
+            TetrisBlock.ClearGrid();
+
+            // 2. Clear hold/next dummies in SpawnTetromino
+            if (SpawnTetromino.Instance != null)
+            {
+                SpawnTetromino.Instance.ClearAllDummies();
+            }
+
+            // 3. Destroy all other TetrisBlock objects (active/inactive)
+            TetrisBlock[] blocks = FindObjectsByType<TetrisBlock>(FindObjectsSortMode.None);
+            foreach (var block in blocks)
+            {
+                if (block != null) Destroy(block.gameObject);
+            }
         }
     }
 }

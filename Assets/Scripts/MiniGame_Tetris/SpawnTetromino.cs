@@ -44,8 +44,6 @@ public class SpawnTetromino : MonoBehaviour
     {
         spawnTrigger = true;
         nextDumies = new GameObject[nextAnchors.Length];
-        NewTetromino();
-
     }
     void Update()
     {
@@ -214,5 +212,23 @@ public class SpawnTetromino : MonoBehaviour
         return CenterPos / block.transform.childCount;
     }
 
-  
+    public void ClearAllDummies()
+    {
+        if (holdDummy != null)
+        {
+            Destroy(holdDummy);
+            holdDummy = null;
+        }
+        if (nextDumies != null)
+        {
+            for (int i = 0; i < nextDumies.Length; i++)
+            {
+                if (nextDumies[i] != null)
+                {
+                    Destroy(nextDumies[i]);
+                    nextDumies[i] = null;
+                }
+            }
+        }
+    }
 }

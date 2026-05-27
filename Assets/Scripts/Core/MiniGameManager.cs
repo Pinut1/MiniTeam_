@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,6 +16,7 @@ namespace MiniTeam.Core
         [Header("Game Progress")]
         public int currentStage = 0;
         public bool isCutscenePlayed = false;
+        private bool isLastGameCleared = false;
 
         [Header("Door Management")]
         [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
@@ -124,13 +125,20 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
-          
-            JudangChiController.Instance?.PlaySequenceForGameClear();
-            
+            if (isLastGameCleared)
+            {
+                JudangChiController.Instance?.PlaySequenceForGameClear();
+            }
+            else
+            {
+                EnablePlayerInput();
+                HubUIManager.Instance?.InitializeBottomUI(currentStage);
+            }
         }
 
         public void OnMiniGameClear()
         {
+            isLastGameCleared = true;
             currentStage++;
             isCutscenePlayed = false; // 새로운 스테이지 진입으로 컷신 미재생 초기화
             SaveGame(); // 스테이지 증가 및 컷신 미재생 상태 저장
@@ -139,6 +147,7 @@ namespace MiniTeam.Core
 
         public void OnMiniGameFail()
         {
+            isLastGameCleared = false;
             ExitMiniGame();
         }
 
