@@ -2301,7 +2301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.OptionsUIManager
   optionsPanel: {fileID: 672095731}
   optionsAnimator: {fileID: 672095735}
-  closeDelay: 0.8
+  closeDelay: 1.4
   masterVolumeSlider: {fileID: 1411194051}
   bgmVolumeSlider: {fileID: 1483108234}
   sfxVolumeSlider: {fileID: 1600436843}
