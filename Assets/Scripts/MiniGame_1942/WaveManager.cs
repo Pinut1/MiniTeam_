@@ -48,6 +48,9 @@ namespace MiniTeam.Shooting1942
         private Coroutine spawnCoroutine;
         private Coroutine waveCoroutine;
 
+        [Header("진입 컷씬이 있을 때 false로 설정 — BeginGame() 호출로 수동 시작")]
+        public bool autoStart = true;
+
         private ShootingGameController gameController;
 
         void Start()
@@ -57,6 +60,13 @@ namespace MiniTeam.Shooting1942
                 gameController = FindAnyObjectByType<ShootingGameController>();
 
             CalculateSpawnBounds();
+            if (autoStart)
+                waveCoroutine = StartCoroutine(RunWaves());
+        }
+
+        public void BeginGame()
+        {
+            if (waveCoroutine != null) return;
             waveCoroutine = StartCoroutine(RunWaves());
         }
 
