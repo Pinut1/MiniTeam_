@@ -75,6 +75,12 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private Animator innocenceAnimLeft;
     [SerializeField] private Animator innocenceAnimRight;
 
+    [Header("판사 망치 연출")]
+    [SerializeField] private GameObject judgeGavelBGImg;
+    [SerializeField] private GameObject judgeGavelImg;
+    [SerializeField] private GameObject judgeEffetImg;
+    [SerializeField] private GameObject judgeGavelImg1;
+
     [Header("레코드 패널 (대사 직접 증거 선택)")]
     [SerializeField] private GameObject recordPnl;
 
@@ -85,6 +91,7 @@ public class SpongeUIManager : MonoBehaviour
     public bool IsPlayingObjection { get; private set; }
     public bool IsPlayingTakeThat { get; private set; }
     public bool IsPlayingInnocence { get; private set; }
+    public bool IsPlayingGavel { get; private set; }
 
     //[Header("옵션 패널")]
     //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
@@ -240,6 +247,24 @@ public class SpongeUIManager : MonoBehaviour
         innocencePnl.SetActive(false);
         SpongeDialogueManager.Instance.SetTextBox(true);
         IsPlayingInnocence = false;
+    }
+
+    public IEnumerator PlayGavelAnim()
+    {
+        IsPlayingGavel = true;
+        judgeGavelBGImg.SetActive(true);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        judgeGavelImg.SetActive(true);
+        judgeEffetImg.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        judgeGavelBGImg.SetActive(false);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(false);
+        IsPlayingGavel = false;
     }
 
     public IEnumerator PlayTakeThatAnim()
