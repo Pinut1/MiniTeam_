@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "mcp__UnityMCP__manage_scene",
+      "mcp__UnityMCP__batch_execute",
+      "mcp__UnityMCP__manage_camera",
+      "PowerShell($data = Get-Content \"C:\\\\Users\\\\mbc-16\\\\.claude\\\\projects\\\\C--Users-mbc-16-Documents-GitHub-MiniTeam--Assets\\\\fa83df16-6679-4992-a56d-c67212ff7af7\\\\tool-results\\\\mcp-UnityMCP-batch_execute-1779860708493.txt\" | ConvertFrom-Json; $data.data.callSuccessCount; $data.data.callFailureCount; $r = $data.data.results; $r[0].result.success; $r[0].result.message)",
+      "PowerShell($data = Get-Content \"C:\\\\Users\\\\mbc-16\\\\.claude\\\\projects\\\\C--Users-mbc-16-Documents-GitHub-MiniTeam--Assets\\\\fa83df16-6679-4992-a56d-c67212ff7af7\\\\tool-results\\\\mcp-UnityMCP-batch_execute-1779860708493.txt\" | ConvertFrom-Json; $r = $data.data.results; $r[0].result.data | ForEach-Object { $_ }; \"---SCREENSHOT---\"; $r[1].result.success; $r[1].result.message)",
+      "mcp__UnityMCP__read_console"
     ]
   }
 }
