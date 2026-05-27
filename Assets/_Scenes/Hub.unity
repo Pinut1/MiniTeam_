@@ -944,7 +944,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -592745889, guid: 63f4ff49c3edb0f4793695c17a0a3648, type: 3}
+  m_Sprite: {fileID: 706884488, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8475,11 +8475,11 @@ MonoBehaviour:
   - {fileID: 962298526}
   objectImg: {fileID: 542294103}
   stageClearSprites:
-  - {fileID: -592745889, guid: 63f4ff49c3edb0f4793695c17a0a3648, type: 3}
-  - {fileID: -759783230, guid: 33683486638853a418b6db3f1534559d, type: 3}
-  - {fileID: 1967432918, guid: dda31ae42c7e9d54b9965184d6525739, type: 3}
-  - {fileID: -688924598, guid: 7c0fa79b7c4ae364da368d1fc678e85c, type: 3}
-  - {fileID: 1670167653, guid: 619412dec1131444d9195db24f4c7c60, type: 3}
+  - {fileID: 706884488, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: -997883463, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: 905361157, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: 428012300, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: -1266240735, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
 --- !u!4 &1995122238
 Transform:
   m_ObjectHideFlags: 0
