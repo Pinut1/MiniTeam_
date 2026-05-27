@@ -7,8 +7,8 @@ public class JudangChiController : MonoBehaviour
 {
     public static JudangChiController Instance { get; private set; }
 
-    [Header("´ë»ç µ¥ÀÌÅÍ ¸ñ·Ï")]
-    [Tooltip("ÀÎµ¦½º 0: °ÔÀÓ ½ÃÀÛ½Ã, 1: 1½ºÅ×ÀÌÁö Å¬¸®¾î ÈÄ...")]
+    [Header("ëŒ€ì‚¬ ë°ì´í„° ëª©ë¡")]
+    [Tooltip("ì¸ë±ìŠ¤ 0: ê²Œì„ ì‹œì‘ì‹œ, 1: 1ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ í›„...")]
     public DialogueData[] stageDialogues;
 
 
@@ -21,7 +21,7 @@ public class JudangChiController : MonoBehaviour
 
     }
 
-    // ÃÖÃÊ Çãºê¿¡¼­ ÁÖ´óÄ¡-> ÁÖ´óÄ¡ ´ëÈ­ ¾À ÁøÀÔ Á¦¾î
+    // ìµœì´ˆ í—ˆë¸Œì—ì„œ ì£¼ëŒ•ì¹˜-> ì£¼ëŒ•ì¹˜ ëŒ€í™” ì”¬ ì§„ì… ì œì–´
     #region FirstScene
     public void PlaySequenceForFirstStage()
     {
@@ -39,34 +39,34 @@ public class JudangChiController : MonoBehaviour
 
         HubUIManager.Instance.FirstCinemaEnter();
 
-        // 1. ½Ã³×¸¶Æ½ ÀÔÀå (ÇÏ´ÜUI ³»·Á°¨ + ·¹ÅÍ¹Ú½º ³ª¿È + Å« ÁÖ´óÄ¡ ¿Ã¶ó¿È)
+        // 1. ì‹œë„¤ë§ˆí‹± ì…ì¥ (í•˜ë‹¨UI ë‚´ë ¤ê° + ë ˆí„°ë°•ìŠ¤ ë‚˜ì˜´ + í° ì£¼ëŒ•ì¹˜ ì˜¬ë¼ì˜´)
         yield return new WaitUntil(() => HubUIManager.Instance.isFirstCinemaEnterDone);
         yield return new WaitForSeconds(0.2f);
 
-        // 2. ´ë»ç ÁøÇà
+        // 2. ëŒ€ì‚¬ ì§„í–‰
         bool isDialogueDone = false;
         JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
 
-        // 3. ½Ã³×¸¶Æ½ ÅğÀå (Å« ÁÖ´óÄ¡ ³»·Á°¨ + ·¹ÅÍ¹Ú½º µé¾î°¨ + »óÈ²¿¡ ¸Â´Â ÇÏ´ÜUI ¿Ã¶ó¿È)
+        // 3. ì‹œë„¤ë§ˆí‹± í‡´ì¥ (í° ì£¼ëŒ•ì¹˜ ë‚´ë ¤ê° + ë ˆí„°ë°•ìŠ¤ ë“¤ì–´ê° + ìƒí™©ì— ë§ëŠ” í•˜ë‹¨UI ì˜¬ë¼ì˜´)
         yield return StartCoroutine(HubUIManager.Instance.FirstCinemaExit(MiniGameManager.Instance.currentStage));
+
+        // ì»·ì‹  ê°ìƒ ì™„ë£Œ í‘œì‹œ ë° ëŠë‚Œí‘œ ì œê±°
+        MiniGameManager.Instance.SetCutscenePlayed(true);
 
         MiniGameManager.Instance.EnablePlayerInput();
     }
 
     #endregion
 
-    // µğÁö¹ÙÀÌ½º¸¦ ¾òÀº ÀÌÈÄ µğÁö¹ÙÀÌ½º -> ÁÖ´óÄ¡ ´ëÈ­ ¾À ÁøÀÔ Á¦¾î
+    // ë””ì§€ë°”ì´ìŠ¤ë¥¼ ì–»ì€ ì´í›„ ë””ì§€ë°”ì´ìŠ¤ -> ì£¼ëŒ•ì¹˜ ëŒ€í™” ì”¬ ì§„ì… ì œì–´
     #region DigiviceScene
     public void PlaySequenceForCurrentStage()
     {
         int currentStage = MiniGameManager.Instance.currentStage;
         if (currentStage >= stageDialogues.Length) return;
-
        
         StartCoroutine(NomalSequenceRoutine(stageDialogues[currentStage]));
-        
-
     }
 
     private IEnumerator NomalSequenceRoutine(DialogueData dialogueData)
@@ -74,16 +74,35 @@ public class JudangChiController : MonoBehaviour
         MiniGameManager.Instance.DisablePlayerInput();
 
         HubUIManager.Instance.PlayCinemaEnter();
-        // 1. ½Ã³×¸¶Æ½ ÀÔÀå (ÇÏ´ÜUI ³»·Á°¨ + ·¹ÅÍ¹Ú½º ³ª¿È + Å« ÁÖ´óÄ¡ ¿Ã¶ó¿È)
+        // 1. ì‹œë„¤ë§ˆí‹± ì…ì¥ (í•˜ë‹¨UI ë‚´ë ¤ê° + ë ˆí„°ë°•ìŠ¤ ë‚˜ì˜´ + í° ì£¼ëŒ•ì¹˜ ì˜¬ë¼ì˜´)
         yield return new WaitUntil(() => HubUIManager.Instance.isNormalCinemaEnterDone);
         yield return new WaitForSeconds(0.2f);
 
-        // 2. ´ë»ç ÁøÇà
+        // 2. ëŒ€ì‚¬ ì§„í–‰
         bool isDialogueDone = false;
         JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
-        
-        yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+
+        bool isFinalStage = MiniGameManager.Instance.currentStage == 5;
+        Debug.Log($"{isFinalStage}");
+
+        if (isFinalStage)
+        {
+            // ë§ˆì§€ë§‰ ëŒ€ì‚¬ì˜€ë‹¤ë©´ í‰ì†Œì²˜ëŸ¼ í‡´ì¥í•˜ì§€ ì•Šê³ , ì—”ë”© ì‹œí€€ìŠ¤ë¡œ ì§„ì…í•©ë‹ˆë‹¤.
+            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(PlayEndingSequence());
+        }
+        else
+        {
+            // í‰ì†Œë¼ë©´ ì–Œì „íˆ í‡´ì¥í•˜ê³  í”Œë ˆì´ì–´ì—ê²Œ ì¡°ì‘ê¶Œì„ ëŒë ¤ì¤ë‹ˆë‹¤.
+            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
+            MiniGameManager.Instance.EnablePlayerInput();
+        }
+
+        // ì»·ì‹  ê°ìƒ ì™„ë£Œ í‘œì‹œ ë° ëŠë‚Œí‘œ ì œê±°
+        MiniGameManager.Instance.SetCutscenePlayed(true);
+
         MiniGameManager.Instance.EnablePlayerInput();
 
     }
@@ -91,7 +110,7 @@ public class JudangChiController : MonoBehaviour
 
 
 
-    // °ÔÀÓ Å¬¸®¾î ÈÄ ÁÖ´óÄ¡ ´ëÈ­ ¾À ¹Ù·Î ÁøÀÔ
+    // ê²Œì„ í´ë¦¬ì–´ í›„ ì£¼ëŒ•ì¹˜ ëŒ€í™” ì”¬ ë°”ë¡œ ì§„ì…
     #region AfterGameClear
     internal void PlaySequenceForGameClear()
     {
@@ -99,41 +118,20 @@ public class JudangChiController : MonoBehaviour
 
         if (currentStage >= stageDialogues.Length) return;
 
-
-        
-
         StartCoroutine(GameClearSequenceRoutine(stageDialogues[currentStage]));
     }
 
     private IEnumerator GameClearSequenceRoutine(DialogueData dialogueData)
     {
+        yield return new WaitForSeconds(0.5f);
         MiniGameManager.Instance.DisablePlayerInput();
 
-        HubUIManager.Instance.StageClearOnCinema();
-        // 1. ½Ã³×¸¶Æ½ ÀÔÀå (ÇÏ´ÜUI ³»·Á°¨ + ·¹ÅÍ¹Ú½º ³ª¿È + Å« ÁÖ´óÄ¡ ¿Ã¶ó¿È)
-        yield return new WaitUntil(() => HubUIManager.Instance.isNormalCinemaEnterDone);
-        yield return new WaitForSeconds(0.2f);
-
-        // 2. ´ë»ç ÁøÇà
-        bool isDialogueDone = false;
-        JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
-        yield return new WaitUntil(() => isDialogueDone);
-        bool isFinalStage = MiniGameManager.Instance.currentStage == 5;
-        Debug.Log($"{isFinalStage}");
-
-        if (isFinalStage)
-        {
-            // ¸¶Áö¸· ´ë»ç¿´´Ù¸é Æò¼ÒÃ³·³ ÅğÀåÇÏÁö ¾Ê°í, ¿£µù ½ÃÄö½º·Î ÁøÀÔÇÕ´Ï´Ù.
-            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
-            yield return new WaitForSeconds(1f);
-            yield return StartCoroutine(PlayEndingSequence());
-        }
-        else
-        {
-            // Æò¼Ò¶ó¸é ¾äÀüÈ÷ ÅğÀåÇÏ°í ÇÃ·¹ÀÌ¾î¿¡°Ô Á¶ÀÛ±ÇÀ» µ¹·ÁÁİ´Ï´Ù.
-            yield return StartCoroutine(HubUIManager.Instance.PlayCinemaExit(MiniGameManager.Instance.currentStage));
-            MiniGameManager.Instance.EnablePlayerInput();
-        }
+        HubUIManager.Instance.StageClear_ObjectGet();
+        
+        // StageClear_ObjectGet ì—°ì¶œì´ ëŒ€ëµ 2.5ì´ˆê°„ ì§„í–‰ëœë‹¤ê³  ê°€ì •í•˜ê³  ëŒ€ê¸°
+        yield return new WaitForSeconds(2.2f);
+        
+        MiniGameManager.Instance.EnablePlayerInput();
     }
     #endregion
 
@@ -141,14 +139,14 @@ public class JudangChiController : MonoBehaviour
 
     private IEnumerator PlayEndingSequence()
     {
-        // (¼±ÅÃ) ¿©±â¼­ È­¸éÀ» ÃµÃµÈ÷ ±î¸Ä°Ô ÆäÀÌµå¾Æ¿ô ½ÃÅ°´Â UI ¿¬ÃâÀ» ³ÖÀ¸¸é ¸ÀÀÖ½À´Ï´Ù.
+        // (ì„ íƒ) ì—¬ê¸°ì„œ í™”ë©´ì„ ì²œì²œíˆ ê¹Œë§£ê²Œ í˜ì´ë“œì•„ì›ƒ ì‹œí‚¤ëŠ” UI ì—°ì¶œì„ ë„£ìœ¼ë©´ ë§›ìˆìŠµë‹ˆë‹¤.
         //  yield return StartCoroutine(HubUIManager.Instance.PlayFadeOut());
 
-        Debug.Log("¸ğµç ½ºÅ×ÀÌÁö Å¬¸®¾î! ¿£µù ¾ÀÀ¸·Î ÁøÀÔÇÕ´Ï´Ù.");
+        Debug.Log("ëª¨ë“  ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´! ì—”ë”© ì”¬ìœ¼ë¡œ ì§„ì…í•©ë‹ˆë‹¤.");
 
         yield return new WaitForSeconds(1f);
 
-        // ¾À ÀüÈ¯ÀÌ¶ó´Â ¹«°Å¿î ÀÛ¾÷Àº Controller°¡ Á÷Á¢ ÇÏÁö ¾Ê°í Manager¿¡°Ô 'À§ÀÓ'ÇÕ´Ï´Ù.
+        // ì”¬ ì „í™˜ì´ë¼ëŠ” ë¬´ê±°ìš´ ì‘ì—…ì€ Controllerê°€ ì§ì ‘ í•˜ì§€ ì•Šê³  Managerì—ê²Œ 'ìœ„ì„'í•©ë‹ˆë‹¤.
         MiniGameManager.Instance.LoadEndingScene();
     }
 

@@ -2,42 +2,55 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // ¾À ÀüÈ¯À» À§ÇØ ¹İµå½Ã Ãß°¡ÇØ¾ß ÇÕ´Ï´Ù.
+using UnityEngine.UI; // ì”¬ ì „í™˜ì„ ìœ„í•´ ë°˜ë“œì‹œ ì¶”ê°€í•´ì•¼ í•©ë‹ˆë‹¤.
 
 public class MainUIManager : MonoBehaviour
 {
     [Header("Transition Settings")]
-    [Tooltip("È­¸éÀ» µ¤À» °ËÀº»ö UI ÀÌ¹ÌÁö ÆĞ³Î")]
+    [Tooltip("í™”ë©´ì„ ë®ì„ ê²€ì€ìƒ‰ UI ì´ë¯¸ì§€ íŒ¨ë„")]
     [SerializeField] private Image fadePanel;
-    [Tooltip("¾îµÎ¿öÁö´Â µ¥ °É¸®´Â ½Ã°£ (ÃÊ)")]
+    [Tooltip("ì–´ë‘ì›Œì§€ëŠ” ë° ê±¸ë¦¬ëŠ” ì‹œê°„ (ì´ˆ)")]
     [SerializeField] private float fadeDuration = 2.0f;
 
-    // Áßº¹ Å¬¸¯ ¹æÁö¿ë ÇÃ·¡±×
+    // ì¤‘ë³µ í´ë¦­ ë°©ì§€ìš© í”Œë˜ê·¸
     private bool isTranstioning = false;
+    private const string SAVE_STAGE_KEY = "SavedCurrentStage";
 
     public void GameStart()
     {
-        Debug.Log("0. GameStart Gone");
         if (isTranstioning) return;
         isTranstioning = true;
-        Debug.Log("1. isTranstioning true");
-        //SceneManager.LoadScene("Hub");
 
-        // ÆäÀÌµå ¾Æ¿ôÀÌ ´Ù ³¡³ª¸é, Hub¾ÀÀ» ·ÎµåÇÏ°Ô ·ÎÁ÷À» ³Ñ±è
+        // ìƒˆë¡œ ì‹œì‘í•˜ë¯€ë¡œ ê¸°ì¡´ ì„¸ì´ë¸Œ ë°ì´í„° ì´ˆê¸°í™”
+        PlayerPrefs.DeleteKey(SAVE_STAGE_KEY);
+        PlayerPrefs.DeleteKey("SavedCutscenePlayed");
+        PlayerPrefs.Save();
+
+        // í˜ì´ë“œ ì•„ì›ƒ í›„ Hub ì”¬ìœ¼ë¡œ ì „í™˜
+        PlayFadeOut(() => SceneManager.LoadScene("Hub"));
+    }
+
+    // ì´ì–´í•˜ê¸° ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œí•  ë©”ì„œë“œ
+    public void ContinueGame()
+    {
+        if (isTranstioning) return;
+        isTranstioning = true;
+
+        // ì €ì¥ëœ ìŠ¤í…Œì´ì§€ ì •ë³´ê°€ ìœ ì§€ëœ ì±„ë¡œ Hub ì”¬ ë¡œë“œ
         PlayFadeOut(() => SceneManager.LoadScene("Hub"));
     }
 
  
 
-    // °ÔÀÓÀ» Á¾·áÇÏ´Â ÇÔ¼ö
+    // ê²Œì„ì„ ì¢…ë£Œí•˜ëŠ” í•¨ìˆ˜
     public void QuitGame()
     {
         if (isTranstioning) return;
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        Debug.Log("°ÔÀÓ Á¾·á (¿¡µğÅÍ)");
+        Debug.Log("ê²Œì„ ì¢…ë£Œ (ì—ë””í„°)");
 #else
-        // ½ÇÁ¦ ºôµåµÈ °ÔÀÓ(exe, apk µî)¿¡¼­ ÇÃ·¹ÀÌ ÁßÀÏ ¶§
+        // ì‹¤ì œ ë¹Œë“œëœ ê²Œì„(exe, apk ë“±)ì—ì„œ í”Œë ˆì´ ì¤‘ì¼ ë•Œ
         Application.Quit();
 #endif
     }

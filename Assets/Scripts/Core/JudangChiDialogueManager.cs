@@ -29,33 +29,63 @@ public class JudangChiDialogueManager : MonoBehaviour
 
     private IEnumerator TypeSentenceRoutine(DialogueData data, Action onComplete)
     {
-        // 1. ±âÁ¸ÀÇ string ´ë½Å SentenceData ±¸Á¶Ã¼¸¦ ¼øÈ¸ÇÕ´Ï´Ù.
         foreach (DialogueData.SentenceData sentenceData in data.sentences)
         {
-            // 2. ´ë»ç Ãâ·ÂÀ» ½ÃÀÛÇÏ±â Àü¿¡, ¼³Á¤µÈ Ç¥Á¤ ÀÌ¹ÌÁö°¡ ÀÖ´Ù¸é HubUIManager¿¡ Àü´ŞÇÏ¿© Ç¥Á¤À» ¹Ù²ß´Ï´Ù.
             if (sentenceData.expressionSprite != null)
             {
                 HubUIManager.Instance.ChangeBigJudangchiExpression(sentenceData.expressionSprite);
             }
 
-            dialogueText.text = "";
-
-            // 3. ÇÑ ±ÛÀÚ¾¿ Ãâ·ÂÇÏ´Â Å¸ÀÚ±â È¿°ú (±¸Á¶Ã¼ ¾ÈÀÇ text ÇÊµå »ç¿ë)
-            foreach (char letter in sentenceData.text.ToCharArray())
+            // ì´ë²ˆ ë¬¸ì¥ì— ì„¤ì •ëœ ë””ì§€ë°”ì´ìŠ¤ íŠ¹ìˆ˜ ì—°ì¶œ íŠ¸ë¦¬ê±°ê°€ ìˆë‹¤ë©´ ì¦‰ì‹œ ì‹¤í–‰
+            if (!string.IsNullOrEmpty(sentenceData.animationTriggerName))
             {
-                dialogueText.text += letter;
-                yield return new WaitForSeconds(typingSpeed);
+                HubUIManager.Instance.PlaySpecialAnimation(sentenceData.animationTriggerName);
             }
 
-            // 4. ±ÛÀÚ°¡ ´Ù ÂïÈ÷¸é À¯ÀúÀÇ Å¬¸¯À» ±â´Ù¸²
-            yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+            dialogueText.text = "";
+            bool skipTyping = false;
 
-            // Å¬¸¯ÀÌ Áßº¹ Ã³¸®µÇÁö ¾Êµµ·Ï ÇÑ ÇÁ·¹ÀÓ ´ë±â
+            // í•œ ê¸€ìì”© íƒ€ì´í•‘ íš¨ê³¼ ì¶œë ¥
+            for (int i = 0; i < sentenceData.text.Length; i++)
+            {
+                // ê¸€ì ì¶œë ¥ ë„ì¤‘ í´ë¦­ ì‹œ ì¦‰ì‹œ ìŠ¤í‚µ í”Œë˜ê·¸ í™œì„±í™”
+                if (Input.GetMouseButtonDown(0))
+                {
+                    skipTyping = true;
+                    break;
+                }
+
+                dialogueText.text += sentenceData.text[i];
+
+                // íƒ€ì´í•‘ ëŒ€ê¸° ì‹œê°„ ì¤‘ì—ë„ ë§ˆìš°ìŠ¤ í´ë¦­ ì •ë°€ ê°ì§€
+                float elapsed = 0f;
+                while (elapsed < typingSpeed)
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        skipTyping = true;
+                        break;
+                    }
+                    elapsed += Time.unscaledDeltaTime;
+                    yield return null;
+                }
+
+                if (skipTyping) break;
+            }
+
+            // í…ìŠ¤íŠ¸ë¥¼ ëê¹Œì§€ ì¶œë ¥
+            dialogueText.text = sentenceData.text;
+
+            // ìŠ¤í‚µ ë‹¹ì‹œì˜ ë§ˆìš°ìŠ¤ í´ë¦­ì´ ë‹¤ìŒ ëŒ€ì‚¬ ë„˜ì–´ê°€ê¸°ë¡œ ì¦‰ì‹œ ì¸ì‹ë˜ì§€ ì•Šë„ë¡ í•œ í”„ë ˆì„ ëŒ€ê¸°
+            yield return null;
+
+            // ë§ˆìš°ìŠ¤ í´ë¦­ ì‹œ ë‹¤ìŒ ëŒ€ì‚¬ë¡œ ì§„í–‰
+            yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
             yield return null;
         }
 
-        // ¸ğµç ´ë»ç ¹è¿­À» ´Ù ¼øÈ¸Çß´Ù¸é Ã¢À» ²ô°í Äİ¹é ½ÇÇà
+        // ëª¨ë“  ëŒ€ì‚¬ ë°°ì—´ì„ ë‹¤ ìˆœíšŒí–ˆë‹¤ë©´ ì°½ì„ ë„ê³  ì½œë°± ì‹¤í–‰
         dialoguePanel.SetActive(false);
-        onComplete?.Invoke(); // ¾ÈÁ¤¼ºÀ» À§ÇØ ? ¿¬»êÀÚ Ãß°¡
+        onComplete?.Invoke(); // ì•ˆì •ì„±ì„ ìœ„í•´ ? ì—°ì‚°ì ì¶”ê°€
     }
 }

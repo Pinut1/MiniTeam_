@@ -9,24 +9,25 @@ public class HubUIManager : MonoBehaviour
 {
     public static HubUIManager Instance { get; private set; }
 
-    [Header("¿ÀÇÁ´× ¿¬Ãâ (WakeUp)")]
+    [Header("WakeUp & Setup (ì˜¤í”„ë‹ ì—°ì¶œ)")]
     public EyeOpeningEffect eyeEffect;
-    public float openSpeed = 1.5f;
+    [SerializeField] private float openSpeed = 1.5f;
 
-    [Header("ÀÎ°ÔÀÓ UI Panels")]
+    [Header("Dialogue UI (ëŒ€í™” ë° ì•Œë¦¼ íŒ¨ë„)")]
+    [SerializeField] private Animator cinemaAnimator;
+    [SerializeField] private Image judangchiBigImage;
     [SerializeField] private GameObject warningUI;
     [SerializeField] private TMP_Text warningText;
 
-    [Header("½Ã³×¸¶Æ½ ÅëÇÕ ¾Ö´Ï¸ŞÀÌÅÍ (ºÎ¸ğ °´Ã¼)")]
+    [Header("Interaction Objects (í•˜ë‹¨ ìƒí˜¸ì‘ìš©)")]
+    [SerializeField] private GameObject judangchiSmallObj;
+    [SerializeField] private GameObject digiviceObj;
+    public GameObject exclamationMark;
+    [SerializeField] private Image[] digiviceBtns;
 
-    [SerializeField] private Animator cinemaAnimator;
-
-    [Header("ÇÏ´Ü »óÈ£ÀÛ¿ë °´Ã¼ ")]
-    [SerializeField] private GameObject judangchiSmallObj; // Judanchi_ÃÊ±â
-    [SerializeField] private GameObject digiviceObj;       // µğÁö¹ÙÀÌ½º GameObject
-
-    [Header("´ëÈ­Ã¢¿ë Å« ÁÖ´óÄ¡ ")]
-    [SerializeField] private Image judangchiBigImage;      // Judanchi_±âº»ÀÇ Image ÄÄÆ÷³ÍÆ®
+    [Header("Stage Clear Reward (í´ë¦¬ì–´ ì—°ì¶œ)")]
+    [SerializeField] private Image objectImg;
+    [SerializeField] private Sprite[] stageClearSprites;
 
     
     #region UNITY LIFE CYCLE
@@ -38,63 +39,100 @@ public class HubUIManager : MonoBehaviour
 
     private void Start()
     {
-        // ¹öÆ° ÀÌº¥Æ® ¿¬°á (GameObject¿¡¼­ Button ÄÄÆ÷³ÍÆ® ÃßÃâ)
+        // ë²„íŠ¼ ì´ë²¤íŠ¸ ì—°ê²° (GameObjectì—ì„œ Button ì»´í¬ë„ŒíŠ¸ ì¶”ì¶œ)
         if (judangchiSmallObj != null)
             judangchiSmallObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedJudangchi);
 
         if (digiviceObj != null)
             digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
-        // ¾ÀÀÌ Ã³À½ ·ÎµåµÇ°Å³ª º¹±ÍÇßÀ» ¶§, ÇöÀç ½ºÅ×ÀÌÁö¿¡ ¸ÂÃç ÃÊ±â UI¸¦ ¶ç¿öµÓ´Ï´Ù.
-        // InitializeBottomUI(MiniGameManager.Instance.currentStage);
     }
 
     #endregion
     public void OnBottomUIClickedJudangchi()
     {
-      
-        // Å¬¸¯ Áßº¹ ¹æÁö¸¦ À§ÇØ ¹öÆ° ±â´ÉÀ» Àá½Ã ²ü´Ï´Ù.
         judangchiSmallObj.GetComponent<Button>().interactable = false;
-       
-        // Controller¿¡°Ô ¿¬Ãâ ½ÃÀÛÀ» º¸°í
+        MiniGameManager.Instance?.SetCutscenePlayed(true);
         JudangChiController.Instance.PlaySequenceForFirstStage();
     }
 
     public void OnBottomUIClickedDigivice()
     {
         digiviceObj.GetComponent<Button>().interactable = false;
-        // Controller¿¡°Ô ¿¬Ãâ ½ÃÀÛÀ» º¸°í
+        MiniGameManager.Instance?.SetCutscenePlayed(true);
         JudangChiController.Instance.PlaySequenceForCurrentStage();
     }
 
    
     public void FirstCinemaEnter()
     {
-        // Event Marker¿¡ ÀÇÇØ ÀÛµ¿ÇÏ´Â bool trigger¸¦ ÃÊ±âÈ­
+        // Event Markerì— ì˜í•´ ì‘ë™í•˜ëŠ” bool triggerë¥¼ ì´ˆê¸°í™”
         isFirstCinemaEnterDone = false;
-        // ÇÏ³ªÀÇ Æ®¸®°Å·Î ÀÔÀå ¿¬Ãâ(ÇÏ´Ü ÅğÀå -> ·¹ÅÍ¹Ú½º -> Å« ÁÖ´óÄ¡)À» ÇÑ¹æ¿¡ Àç»ı!
+        // í•˜ë‚˜ì˜ íŠ¸ë¦¬ê±°ë¡œ ì…ì¥ ì—°ì¶œ(í•˜ë‹¨ í‡´ì¥ -> ë ˆí„°ë°•ìŠ¤ -> í° ì£¼ëŒ•ì¹˜)ì„ í•œë°©ì— ì¬ìƒ!
         cinemaAnimator.SetTrigger("FirstCinemaEnter");
       
     }
 
     public IEnumerator FirstCinemaExit(int currentStage)
     {
-        // ÅğÀå ¿¬ÃâÀ» Àç»ıÇÏ±â Á÷Àü¿¡, ´Ù½Ã ¿Ã¶ó¿Í¾ß ÇÒ ÇÏ´Ü UI¸¦ ¹Ì¸® ¼¼ÆÃÇØÁİ´Ï´Ù.
+        // í‡´ì¥ ì—°ì¶œì„ ì¬ìƒí•˜ê¸° ì§ì „ì—, ë‹¤ì‹œ ì˜¬ë¼ì™€ì•¼ í•  í•˜ë‹¨ UIë¥¼ ë¯¸ë¦¬ ì„¸íŒ…í•´ì¤ë‹ˆë‹¤.
         InitializeBottomUI(currentStage);
 
-        // ÇÏ³ªÀÇ Æ®¸®°Å·Î ÅğÀå ¿¬Ãâ(Å« ÁÖ´óÄ¡ ÅğÀå -> ·¹ÅÍ¹Ú½º Ä¡¿ì±â -> ÇÏ´Ü ÀÔÀå)À» ÇÑ¹æ¿¡ Àç»ı!
+        // í•˜ë‚˜ì˜ íŠ¸ë¦¬ê±°ë¡œ í‡´ì¥ ì—°ì¶œ(í° ì£¼ëŒ•ì¹˜ í‡´ì¥ -> ë ˆí„°ë°•ìŠ¤ ì¹˜ìš°ê¸° -> í•˜ë‹¨ ì…ì¥)ì„ í•œë°©ì— ì¬ìƒ!
         cinemaAnimator.SetTrigger("FirstCinemaExit");
         yield return new WaitForSeconds(1.2f);
     }
 
-    public void StageClearOnCinema()
+    public void StageClear_ObjectGet()
     {
-        InitializeBottomUI(1);
-        digiviceObj.GetComponent<Button>().interactable = false;
+        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
+
+        // í´ë¦¬ì–´í•œ ìŠ¤í…Œì´ì§€ì— ë§ì¶° íšë“ ì˜¤ë¸Œì íŠ¸ ìŠ¤í”„ë¼ì´íŠ¸ êµì²´ (stage 0 í´ë¦¬ì–´ ì‹œ currentStage=1ì´ ë˜ë¯€ë¡œ index 0 ëŒ€ì…)
+        int spriteIndex = currentStage - 1;
+        if (objectImg != null && stageClearSprites != null)
+        {
+            if (spriteIndex >= 0 && spriteIndex < stageClearSprites.Length)
+            {
+                objectImg.sprite = stageClearSprites[spriteIndex];
+            }
+        }
+
+        if (currentStage >= 2)
+        {
+            InitializeBottomUI(currentStage);
+        }
+        else
+        {
+            if (judangchiSmallObj != null) judangchiSmallObj.SetActive(false);
+            if (digiviceObj != null) digiviceObj.SetActive(false);
+        }
+
+        if (digiviceObj != null)
+        {
+            digiviceObj.GetComponent<Button>().interactable = false;
+        }
 
         isNormalCinemaEnterDone = false;
-        cinemaAnimator.SetTrigger("StageClearOnCinema");
-      
+        cinemaAnimator.SetTrigger("StageClear_ObjectGet");
+        
+        StartCoroutine(RestoreDigiviceButtonAfterDelay(2.5f, currentStage));
+    }
+
+    private IEnumerator RestoreDigiviceButtonAfterDelay(float delay, int stage)
+    {
+        yield return new WaitForSeconds(delay);
+        if (stage >= 2)
+        {
+            if (digiviceObj != null)
+            {
+                digiviceObj.GetComponent<Button>().interactable = true;
+            }
+        }
+        else
+        {
+            if (judangchiSmallObj != null) judangchiSmallObj.GetComponent<Button>().interactable = true;
+            if (digiviceObj != null) digiviceObj.GetComponent<Button>().interactable = true;
+        }
     }
 
     public void PlayCinemaEnter()
@@ -107,10 +145,10 @@ public class HubUIManager : MonoBehaviour
 
     public IEnumerator PlayCinemaExit(int currentStage)
     {
-        // ÅğÀå ¿¬ÃâÀ» Àç»ıÇÏ±â Á÷Àü¿¡, ´Ù½Ã ¿Ã¶ó¿Í¾ß ÇÒ ÇÏ´Ü UI¸¦ ¹Ì¸® ¼¼ÆÃÇØÁİ´Ï´Ù.
+        // í‡´ì¥ ì—°ì¶œì„ ì¬ìƒí•˜ê¸° ì§ì „ì—, ë‹¤ì‹œ ì˜¬ë¼ì™€ì•¼ í•  í•˜ë‹¨ UIë¥¼ ë¯¸ë¦¬ ì„¸íŒ…í•´ì¤ë‹ˆë‹¤.
         InitializeBottomUI(currentStage);
 
-        // ÇÏ³ªÀÇ Æ®¸®°Å·Î ÅğÀå ¿¬Ãâ(Å« ÁÖ´óÄ¡ ÅğÀå -> ·¹ÅÍ¹Ú½º Ä¡¿ì±â -> ÇÏ´Ü ÀÔÀå)À» ÇÑ¹æ¿¡ Àç»ı!
+        // í•˜ë‚˜ì˜ íŠ¸ë¦¬ê±°ë¡œ í‡´ì¥ ì—°ì¶œ(í° ì£¼ëŒ•ì¹˜ í‡´ì¥ -> ë ˆí„°ë°•ìŠ¤ ì¹˜ìš°ê¸° -> í•˜ë‹¨ ì…ì¥)ì„ í•œë°©ì— ì¬ìƒ!
         cinemaAnimator.SetTrigger("CinemaExit");
         yield return new WaitForSeconds(1.9f);
         digiviceObj.GetComponent<Button>().interactable = true;
@@ -121,10 +159,11 @@ public class HubUIManager : MonoBehaviour
         if (stage >= 1)
         {
             judangchiSmallObj.SetActive(false);
+            if (digiviceObj != null) judangchiSmallObj.SetActive(false); // ê¸°ì¡´ ì•ˆì „ì¥ì¹˜
             if (digiviceObj != null)
             {
                 digiviceObj.SetActive(true);
-               
+                digiviceObj.GetComponent<Button>().interactable = true;
             }
         }
         else
@@ -133,14 +172,58 @@ public class HubUIManager : MonoBehaviour
             judangchiSmallObj.SetActive(true);
             judangchiSmallObj.GetComponent<Button>().interactable = true;
         }
+
+        // ì˜¤ì§ 0ë‹¨ê³„ì´ê³  ì•„ì§ ì»·ì‹ ì„ ì•ˆ ë´¤ì„ ë•Œë§Œ ìµœì´ˆ ì§€ì—°(0.75ì´ˆ) ì¶œí˜„ ì—°ì¶œ ì ìš©
+        if (stage == 0 && MiniGameManager.Instance != null && !MiniGameManager.Instance.isCutscenePlayed)
+        {
+            StartCoroutine(ShowExclamationWithDelay(0.75f));
+        }
+        else
+        {
+            UpdateExclamationMark();
+        }
+
+        UpdateDigiviceButtons(stage);
     }
 
+    private void UpdateDigiviceButtons(int stage)
+    {
+        if (digiviceBtns == null || digiviceBtns.Length == 0) return;
 
-   
+        for (int i = 0; i < digiviceBtns.Length; i++)
+        {
+            if (digiviceBtns[i] == null) continue;
 
+            // 0-based stage ê¸°ì¤€ ë§¤í•‘:
+            // 1ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œ(stage = 2) -> digiviceBtns[0] ì˜¨ (alpha = 1.0f)
+            // 2ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œ(stage = 3) -> digiviceBtns[1] ì˜¨
+            // 3ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œ(stage = 4) -> digiviceBtns[2] ì˜¨
+            // 4ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì‹œ(stage = 5) -> digiviceBtns[3] ì˜¨
+            int requiredStage = 2 + i;
+            float alpha = (stage >= requiredStage) ? 1.0f : 0.3f;
+            
+            Color color = digiviceBtns[i].color;
+            color.a = alpha;
+            digiviceBtns[i].color = color;
+        }
+    }
+    // ê°±ì‹  í•¨ìˆ˜: ì˜¤ì§ '0ë‹¨ê³„'ì—ì„œë§Œ ë³´ì´ë©°, 0ë‹¨ê³„ ì»·ì‹ ì„ ì•„ì§ ì•ˆ ë³¸ ìƒíƒœì—¬ì•¼ í™œì„±í™”
+    public void UpdateExclamationMark()
+    {
+        if (exclamationMark == null || MiniGameManager.Instance == null) return;
+        bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
+        exclamationMark.SetActive(shouldShow);
+    }
+    // 1íšŒì„± ì§€ì—° ì¶œí˜„ ì½”ë£¨í‹´
+    private IEnumerator ShowExclamationWithDelay(float delay)
+    {
+        exclamationMark.SetActive(false); // ë¨¼ì € êº¼ë‘ 
+        yield return new WaitForSecondsRealtime(delay);
+        UpdateExclamationMark();
+    }
 
     // ==========================================
-    // ´« ±ôºıÀÓ ¿¬Ãâ 
+    // ëˆˆ ê¹œë¹¡ì„ ì—°ì¶œ 
     // ==========================================
     #region EyeBlank
     public void WakeUp(Action onComplete = null)
@@ -211,7 +294,7 @@ public class HubUIManager : MonoBehaviour
     #endregion
 
     #region ETC
-    // Ç¥Á¤ º¯°æ ÇÔ¼ö (À¯Áö)
+    // í‘œì • ë³€ê²½ í•¨ìˆ˜ (ìœ ì§€)
     public void ChangeBigJudangchiExpression(Sprite newSprite)
     {
         if (newSprite != null)
@@ -225,7 +308,7 @@ public class HubUIManager : MonoBehaviour
         
         if (warningUI != null) warningUI.SetActive(isOn);
 
-        // Ã¢À» ÄÓ ¶§ Àü´Ş¹ŞÀº ¸Ş¼¼Áö°¡ ºñ¾îÀÖÁö ¾Ê´Ù¸é ÅØ½ºÆ®¸¦ ¾÷µ¥ÀÌÆ®.
+        // ì°½ì„ ì¼¤ ë•Œ ì „ë‹¬ë°›ì€ ë©”ì„¸ì§€ê°€ ë¹„ì–´ìˆì§€ ì•Šë‹¤ë©´ í…ìŠ¤íŠ¸ë¥¼ ì—…ë°ì´íŠ¸.
         if (isOn && !string.IsNullOrEmpty(message) && warningText != null)
         {
             warningText.text = message;
@@ -234,7 +317,7 @@ public class HubUIManager : MonoBehaviour
     #endregion
 
 
-    // Animator Event Marker Á¦¾î
+    // Animator Event Marker ì œì–´
     public bool isFirstCinemaEnterDone { get; private set; } = false;
     public void CompleteFirstCinemaEnter()
     {
@@ -245,6 +328,20 @@ public class HubUIManager : MonoBehaviour
     public void CompleteNormalCinemaEnter()
     {
         isNormalCinemaEnterDone = true;
+
+        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
+        if (currentStage == 1)
+        {
+            InitializeBottomUI(1);
+        }
+    }
+
+    public void PlaySpecialAnimation(string triggerName)
+    {
+        if (cinemaAnimator != null && !string.IsNullOrEmpty(triggerName))
+        {
+            cinemaAnimator.SetTrigger(triggerName);
+        }
     }
     
 
