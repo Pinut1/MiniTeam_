@@ -98,34 +98,25 @@ public class DroppedHeart : MonoBehaviour
                 // --- 1. 피에르 하트 처리 로직 ---
                 if (isPierreHeart)
                 {
-                    if (pierreEffectPrefab != null)
-                    {
-                        GameObject effect = Instantiate(pierreEffectPrefab, transform.position, Quaternion.identity);
-                        SpriteRenderer[] allRenderers = effect.GetComponentsInChildren<SpriteRenderer>(true);
-                        foreach (SpriteRenderer renderer in allRenderers)
-                        {
-                            renderer.sortingLayerName = "Magic";
-                            renderer.sortingOrder = 10;
-                        }
-                        Destroy(effect, 2.0f);
-                    }
-
                     PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
                     if (laser != null)
                     {
                         Debug.Log("PlayerLaser를 찾아서 TriggerPierreEnding을 호출합니다!");
-                        laser.TriggerPierreEnding();
+                        laser.TriggerPierreEnding(transform.position);
                     }
                 }
 
                 // --- 2. ★ 바닐라 하얀 하트 (게임 클리어) 처리 로직 ---
                 if (isBanillaWhiteHeart)
                 {
-                    Debug.Log("게임 클리어");
+                    Debug.Log("바닐라 하얀 하트 획득! 컷신 시작");
 
-                    if (MiniGameManager.Instance != null)
+                    // ★★★ [주의] 예전에 여기에 있던 MiniGameManager.Instance.OnMiniGameClear(); 코드는 꼭 지워주세요! ★★★
+
+                    PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
+                    if (laser != null)
                     {
-                        MiniGameManager.Instance.OnMiniGameClear();
+                        laser.TriggerBanillaEnding(); // 레이저를 통해 컷신을 발동시킵니다.
                     }
                     else
                     {

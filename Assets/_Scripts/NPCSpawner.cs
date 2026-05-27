@@ -8,14 +8,27 @@ public class NpcSpawner : MonoBehaviour
     public GameObject[] girlPrefabs;
 
     [Header("스폰 위치 범위")]
-    public float minX = -10f;
-    public float maxX = 10f;
-    public float minY = -1f;
-    public float maxY = 2f;
+    public float minX = -14f;
+    public float maxX = 35f;
+    public float minY = 0f;
+    public float maxY = 0.5f;
 
     [Header("수량 설정")]
-    public int minGirlCount = 3;
-    public int maxGirlCount = 5;
+    public int minGirlCount = 7;
+    public int maxGirlCount = 11;
+
+    [Header("리스폰 딜레이 시간 설정")]
+    public float normalDelay = 3f; // 하트를 다 모았을 때의 기본 대기 시간
+    public float fastDelay = 0.5f; // 하트가 부족할 때의 빠른 대기 시간
+
+    [Header("하트 매니저 연결")]
+    // 인스펙터 창에서 하이어라키의 HeartManager 오브젝트를 끌어다 넣으세요.
+    public HeartUIManager heartManager;
+
+    // ★★★ [새로 추가] 바닥 Y 위치 설정 ★★★
+    [Header("바닥 레벨 설정")]
+    [Tooltip("남자 NPC가 무조건 생성되어야 하는 바닥의 Y 위치 값")]
+    public float floorY = 0f;
 
     void Start()
     {
@@ -37,25 +50,43 @@ public class NpcSpawner : MonoBehaviour
 
     private IEnumerator ManagePair(Transform girl)
     {
-        // 1. 첫 생성은 즉시 (딜레이 없음)
-        GameObject boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], girl.position + new Vector3(1.5f, 0, 0), Quaternion.identity);
-
+        // 1. 첫 생성은 즉시 (★첫 생성 위치도 바닥으로 고정★)
+        Vector3 firstSpawnPos = new Vector3(girl.position.x + 1.5f, floorY, transform.position.z);
+        GameObject boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], firstSpawnPos, Quaternion.identity);
         boy.tag = "NPC";
 
-        // 2. 이후 남학생이 죽었을 때만 3초 딜레이 후 재생성
+        // 2. 남자 NPC가 사라졌을 때 조건에 따라 재생성
         while (girl != null)
         {
             if (boy == null)
-
             {
-                yield return new WaitForSeconds(3f);
+                bool isHeartFull = false;
+
+                // 연결된 HeartUIManager가 있는지 확인
+                if (heartManager != null)
+                {
+                    // ★주의: 아래 코드는 HeartUIManager 스크립트에 있는 실제 변수명으로 변경해야 합니다!★
+                    // 예시: heartManager.currentHearts >= 7 (현재 하트가 7개 이상인지 확인)
+
+                    // isHeartFull = heartManager.currentHearts >= 7; 
+                }
+                else
+                {
+                    Debug.LogWarning("NpcSpawner에 HeartUIManager가 연결되지 않았습니다!");
+                }
+
+                // 하트가 다 찼으면 normalDelay(3초), 안 찼으면 fastDelay(0.5초) 적용
+                float waitTime = isHeartFull ? normalDelay : fastDelay;
+
+                yield return new WaitForSeconds(waitTime);
 
                 if (girl != null)
                 {
-                    Vector3 spawnPos = girl.position + new Vector3(1.5f, 0, 0);
-
+                    // ★★★ [수정된 핵심 부분] ★★★
+                    // 여자 NPC의 Y 위치를 사용하지 않고, 고정된 floorY 값을 사용합니다.
+                    // 이렇게 하면 여자 NPC가 계단 위에 있어도, 남자 NPC는 바닥에서 생성됩니다.
+                    Vector3 spawnPos = new Vector3(girl.position.x + 1.5f, floorY, transform.position.z);
                     boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], spawnPos, Quaternion.identity);
-
                     boy.tag = "NPC";
                 }
             }

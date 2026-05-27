@@ -63,9 +63,7 @@ public class PlayerLaser : MonoBehaviour
     // 중복 방지를 위한 하트 이미지 제비뽑기 주머니
     private List<Sprite> heartSpritePool = new List<Sprite>();
 
-    // ==========================================
-    // ★ 바닐라와의 대결 모드 변수 ★
-    // ==========================================
+    // 바닐라와의 대결 모드 변수
     private bool isInCompetitionMode = false;
     private Vector2 competitionTarget;
     private Color originalLaserColor = Color.white;
@@ -73,7 +71,6 @@ public class PlayerLaser : MonoBehaviour
 
     void Start()
     {
-        // 원본 레이저의 두께와 색상을 저장해둡니다.
         originalWidth = laserWidth;
         if (laserObject != null)
         {
@@ -138,13 +135,11 @@ public class PlayerLaser : MonoBehaviour
 
                 if (playerPinkGauge != null)
                 {
-                    // =======================================================
                     // ★ [난이도 적용] 주변 여학생 수만큼 연타 게이지 깎이는 속도가 빨라집니다! (어려워짐)
                     int girlCount = GetNearbyGirlCount();
                     float currentDrainSpeed = clashDrainSpeed + (penaltyDrainSpeedPerGirl * girlCount);
 
                     playerPinkGauge.fillAmount -= currentDrainSpeed * Time.deltaTime;
-                    // =======================================================
 
                     if (playerPinkGauge.fillAmount <= 0f)
                     {
@@ -180,7 +175,6 @@ public class PlayerLaser : MonoBehaviour
 
                         if (currentFillImage != null)
                         {
-                            // =======================================================
                             // ★ [난이도 적용] 주변 여학생 수만큼 홀드 게이지 차오르는 속도가 느려집니다! (어려워짐)
                             int girlCount = GetNearbyGirlCount();
                             float currentFillSpeed = heartFillSpeed - (penaltyFillSpeedPerGirl * girlCount);
@@ -189,7 +183,6 @@ public class PlayerLaser : MonoBehaviour
                             currentFillSpeed = Mathf.Max(minHeartFillSpeed, currentFillSpeed);
 
                             currentFillImage.fillAmount += currentFillSpeed * Time.deltaTime;
-                            // =======================================================
 
                             if (currentFillImage.fillAmount >= 1f) SuccessAndDropHeart();
                         }
@@ -422,19 +415,16 @@ public class PlayerLaser : MonoBehaviour
             }
         }
 
-        // =======================================================
-        // ★ [추가] 하트를 성공적으로 뽑아냈으니 UI 하트 이미지를 강제로 지웁니다!
+        // ★ 하트를 성공적으로 뽑아냈으니 UI 하트 이미지를 강제로 지웁니다
         if (PlayerUIScene.instance != null)
         {
             PlayerUIScene.instance.HideUIHeart();
         }
 
-        // NPC가 삭제될 예정이므로 마우스 오버(Hover) 타겟도 비워줍니다.
         if (currentHoveredNpc == npcToDestroy)
         {
             currentHoveredNpc = null;
         }
-        // =======================================================
 
         StopFiring();
         ResumeAllGirls();
@@ -465,17 +455,42 @@ public class PlayerLaser : MonoBehaviour
 
     void UpdateHovering()
     {
-        // =======================================================
-        // ★ [추가 1] 넉백 중일 때는 마우스 감지를 아예 건너뛰어서 표정(UI_2)을 유지합니다.
+        // ★ 넉백 중일 때는 마우스 감지를 아예 건너뛰어서 표정(UI_2)을 유지합니다.
         if (isPlayerKnockedBack) return;
-        // =======================================================
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-        if (hit.collider != null && (hit.collider.CompareTag("NPC") || hit.collider.CompareTag("Banilla")))
+        // ★ [핵심 수정] RaycastAll을 써서 마우스 위치에 겹친 '모든' 오브젝트를 싹 다 가져옵니다!
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+
+        GameObject hitNpc = null;
+
+        // 1순위: 꿰뚫은 오브젝트 중 '남학생(NPC)'이 있는지 가장 먼저 찾습니다.
+        foreach (RaycastHit2D hit in hits)
         {
-            GameObject hitNpc = hit.collider.gameObject;
+            if (hit.collider != null && hit.collider.CompareTag("NPC"))
+            {
+                hitNpc = hit.collider.gameObject;
+                break; // 찾았으면 더 안 찾고 바로 종료!
+            }
+        }
+
+        // 2순위: 남학생이 없다면, '바닐라(Banilla)'인지 확인합니다.
+        if (hitNpc == null)
+        {
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider != null && hit.collider.CompareTag("Banilla"))
+                {
+                    hitNpc = hit.collider.gameObject;
+                    break;
+                }
+            }
+        }
+
+        // --- 여기서부터는 찾은 대상(hitNpc)에 대한 기존 로직 그대로! ---
+        if (hitNpc != null)
+        {
             if (targetPoint != null)
             {
                 targetPoint.SetActive(true);
@@ -484,20 +499,10 @@ public class PlayerLaser : MonoBehaviour
 
             if (PlayerUIScene.instance != null)
             {
-                // 배경 교체
-                if (hit.collider.CompareTag("Banilla"))
-                {
-                    PlayerUIScene.instance.SetBanillaBG();
-                }
-                else if (hit.collider.CompareTag("NPC"))
-                {
-                    PlayerUIScene.instance.SetExtraBG();
-                }
+                if (hitNpc.CompareTag("Banilla")) PlayerUIScene.instance.SetBanillaBG();
+                else if (hitNpc.CompareTag("NPC")) PlayerUIScene.instance.SetExtraBG();
 
-                // =======================================================
-                // ★ [추가 2] 타겟에 커서를 댔으니 초상화를 Checking(UI_Chacking)으로 바꿉니다.
                 PlayerUIScene.instance.SetCheckingPortrait();
-                // =======================================================
             }
 
             if (currentHoveredNpc != hitNpc)
@@ -518,13 +523,8 @@ public class PlayerLaser : MonoBehaviour
 
             if (PlayerUIScene.instance != null)
             {
-                // 허공에 커서를 두면 배경 복구
                 PlayerUIScene.instance.SetNormalBG();
-
-                // =======================================================
-                // ★ [추가 3] 허공에 커서를 두면 초상화도 기본(UI_IDLE)으로 복구합니다.
                 PlayerUIScene.instance.SetIdlePortrait();
-                // =======================================================
             }
         }
     }
@@ -539,7 +539,8 @@ public class PlayerLaser : MonoBehaviour
             for (int i = 0; i < heartSpritePool.Count; i++)
             {
                 Sprite temp = heartSpritePool[i];
-                int randomIndex = Random.Range(i, heartSpritePool.Count);
+                int randomIndex = UnityEngine.Random.Range(i, heartSpritePool.Count);
+
                 heartSpritePool[i] = heartSpritePool[randomIndex];
                 heartSpritePool[randomIndex] = temp;
             }
@@ -554,8 +555,7 @@ public class PlayerLaser : MonoBehaviour
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
 
-        // ★ [기존 로직 원상복구] 이미 하트가 있고, 바닐라가 아니라면 
-        // 더 이상 계산하지 않고 기존 하트를 그대로 활성화만 시키고 즉시 함수를 끝냅니다!
+        // ★ 이미 하트가 있고, 바닐라가 아니라면 더 이상 계산하지 않고 기존 하트를 그대로 활성화만 시키고 즉시 함수를 끝냅니다!
         if (existingHeart != null && !npc.CompareTag("Banilla"))
         {
             existingHeart.gameObject.SetActive(true);
@@ -593,7 +593,6 @@ public class PlayerLaser : MonoBehaviour
         // 하트 이미지 결정 단계
         if (heartSR != null)
         {
-            // 기본적으로 기존 하트의 이미지를 유지합니다.
             Sprite pickedSprite = heartSR.sprite;
 
             // 아예 새로 생성하는 경우에만 랜덤 풀이나 피에르 고정 하트를 집어넣습니다.
@@ -631,7 +630,7 @@ public class PlayerLaser : MonoBehaviour
                             isSmiling = banillaAnim.GetCurrentAnimatorStateInfo(0).IsName("Banilla_Smile");
                         }
 
-                        // 웃고 있다면 하얀 하트로 교체! (다음 마우스 Hover부터는 위 1번 조건에 걸려서 이 검사를 안 함)
+                        // 웃고 있다면 하얀 하트로 교체
                         if (isSmiling && npcManager.banillaWhiteHeart != null)
                         {
                             pickedSprite = npcManager.banillaWhiteHeart;
@@ -663,23 +662,35 @@ public class PlayerLaser : MonoBehaviour
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
         if (existingHeart != null) existingHeart.gameObject.SetActive(false);
 
-        // ==========================================
         // ★ NPC 머리 위 하트가 꺼질 때 UI 하트도 같이 숨김
         if (PlayerUIScene.instance != null)
         {
             PlayerUIScene.instance.HideUIHeart();
         }
-        // ==========================================
     }
 
     public void CheckAndLockTarget()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-        if (hit.collider != null && hit.collider.CompareTag("NPC"))
+        // ★ [핵심 수정] 클릭할 때도 RaycastAll을 써서 모든 걸 뚫고 검사합니다.
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+
+        GameObject targetNpc = null;
+
+        // 마우스 아래 겹친 애들 중에 남학생(NPC)만 골라냅니다!
+        foreach (RaycastHit2D hit in hits)
         {
-            currentBurningNpc = hit.collider.gameObject;
+            if (hit.collider != null && hit.collider.CompareTag("NPC"))
+            {
+                targetNpc = hit.collider.gameObject;
+                break;
+            }
+        }
+
+        if (targetNpc != null)
+        {
+            currentBurningNpc = targetNpc;
             lockedTargetPos = currentBurningNpc.transform.position;
             isFiring = true;
 
@@ -712,10 +723,8 @@ public class PlayerLaser : MonoBehaviour
             var move = currentBurningNpc.GetComponent<NpcRandomPatrol>();
             if (move != null) move.enabled = false;
 
-            // ★ [수정] 피에르(보스)일 때와 일반 NPC일 때 방해꾼 호출 방식을 나눕니다.
             if (currentBurningNpc.name.Contains("Pierre"))
             {
-                // 1. 타겟이 피에르인 경우: 거리 무시하고 컷신에 스폰된 7명 전원 호출!
                 CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
                 if (npcManager != null)
                 {
@@ -731,12 +740,12 @@ public class PlayerLaser : MonoBehaviour
             }
             else
             {
-                // 2. 일반 남학생인 경우: 기존처럼 클릭한 주변(0.5f 반경)의 여학생만 감지!
                 Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
                 foreach (Collider2D col in overlappingColliders)
                 {
                     GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
-                    if (girl != null && girl.gameObject != hit.collider.gameObject)
+                    // ★ 기존의 hit.collider.gameObject 대신 찾아낸 targetNpc로 변경
+                    if (girl != null && girl.gameObject != targetNpc)
                     {
                         girl.LookAtAttackedNpc(currentBurningNpc);
                     }
@@ -800,17 +809,22 @@ public class PlayerLaser : MonoBehaviour
         if (laserObject != null && !isInCompetitionMode) laserObject.SetActive(false);
         if (targetPoint != null) targetPoint.SetActive(false);
 
-        // =======================================================
-        // ★ [추가] 행동이 끝나고 타겟팅이 풀리면 무조건 기본 배경으로 복구
         if (PlayerUIScene.instance != null)
         {
             PlayerUIScene.instance.SetNormalBG();
         }
-        // =======================================================
     }
 
     public void TriggerAllNpcsExit()
     {
+        // 1. ★ [가장 중요] 남학생 스포너 기계의 전원부터 꺼서 더 이상 안 나오게 막습니다!
+        GameObject spawner = GameObject.Find("NPC_Spawner");
+        if (spawner != null)
+        {
+            spawner.SetActive(false);
+        }
+
+        // 2. 여학생 NPC들 퇴장 및 소멸
         GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
         foreach (GameObject girlObj in girlNpcs)
         {
@@ -818,18 +832,27 @@ public class PlayerLaser : MonoBehaviour
             if (girl != null) girl.WalkAwayAndDestroy();
         }
 
-        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject boyObj in boyNpcs)
+        // 3. 씬에 존재하는 모든 남학생 NPC와 기존 피에르를 싹 다 잡아서 삭제!
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
         {
-            Destroy(boyObj);
+            if (obj != null)
+            {
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
         }
 
+        // 4. 보스 컷신 세팅
         CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
         if (npcManager != null) npcManager.SpawnAndPlayCutscene();
     }
 
-    public void TriggerPierreEnding()
+    public void TriggerPierreEnding(Vector3 heartPos)
     {
+        // 1. 여학생 NPC들 퇴장 및 소멸
         GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
         foreach (GameObject girlObj in girlNpcs)
         {
@@ -837,16 +860,52 @@ public class PlayerLaser : MonoBehaviour
             if (girl != null) girl.WalkAwayAndDestroy();
         }
 
-        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject boyObj in boyNpcs) Destroy(boyObj);
+        // 2. ★ [수정] 씬에 존재하는 모든 오브젝트를 검사하여 남학생 NPC를 흔적도 없이 삭제합니다.
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj != null)
+            {
+                // 태그가 NPC이거나, 이름에 BoyNpc 또는 Pierre가 포함되어 있다면 복제본((Clone))까지 전부 삭제!
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
+        }
 
         CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
-        if (npcManager != null) npcManager.OnPlayerGetPierreHeart();
+        if (npcManager != null) npcManager.OnPlayerGetPierreHeart(heartPos);
     }
 
-    // ==========================================
-    // ★ 바닐라 대결 모드 함수 (SpriteRenderer 대응) ★
-    // ==========================================
+    public void TriggerBanillaEnding()
+    {
+        // 1. 여학생 NPC들 퇴장 및 소멸
+        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
+        foreach (GameObject girlObj in girlNpcs)
+        {
+            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+            if (girl != null) girl.WalkAwayAndDestroy();
+        }
+
+        // 2. ★ [수정] 바닐라 엔딩 때도 새로 생성된 남학생까지 싹 다 잡아서 삭제합니다.
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj != null)
+            {
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
+        }
+
+        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+        if (npcManager != null) npcManager.OnPlayerGetBanillaHeart();
+    }
+
+    // 바닐라 대결 모드
     public void EnterCompetitionMode(Vector2 target, Color color)
     {
         isInCompetitionMode = true;
@@ -857,7 +916,6 @@ public class PlayerLaser : MonoBehaviour
             SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = color;
         }
-        // 대결 중 레이저 두께를 키웁니다.
         laserWidth = 0.1f; 
 
         if (laserObject != null) laserObject.SetActive(true);
@@ -873,7 +931,6 @@ public class PlayerLaser : MonoBehaviour
             SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = originalLaserColor;
         }
-        // 레이저 두께 원상복구
         laserWidth = originalWidth; 
         
         if (laserObject != null) laserObject.SetActive(false);
