@@ -17,7 +17,7 @@ namespace MiniTeam.Pokemon
             var gc = PokemonGameController.Instance;
             if (gc == null) return;
 
-            if (gc.HasItem)
+            if (gc.IsPokemonEventDone)
             {
                 gc.OnGameClear();
             }

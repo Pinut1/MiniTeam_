@@ -177,7 +177,9 @@ namespace MiniTeam.Pokemon
 
         void SelectBagItem()
         {
-            StartCoroutine(ShowMenuDialogue("menu_bag_has"));
+            var slots = GetActiveBagSlots();
+            if (slots.Count == 0)
+                StartCoroutine(ShowMenuDialogue("menu_bag_empty"));
         }
 
         void CloseBag()
