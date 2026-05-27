@@ -14,6 +14,12 @@ public class JudangChiDialogueManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float typingSpeed = 0.05f;
 
+    [Header("Audio")]
+    [Tooltip("타이핑 시 재생될 기본 효과음 (동물의 숲 텍스트 소리 등)")]
+    [SerializeField] private AudioClip defaultTypingSfx;
+    [Tooltip("몇 글자마다 타이핑 소리를 낼지 결정 (기본: 2)")]
+    [SerializeField] private int typingSfxFrequency = 2;
+
 
     private void Awake()
     {
@@ -42,13 +48,19 @@ public class JudangChiDialogueManager : MonoBehaviour
                 HubUIManager.Instance.PlaySpecialAnimation(sentenceData.animationTriggerName);
             }
 
+            // 해당 문장 전용 보이스/효과음이 있다면 시작 시 재생
+            if (sentenceData.voiceClip != null)
+            {
+                MiniTeam.Core.SoundManager.Instance?.PlaySFX(sentenceData.voiceClip);
+            }
+
             dialogueText.text = "";
             bool skipTyping = false;
 
             // 한 글자씩 타이핑 효과 출력
             for (int i = 0; i < sentenceData.text.Length; i++)
             {
-                // 글자 출력 도중 클릭 시 즉시 스킵 플래그 활성화
+                // 글자 출력 도중 클릭 시 즉시 스킵 플래그 생성
                 if (Input.GetMouseButtonDown(0))
                 {
                     skipTyping = true;
@@ -57,7 +69,13 @@ public class JudangChiDialogueManager : MonoBehaviour
 
                 dialogueText.text += sentenceData.text[i];
 
-                // 타이핑 대기 시간 중에도 마우스 클릭 정밀 감지
+                // 공백이 아닌 글자를 출력할 때 타건음 재생
+                if (defaultTypingSfx != null && sentenceData.text[i] != ' ' && (i % typingSfxFrequency == 0))
+                {
+                    MiniTeam.Core.SoundManager.Instance?.PlaySFX(defaultTypingSfx, 0.4f); // 텍스트 소리는 약간 작게
+                }
+
+                // 타이핑 대기 시간 중에도 마우스 클릭 입력 감지지
                 float elapsed = 0f;
                 while (elapsed < typingSpeed)
                 {

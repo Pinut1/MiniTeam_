@@ -26,6 +26,11 @@ namespace MiniTeam.Core
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.loop = false;
 
+            // 저장된 볼륨 값 로드 (저장된 값이 없으면 기본값 사용)
+            masterVolume = PlayerPrefs.GetFloat("SavedMasterVolume", 1f);
+            bgmVolume    = PlayerPrefs.GetFloat("SavedBGMVolume", 0.6f);
+            sfxVolume    = PlayerPrefs.GetFloat("SavedSFXVolume", 1f);
+
             ApplyVolumes();
         }
 
@@ -42,6 +47,12 @@ namespace MiniTeam.Core
         {
             bgmSource.Stop();
             bgmSource.clip = null;
+            bgmSource.pitch = 1f; // 정지 시 기본 피치로 원상복구
+        }
+
+        public void SetBGMPitch(float pitchValue)
+        {
+            bgmSource.pitch = pitchValue;
         }
 
         public void PlaySFX(AudioClip clip)
@@ -61,18 +72,21 @@ namespace MiniTeam.Core
         public void SetMasterVolume(float value)
         {
             masterVolume = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat("SavedMasterVolume", masterVolume);
             ApplyVolumes();
         }
 
         public void SetBGMVolume(float value)
         {
             bgmVolume = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat("SavedBGMVolume", bgmVolume);
             ApplyVolumes();
         }
 
         public void SetSFXVolume(float value)
         {
             sfxVolume = Mathf.Clamp01(value);
+            PlayerPrefs.SetFloat("SavedSFXVolume", sfxVolume);
             ApplyVolumes();
         }
 

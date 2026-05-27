@@ -10,6 +10,7 @@ public class DialogueData : ScriptableObject
         [TextArea(2, 4)] public string text;
         public Sprite expressionSprite;
         public string animationTriggerName;
+        public AudioClip voiceClip; // 해당 대사가 출력될 때 재생할 음성/효과음
     }
 
     [Header("대사 및 표정 데이터")]
