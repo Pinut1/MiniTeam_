@@ -23,14 +23,37 @@ namespace MiniTeam.Sponge
             Instance = this;
         }
 
+        void Start()
+        {
+            SpongeGameManager.OnStateChanged += OnStateChanged;
+            PlayBGM(bgmOpening);
+        }
+
         void OnDestroy()
         {
+            SpongeGameManager.OnStateChanged -= OnStateChanged;
             if (Instance == this) Instance = null;
         }
 
-        public void PlayBGM(AudioClip clip)                    => SoundManager.Instance?.PlayBGM(clip);
-        public void StopBGM()                                  => SoundManager.Instance?.StopBGM();
-        public void PlaySFX(AudioClip clip)                    => SoundManager.Instance?.PlaySFX(clip);
-        // public void PlaySFX(AudioClip clip, float volumeScale) => SoundManager.Instance?.PlaySFX(clip, volumeScale);
+        void OnStateChanged(SpongeGameState.GameState state)
+        {
+            switch (state)
+            {
+                case SpongeGameState.GameState.Testifying:
+                case SpongeGameState.GameState.CrossExamination:
+                    PlayBGM(bgmExamination);
+                    break;
+                case SpongeGameState.GameState.Dialogue:
+                    PlayBGM(bgmCourtroom);
+                    break;
+                case SpongeGameState.GameState.Resolution:
+                    PlayBGM(bgmEnding);
+                    break;
+            }
+        }
+
+        public void PlayBGM(AudioClip clip)  => SoundManager.Instance?.PlayBGM(clip);
+        public void StopBGM()                => SoundManager.Instance?.StopBGM();
+        public void PlaySFX(AudioClip clip)  => SoundManager.Instance?.PlaySFX(clip);
     }
 }
