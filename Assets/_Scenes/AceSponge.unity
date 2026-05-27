@@ -9017,6 +9017,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 603a8d24b49b8374897b2cecdb51ae06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpongeAudioManager
+  bgmOpening: {fileID: 8300000, guid: 82b67e25b10a99245b146b949de1e31c, type: 3}
+  bgmCourtroom: {fileID: 8300000, guid: 5e3ea9c72d6f43c40b4f0be382f71ea0, type: 3}
+  bgmExamination: {fileID: 8300000, guid: 80ff4f89c427f3843a86026645e764da, type: 3}
+  bgmTheTruth: {fileID: 8300000, guid: 39fdf0b6902112a4ea92b445fadaca12, type: 3}
+  bgmEnding: {fileID: 8300000, guid: 0ad1f27c7ecd6ec479c2a3bcf646a082, type: 3}
+  sfxObjec: {fileID: 0}
 --- !u!1 &1967025278
 GameObject:
   m_ObjectHideFlags: 0
