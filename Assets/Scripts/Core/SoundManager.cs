@@ -13,6 +13,7 @@ namespace MiniTeam.Core
 
         private AudioSource bgmSource;
         private AudioSource sfxSource;
+        private AudioSource voiceSource; // 대사 음성 전용 (이전 대사를 끊기 위함)
 
         void Awake()
         {
@@ -25,6 +26,9 @@ namespace MiniTeam.Core
 
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.loop = false;
+
+            voiceSource = gameObject.AddComponent<AudioSource>();
+            voiceSource.loop = false;
 
             // 저장된 볼륨 값 로드 (저장된 값이 없으면 기본값 사용)
             masterVolume = PlayerPrefs.GetFloat("SavedMasterVolume", 1f);
@@ -67,6 +71,15 @@ namespace MiniTeam.Core
             sfxSource.PlayOneShot(clip, masterVolume * sfxVolume * volumeScale);
         }
 
+        public void PlayVoice(AudioClip clip)
+        {
+            if (clip == null) return;
+            // 이전 대사 음성이 재생 중이면 끊고 새 음성 재생 (다른 효과음은 영향 안 받음)
+            voiceSource.Stop();
+            voiceSource.clip = clip;
+            voiceSource.Play();
+        }
+
         // ── 볼륨 조절 ─────────────────────────────
 
         public void SetMasterVolume(float value)
@@ -93,6 +106,7 @@ namespace MiniTeam.Core
         void ApplyVolumes()
         {
             bgmSource.volume = masterVolume * bgmVolume;
+            voiceSource.volume = masterVolume * sfxVolume; // 음성도 기본적으로 효과음 볼륨을 따름
         }
     }
 }

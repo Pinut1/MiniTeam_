@@ -16,16 +16,21 @@ MonoBehaviour:
   - text: "\uBC30\uAC00 \uBE75\uBE75\uD558\uB2E4\uCE58!!"
     expressionSprite: {fileID: 21300000, guid: f9fb4689fc86e7f4ab1b5d54d772c405, type: 3}
     animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: 5b85f12324b2361419dd641f035f7b1b, type: 3}
   - text: "\uBFCC\uC9C1!!!! \uC544 \uC26C\uC6D0\uD574~~"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: DDong
+    voiceClip: {fileID: 8300000, guid: 64099d88fb853ac4987ffac739b2cdf3, type: 3}
   - text: "\uC557. \uBC30\uAC00 \uBD88\uB7EC \uADF8\uB9CC \uC2E4\uC218\uB97C \uD588\uB2E4\uCE58...!!!"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: a106a5e373138b94e8bc0b202f865deb, type: 3}
   - text: "\uD639\uC2DC..."
     expressionSprite: {fileID: 21300000, guid: f31671a02ea42a947ab7234273886b75, type: 3}
     animationTriggerName: 
+    voiceClip: {fileID: 0}
   - text: "\uC5D0\uC787!!!"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: 172cd5d129a909f46b3df68e31bbf1d9, type: 3}
   nextInteractableIndex: 0
