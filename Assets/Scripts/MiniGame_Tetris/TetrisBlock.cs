@@ -239,6 +239,9 @@ public class TetrisBlock : MonoBehaviour
                 moveCount = 0;
             }
         }
+
+        // 6순위: 고스트 위치 업데이트
+        UpdateGhost();
     }
 
     private void HardDrop()
@@ -458,6 +461,48 @@ public class TetrisBlock : MonoBehaviour
             }
         }
         return true;
+    }
+
+    bool ValidMoveFor(GameObject obj)
+    {
+        foreach (Transform children in obj.transform)
+        {
+            int roundedX = Mathf.RoundToInt(children.transform.position.x - 0.2f);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y - 0.2f);
+
+            if (roundedX < 0 || roundedX >= width || roundedY < 0)
+            {
+                return false;
+            }
+
+            if ((roundedY < height && grid[roundedX, roundedY] != null))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void UpdateGhost()
+    {
+        if (SpawnTetromino.Instance == null || SpawnTetromino.Instance.currentGhost == null) return;
+        
+        GameObject ghost = SpawnTetromino.Instance.currentGhost;
+
+        // 고스트 회전을 진짜 블록과 동일하게 맞춤
+        ghost.transform.rotation = transform.rotation;
+        
+        // 고스트를 우선 진짜 블록 위치로 가져옴
+        ghost.transform.position = transform.position;
+
+        // 바닥/기존 블록에 닿을 때까지 가상으로 한 칸씩 내려봄
+        while (ValidMoveFor(ghost))
+        {
+            ghost.transform.position += new Vector3(0, -1, 0);
+        }
+        
+        // 반복문이 끝났다는 것은 바닥을 뚫었다는 뜻이므로, 마지막 유효한 위치(한 칸 위)로 되돌림
+        ghost.transform.position += new Vector3(0, 1, 0);
     }
 
     private bool MoveHorizontal(int direction)
