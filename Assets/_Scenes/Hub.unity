@@ -7907,7 +7907,7 @@ MonoBehaviour:
   endHeight: 8
   endRadius: 0.5
   spiralTurns: 1.5
-  duration: 6
+  duration: 7
   postProcessVolume: {fileID: 234528878}
   maxShutterAngle: 270
   easing:
@@ -8080,6 +8080,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1620732379}
   - component: {fileID: 1620732378}
+  - component: {fileID: 1620732380}
   m_Layer: 0
   m_Name: MiniGameManager
   m_TagString: Untagged
@@ -8122,6 +8123,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1620732380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620732377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6461307fbcaec140aa26665181cf16b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HubDebugger
 --- !u!4 &1629168918 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5728395092175287480, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
