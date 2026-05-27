@@ -14,6 +14,7 @@ namespace MiniTeam.Core
         public AudioClip sfxClick;
         public AudioClip sfxCancel;
         public AudioClip sfxPopupOpen;
+        public AudioClip sfxSmallJudangchiAppear; // 작은 주댕치 등장음
         
         [Header("효과음 (상호작용)")]
         public AudioClip sfxInteract;

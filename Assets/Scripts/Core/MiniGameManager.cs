@@ -94,8 +94,9 @@ namespace MiniTeam.Core
         {
             if (IsInMiniGame) return;
 
-            // 미니게임 진입 시 기존 BGM 강제 종료 (안전장치)
+            // 미니게임 진입 시 기존 BGM 및 효과음 강제 종료 (안전장치)
             SoundManager.Instance?.StopBGM();
+            SoundManager.Instance?.StopAllSFX();
 
             // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
             playerMove.UnlockCursor();
@@ -111,7 +112,9 @@ namespace MiniTeam.Core
         {
             if (string.IsNullOrEmpty(currentScene)) return;
 
+            // 미니게임 탈출 시 모든 오디오 강제 종료
             SoundManager.Instance?.StopBGM();
+            SoundManager.Instance?.StopAllSFX();
 
             var op = SceneManager.UnloadSceneAsync(currentScene);
             currentScene = null;

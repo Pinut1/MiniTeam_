@@ -54,6 +54,12 @@ namespace MiniTeam.Core
             bgmSource.pitch = 1f; // 정지 시 기본 피치로 원상복구
         }
 
+        public void StopAllSFX()
+        {
+            if (sfxSource != null) sfxSource.Stop();
+            if (voiceSource != null) voiceSource.Stop();
+        }
+
         public void SetBGMPitch(float pitchValue)
         {
             bgmSource.pitch = pitchValue;

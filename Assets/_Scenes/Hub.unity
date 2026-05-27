@@ -1076,6 +1076,7 @@ MonoBehaviour:
   sfxClick: {fileID: 0}
   sfxCancel: {fileID: 0}
   sfxPopupOpen: {fileID: 0}
+  sfxSmallJudangchiAppear: {fileID: 8300000, guid: 1a62f25f0a5fb444da25655e107b185c, type: 3}
   sfxInteract: {fileID: 0}
   sfxGetItem: {fileID: 0}
 --- !u!4 &610218214
