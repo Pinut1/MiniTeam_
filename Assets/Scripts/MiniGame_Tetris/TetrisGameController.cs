@@ -20,19 +20,13 @@ namespace MiniTeam.Tetris
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
         }
 
         void Start()
         {
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
             currentImpactCount = 0;
 
           

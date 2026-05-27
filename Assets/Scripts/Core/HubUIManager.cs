@@ -154,7 +154,7 @@ public class HubUIManager : MonoBehaviour
         digiviceObj.GetComponent<Button>().interactable = true;
     }
 
-    private void InitializeBottomUI(int stage)
+    public void InitializeBottomUI(int stage)
     {
         if (stage >= 1)
         {

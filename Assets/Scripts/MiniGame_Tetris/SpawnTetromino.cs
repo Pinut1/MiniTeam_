@@ -44,8 +44,6 @@ public class SpawnTetromino : MonoBehaviour
     {
         spawnTrigger = true;
         nextDumies = new GameObject[nextAnchors.Length];
-        NewTetromino();
-
     }
     void Update()
     {

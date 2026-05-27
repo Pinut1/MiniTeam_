@@ -53,6 +53,8 @@ public class TetrisBlock : MonoBehaviour
         {
             Debug.Log(" GAME OVER!");
             SpawnTetromino.Instance.TogglespawnTrigger();
+            TetrisGameController.Instance.OnGameFail();
+            return;
             this.enabled = false;
         }
     }
