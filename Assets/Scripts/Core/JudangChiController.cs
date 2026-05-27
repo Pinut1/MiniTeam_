@@ -103,8 +103,6 @@ public class JudangChiController : MonoBehaviour
         // 컷신 감상 완료 표시 및 느낌표 제거
         MiniGameManager.Instance.SetCutscenePlayed(true);
 
-        MiniGameManager.Instance.EnablePlayerInput();
-
     }
     #endregion
 

@@ -159,7 +159,7 @@ public class HubUIManager : MonoBehaviour
         if (stage >= 1)
         {
             judangchiSmallObj.SetActive(false);
-            if (digiviceObj != null) judangchiSmallObj.SetActive(false); // 기존 안전장치
+        
             if (digiviceObj != null)
             {
                 digiviceObj.SetActive(true);

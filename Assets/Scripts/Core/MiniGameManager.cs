@@ -118,7 +118,7 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
-            // 허브 씬이 다시 켜진 직후, 현재 스테이지에 맞는 연출을 지시. (일단 주석 처리하여 일시 정지)
+          
             JudangChiController.Instance?.PlaySequenceForGameClear();
             
         }
