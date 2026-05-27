@@ -20,8 +20,6 @@ public class SpongeGameManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         InitializeRequiredConditions();
     }
 

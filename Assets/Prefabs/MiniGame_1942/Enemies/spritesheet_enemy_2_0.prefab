@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1829629945198750010}
   - component: {fileID: 7678234461652774571}
   - component: {fileID: -7972030029384860652}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: spritesheet_enemy_2_0
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1447748077
-  m_SortingLayer: 5
+  m_SortingLayer: 12
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1071165179, guid: c5dbd8f8a3c945141b30a886bb8d530d, type: 3}

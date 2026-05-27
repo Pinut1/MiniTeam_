@@ -61,7 +61,13 @@ namespace MiniTeam.Core
                 // 눈 깜빡임 연출이 진행되는 동안 플레이어가 움직이지 못하게 스크립트 OFF
                 DisablePlayerInput();
                 // 연출(WakeUp)을 실행, 다 끝나면 다음 메서드를 콜백.
-                HubUIManager.Instance.WakeUp(() =>EnablePlayerInput());
+                HubUIManager.Instance.WakeUp(() =>
+                {
+                    if (SpiralDiveCutscene.Instance != null)
+                        SpiralDiveCutscene.Instance.PlayIfFirstTime(() => EnablePlayerInput());
+                    else
+                        EnablePlayerInput();
+                });
             }
             else
             {

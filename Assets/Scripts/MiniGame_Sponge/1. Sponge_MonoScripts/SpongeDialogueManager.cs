@@ -103,7 +103,6 @@ public class SpongeDialogueManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         arrowLeftImg.gameObject.SetActive(false);
         arrowRightImg.gameObject.SetActive(false);

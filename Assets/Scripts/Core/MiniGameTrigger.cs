@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class MiniGameTrigger : MonoBehaviour
 {
-    [Header("¿¬°áµÉ ¹Ì´Ï°ÔÀÓ ¾ÀÀÇ Á¤È®ÇÑ ÀÌ¸§")]
-    [SerializeField] private string targetSceneName = "MiniGame_1";
+    [Header("ì§„ì…í•  ë¯¸ë‹ˆê²Œì„ ì”¬ ì´ë¦„")]
+    [Scene]
+    [SerializeField] private string targetSceneName;
     private bool isTriggered = false;
 
     private void OnEnable()
@@ -20,18 +21,18 @@ public class MiniGameTrigger : MonoBehaviour
         }
 
         
-        // ºÎµúÈù ´ë»óÀÌ ÇÃ·¹ÀÌ¾îÀÎÁö È®ÀÎ (ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¿¡ "Player" ÅÂ±× ÇÊ¼ö)
+        // ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ (ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ "Player" ï¿½Â±ï¿½ ï¿½Ê¼ï¿½)
         if (other.CompareTag("Player"))
         {
             isTriggered = true;
-            Debug.Log($"{targetSceneName} ¾ÀÀ¸·Î ÀÌµ¿ÇÕ´Ï´Ù!");
+            Debug.Log($"{targetSceneName} ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ï¿½Õ´Ï´ï¿½!");
             MiniGameManager.Instance.EnterMiniGame(targetSceneName);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // ¾ÀÀÌ º¹±¸µÈ ÈÄ, ÇÃ·¹ÀÌ¾î°¡ ¹® ¹üÀ§ ¹ÛÀ¸·Î ÇÑ °ÉÀ½ÀÌ¶óµµ ³ª°¡¸é ´Ù½Ã ¹®À» ¿­¾îÁÜ
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (other.CompareTag("Player"))
         {
             isTriggered = false;
