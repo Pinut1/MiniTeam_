@@ -74,6 +74,10 @@ public class SpawnTetromino : MonoBehaviour
         if(!spawnTrigger)
             return;
 
+        // 컷신 중에는 새로운 블록을 생성하지 않음
+        if (MiniTeam.Tetris.TetrisGameController.Instance != null && MiniTeam.Tetris.TetrisGameController.Instance.isCutscenePlaying)
+            return;
+
         if (bag.Count <= nextAnchors.Length)
         {
             FillAndShuffleBag();
