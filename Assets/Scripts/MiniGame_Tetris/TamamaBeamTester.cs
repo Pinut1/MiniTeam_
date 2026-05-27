@@ -25,7 +25,7 @@ public class TamamaBeamTester : MonoBehaviour
         // 컨트롤러를 통해 임팩트 발동 요청 (마지막 인자로 isDebug = true 전달)
         if (TetrisGameController.Instance != null)
         {
-            TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number, true);
+            TetrisGameController.Instance.OnTamamaImpactTriggered(true, spawnPosition, Quaternion.identity, (float)number, false);
         }
         else
         {

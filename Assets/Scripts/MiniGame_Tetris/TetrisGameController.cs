@@ -20,13 +20,19 @@ namespace MiniTeam.Tetris
 
         private void Awake()
         {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
+            if (Instance == null)
+            {
+                Instance = this;
+                UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         void Start()
         {
-            UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
             currentImpactCount = 0;
 
           
@@ -143,6 +149,16 @@ namespace MiniTeam.Tetris
 
         private void CleanupRemainingBlocks()
         {
+            // 1. Clear static grid and destroy block tiles in the grid
+            TetrisBlock.ClearGrid();
+
+            // 2. Clear hold/next dummies in SpawnTetromino
+            if (SpawnTetromino.Instance != null)
+            {
+                SpawnTetromino.Instance.ClearAllDummies();
+            }
+
+            // 3. Destroy all other TetrisBlock objects (active/inactive)
             TetrisBlock[] blocks = FindObjectsByType<TetrisBlock>(FindObjectsSortMode.None);
             foreach (var block in blocks)
             {

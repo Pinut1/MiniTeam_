@@ -470,4 +470,19 @@ public class TetrisBlock : MonoBehaviour
         
         return true;
     }
+
+    public static void ClearGrid()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (grid[x, y] != null)
+                {
+                    Destroy(grid[x, y].gameObject);
+                    grid[x, y] = null;
+                }
+            }
+        }
+    }
 }
