@@ -44,30 +44,36 @@ public class PlayerLaser : MonoBehaviour
     private Camera mainCam;
     private bool isClashMode = false;
 
+    [Header("Difficulty by Girls (ì—¬í•™ìƒ ë‚œì´ë„ ì„¤ì •)")]
+    public float difficultyRadius = 3.0f; // ì£¼ë³€ ì—¬í•™ìƒì„ íƒìƒ‰í•  ë°˜ê²½
+    public float penaltyFillSpeedPerGirl = 0.1f; // ì—¬í•™ìƒ 1ëª…ë‹¹ 'í™€ë“œ ì±„ìš°ê¸°' ì†ë„ ê°ì†ŒëŸ‰
+    public float minHeartFillSpeed = 0.05f; // ì•„ë¬´ë¦¬ ì—¬í•™ìƒì´ ë§ì•„ë„ ìµœì†Œí•œ ë³´ì¥ë˜ëŠ” ì±„ìš°ê¸° ì†ë„
+    public float penaltyDrainSpeedPerGirl = 0.1f; // ì—¬í•™ìƒ 1ëª…ë‹¹ 'ì—°íƒ€ ë°©ì–´(ê²Œì´ì§€ ê¹ì„)' ì†ë„ ì¦ê°€ëŸ‰
+
     [Header("Player Knockback Settings")]
     public float playerKnockbackDistance = 3f;
     public float playerKnockbackHeight = 1.5f;
-    public float playerGroundStunDuration = 2.0f; // ±âÀı ´ë±â ½Ã°£
+    public float playerGroundStunDuration = 2.0f; // ê¸°ì ˆ ëŒ€ê¸° ì‹œê°„
     public float knockbackYOffset = -0.5f;
     private bool isPlayerKnockedBack = false;
 
     [Header("Scripts")]
     public PlayerMove playerMoveScript;
 
-    // Áßº¹ ¹æÁö¸¦ À§ÇÑ ÇÏÆ® ÀÌ¹ÌÁö Á¦ºñ»Ì±â ÁÖ¸Ó´Ï
+    // ì¤‘ë³µ ë°©ì§€ë¥¼ ìœ„í•œ í•˜íŠ¸ ì´ë¯¸ì§€ ì œë¹„ë½‘ê¸° ì£¼ë¨¸ë‹ˆ
     private List<Sprite> heartSpritePool = new List<Sprite>();
 
-    // ==========================================
-    // ¡Ú ¹Ù´Ò¶ó¿ÍÀÇ ´ë°á ¸ğµå º¯¼ö ¡Ú
-    // ==========================================
+    // ë°”ë‹ë¼ì™€ì˜ ëŒ€ê²° ëª¨ë“œ ë³€ìˆ˜
     private bool isInCompetitionMode = false;
     private Vector2 competitionTarget;
     private Color originalLaserColor = Color.white;
     private float originalWidth;
 
+    [Header("Cutscene State")]
+    public bool isCutscenePlaying = false; // ì»·ì”¬ ì§„í–‰ ì¤‘ì¸ì§€ ì²´í¬
+
     void Start()
     {
-        // ¿øº» ·¹ÀÌÀúÀÇ µÎ²²¿Í »ö»óÀ» ÀúÀåÇØµÓ´Ï´Ù.
         originalWidth = laserWidth;
         if (laserObject != null)
         {
@@ -87,11 +93,13 @@ public class PlayerLaser : MonoBehaviour
 
     void Update()
     {
-        // ¡Ú ´ë°á ¸ğµå ÁßÀÏ ¶§´Â ¸¶¿ì½º Å¬¸¯À» ¹«½ÃÇÏ°í Áß¾ÓÀ¸·Î¸¸ ·¹ÀÌÀú¸¦ ½õ´Ï´Ù.
+        // â˜… ì»·ì”¬ ì¤‘ì´ë©´ ì•„ë˜ì˜ ëª¨ë“  ì…ë ¥(ê³µê²©, ë§ˆìš°ìŠ¤ ì˜¤ë²„ ë“±)ì„ ë¬´ì‹œí•©ë‹ˆë‹¤.
+        if (isCutscenePlaying) return;
+
         if (isInCompetitionMode)
         {
             DrawLaser(competitionTarget);
-            return; 
+            return;
         }
 
         if (isPlayerKnockedBack)
@@ -133,7 +141,12 @@ public class PlayerLaser : MonoBehaviour
 
                 if (playerPinkGauge != null)
                 {
-                    playerPinkGauge.fillAmount -= clashDrainSpeed * Time.deltaTime;
+                    // â˜… [ë‚œì´ë„ ì ìš©] ì£¼ë³€ ì—¬í•™ìƒ ìˆ˜ë§Œí¼ ì—°íƒ€ ê²Œì´ì§€ ê¹ì´ëŠ” ì†ë„ê°€ ë¹¨ë¼ì§‘ë‹ˆë‹¤! (ì–´ë ¤ì›Œì§)
+                    int girlCount = GetNearbyGirlCount();
+                    float currentDrainSpeed = clashDrainSpeed + (penaltyDrainSpeedPerGirl * girlCount);
+
+                    playerPinkGauge.fillAmount -= currentDrainSpeed * Time.deltaTime;
+
                     if (playerPinkGauge.fillAmount <= 0f)
                     {
                         LetGirlWinAndLeave();
@@ -168,7 +181,15 @@ public class PlayerLaser : MonoBehaviour
 
                         if (currentFillImage != null)
                         {
-                            currentFillImage.fillAmount += heartFillSpeed * Time.deltaTime;
+                            // â˜… [ë‚œì´ë„ ì ìš©] ì£¼ë³€ ì—¬í•™ìƒ ìˆ˜ë§Œí¼ í™€ë“œ ê²Œì´ì§€ ì°¨ì˜¤ë¥´ëŠ” ì†ë„ê°€ ëŠë ¤ì§‘ë‹ˆë‹¤! (ì–´ë ¤ì›Œì§)
+                            int girlCount = GetNearbyGirlCount();
+                            float currentFillSpeed = heartFillSpeed - (penaltyFillSpeedPerGirl * girlCount);
+
+                            // ì•„ë¬´ë¦¬ ì—¬í•™ìƒì´ ë§ì•„ë„ ì†ë„ê°€ ë§ˆì´ë„ˆìŠ¤ê°€ ë˜ê±°ë‚˜ ë©ˆì¶”ì§€ ì•Šê²Œ ìµœì†Œ ì†ë„(minHeartFillSpeed)ë¥¼ ë³´ì¥í•©ë‹ˆë‹¤.
+                            currentFillSpeed = Mathf.Max(minHeartFillSpeed, currentFillSpeed);
+
+                            currentFillImage.fillAmount += currentFillSpeed * Time.deltaTime;
+
                             if (currentFillImage.fillAmount >= 1f) SuccessAndDropHeart();
                         }
                     }
@@ -182,24 +203,65 @@ public class PlayerLaser : MonoBehaviour
         }
     }
 
-    // ¡Ú ¸Å´ÏÀú¿¡¼­ ³Ë¹éÀ» È£ÃâÇÒ ¼ö ÀÖµµ·Ï publicÀ¸·Î ¿­°í, °ø°İÀÚ(¹Ù´Ò¶ó)ÀÇ À§Ä¡¸¦ ¹ŞÀ» ¼ö ÀÖ°Ô ¼öÁ¤Çß½À´Ï´Ù.
+    // íƒ€ê²Ÿ ì£¼ë³€ì˜ ì—¬í•™ìƒ ìˆ˜ë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜
+    private int GetNearbyGirlCount()
+    {
+        if (currentBurningNpc == null) return 0;
+
+        int count = 0;
+        // íƒ€ê²Ÿì„ ì¤‘ì‹¬ìœ¼ë¡œ difficultyRadius ë°˜ê²½ ë‚´ì˜ ëª¨ë“  ì½œë¼ì´ë”ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(currentBurningNpc.transform.position, difficultyRadius);
+
+        foreach (Collider2D col in colliders)
+        {
+            // GirlNpcReaction ì»´í¬ë„ŒíŠ¸ê°€ ìˆëŠ”ì§€ í™•ì¸í•˜ì—¬ ì—¬í•™ìƒì¸ì§€ íŒë³„í•©ë‹ˆë‹¤.
+            GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
+            if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
+            if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
+
+            if (girl != null)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // â˜… ë§¤ë‹ˆì €ì—ì„œ ë„‰ë°±ì„ í˜¸ì¶œí•  ìˆ˜ ìˆë„ë¡ publicìœ¼ë¡œ ì—´ê³ , ê³µê²©ì(ë°”ë‹ë¼)ì˜ ìœ„ì¹˜ë¥¼ ë°›ì„ ìˆ˜ ìˆê²Œ ìˆ˜ì •í–ˆìŠµë‹ˆë‹¤.
     public void StartPlayerKnockback(Transform attacker = null)
     {
         if (isPlayerKnockedBack) return;
         isPlayerKnockedBack = true;
 
+        // ë„‰ë°± íš¨ê³¼ìŒ ì¬ìƒ
+        if (BgmManager.Instance != null && BgmManager.Instance.knockbackSfx != null)
+        {
+            BgmManager.Instance.PlaySFX(BgmManager.Instance.knockbackSfx);
+        }
+
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetKnockbackPortrait();
+        }
+
         float pushDirection = -1f;
 
-        // attacker(¹Ù´Ò¶ó)°¡ µû·Î ÁöÁ¤µÇ¾úÀ¸¸é ±× À§Ä¡¸¦, ¾Æ´Ï¸é ±âÁ¸ ÀÏ¹İ NPC(currentBurningNpc) À§Ä¡¸¦ ±âÁØÀ¸·Î »ï½À´Ï´Ù.
+        // attacker(ë°”ë‹ë¼)ê°€ ë”°ë¡œ ì§€ì •ë˜ì—ˆìœ¼ë©´ ê·¸ ìœ„ì¹˜ë¥¼, ì•„ë‹ˆë©´ ê¸°ì¡´ ì¼ë°˜ NPC(currentBurningNpc) ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì‚¼ìŠµë‹ˆë‹¤.
         Transform target = attacker != null ? attacker : (currentBurningNpc != null ? currentBurningNpc.transform : null);
 
         if (target != null)
         {
-            // °ø°İÀÚ°¡ ¼îÄİ¶óº¸´Ù ¿À¸¥ÂÊ¿¡ ÀÖÀ¸¸é ¿ŞÂÊ(-1)À¸·Î, ¿ŞÂÊ¿¡ ÀÖÀ¸¸é ¿À¸¥ÂÊ(1)À¸·Î ³¯¾Æ°©´Ï´Ù.
+            // ê³µê²©ìê°€ ì‡¼ì½œë¼ë³´ë‹¤ ì˜¤ë¥¸ìª½ì— ìˆìœ¼ë©´ ì™¼ìª½(-1)ìœ¼ë¡œ, ì™¼ìª½ì— ìˆìœ¼ë©´ ì˜¤ë¥¸ìª½(1)ìœ¼ë¡œ ë‚ ì•„ê°‘ë‹ˆë‹¤.
             pushDirection = transform.position.x >= target.position.x ? 1f : -1f;
         }
 
         if (anim != null) anim.SetTrigger("isKnockback");
+
+        if (currentHoveredNpc != null)
+        {
+            HideHeart(currentHoveredNpc);
+            currentHoveredNpc = null;
+        }
 
         StopFiring();
         ResumeAllGirls();
@@ -245,9 +307,16 @@ public class PlayerLaser : MonoBehaviour
         transform.position = targetPos;
         if (rb != null) rb.position = targetPos;
 
+        // ê¸°ì ˆí•´ì„œ ëˆ„ì›ŒìˆëŠ” ì‹œê°„ ëŒ€ê¸°
         yield return new WaitForSeconds(playerGroundStunDuration);
 
         isPlayerKnockedBack = false;
+
+        // ë„‰ë°± ìŠ¤í„´ ì‹œê°„ì´ ëë‚˜ê³  ì¼ì–´ë‚¬ìœ¼ë‹ˆ ì´ˆìƒí™”ë¥¼ ë‹¤ì‹œ í‰ì†Œ í‘œì •(UI_IDLE)ìœ¼ë¡œ ë³µêµ¬í•©ë‹ˆë‹¤.
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetIdlePortrait();
+        }
 
         Vector3 wakeUpPos = new Vector3(transform.position.x, startPos.y, transform.position.z);
         transform.position = wakeUpPos;
@@ -267,13 +336,26 @@ public class PlayerLaser : MonoBehaviour
     void KnockbackNearbyGirls()
     {
         if (currentBurningNpc == null) return;
+
+        bool playedSfx = false;
+
         Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(currentBurningNpc.transform.position, 2.0f);
         foreach (Collider2D col in overlappingColliders)
         {
             GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
-            if (girl != null) girl.StartFlyingAway(transform.position);
+            if (girl != null)
+            {
+                girl.StartFlyingAway(transform.position);
+
+                // ê±¸ë“¤ì´ ë„‰ë°±ë  ë•Œ íš¨ê³¼ìŒ ì¬ìƒ (í•œ ë²ˆë§Œ)
+                if (!playedSfx && BgmManager.Instance != null && BgmManager.Instance.knockbackSfx != null)
+                {
+                    BgmManager.Instance.PlaySFX(BgmManager.Instance.knockbackSfx);
+                    playedSfx = true;
+                }
+            }
         }
     }
 
@@ -358,6 +440,17 @@ public class PlayerLaser : MonoBehaviour
             }
         }
 
+        // â˜… í•˜íŠ¸ë¥¼ ì„±ê³µì ìœ¼ë¡œ ë½‘ì•„ëƒˆìœ¼ë‹ˆ UI í•˜íŠ¸ ì´ë¯¸ì§€ë¥¼ ê°•ì œë¡œ ì§€ì›ë‹ˆë‹¤
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.HideUIHeart();
+        }
+
+        if (currentHoveredNpc == npcToDestroy)
+        {
+            currentHoveredNpc = null;
+        }
+
         StopFiring();
         ResumeAllGirls();
 
@@ -387,17 +480,56 @@ public class PlayerLaser : MonoBehaviour
 
     void UpdateHovering()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+        // â˜… ë„‰ë°± ì¤‘ì¼ ë•ŒëŠ” ë§ˆìš°ìŠ¤ ê°ì§€ë¥¼ ì•„ì˜ˆ ê±´ë„ˆë›°ì–´ì„œ í‘œì •(UI_2)ì„ ìœ ì§€í•©ë‹ˆë‹¤.
+        if (isPlayerKnockedBack) return;
 
-        if (hit.collider != null && (hit.collider.CompareTag("NPC") || hit.collider.CompareTag("Banilla")))
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // â˜… [í•µì‹¬ ìˆ˜ì •] RaycastAllì„ ì¨ì„œ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì— ê²¹ì¹œ 'ëª¨ë“ ' ì˜¤ë¸Œì íŠ¸ë¥¼ ì‹¹ ë‹¤ ê°€ì ¸ì˜µë‹ˆë‹¤!
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+
+        GameObject hitNpc = null;
+
+        // 1ìˆœìœ„: ê¿°ëš«ì€ ì˜¤ë¸Œì íŠ¸ ì¤‘ 'ë‚¨í•™ìƒ(NPC)'ì´ ìˆëŠ”ì§€ ê°€ì¥ ë¨¼ì € ì°¾ìŠµë‹ˆë‹¤.
+        foreach (RaycastHit2D hit in hits)
         {
-            GameObject hitNpc = hit.collider.gameObject;
+            if (hit.collider != null && hit.collider.CompareTag("NPC"))
+            {
+                hitNpc = hit.collider.gameObject;
+                break; // ì°¾ì•˜ìœ¼ë©´ ë” ì•ˆ ì°¾ê³  ë°”ë¡œ ì¢…ë£Œ!
+            }
+        }
+
+        // 2ìˆœìœ„: ë‚¨í•™ìƒì´ ì—†ë‹¤ë©´, 'ë°”ë‹ë¼(Banilla)'ì¸ì§€ í™•ì¸í•©ë‹ˆë‹¤.
+        if (hitNpc == null)
+        {
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider != null && hit.collider.CompareTag("Banilla"))
+                {
+                    hitNpc = hit.collider.gameObject;
+                    break;
+                }
+            }
+        }
+
+        // --- ì—¬ê¸°ì„œë¶€í„°ëŠ” ì°¾ì€ ëŒ€ìƒ(hitNpc)ì— ëŒ€í•œ ê¸°ì¡´ ë¡œì§ ê·¸ëŒ€ë¡œ! ---
+        if (hitNpc != null)
+        {
             if (targetPoint != null)
             {
                 targetPoint.SetActive(true);
                 targetPoint.transform.position = hitNpc.transform.position;
             }
+
+            if (PlayerUIScene.instance != null)
+            {
+                if (hitNpc.CompareTag("Banilla")) PlayerUIScene.instance.SetBanillaBG();
+                else if (hitNpc.CompareTag("NPC")) PlayerUIScene.instance.SetExtraBG();
+
+                PlayerUIScene.instance.SetCheckingPortrait();
+            }
+
             if (currentHoveredNpc != hitNpc)
             {
                 if (currentHoveredNpc != null) HideHeart(currentHoveredNpc);
@@ -413,6 +545,12 @@ public class PlayerLaser : MonoBehaviour
                 HideHeart(currentHoveredNpc);
                 currentHoveredNpc = null;
             }
+
+            if (PlayerUIScene.instance != null)
+            {
+                PlayerUIScene.instance.SetNormalBG();
+                PlayerUIScene.instance.SetIdlePortrait();
+            }
         }
     }
 
@@ -426,7 +564,8 @@ public class PlayerLaser : MonoBehaviour
             for (int i = 0; i < heartSpritePool.Count; i++)
             {
                 Sprite temp = heartSpritePool[i];
-                int randomIndex = Random.Range(i, heartSpritePool.Count);
+                int randomIndex = UnityEngine.Random.Range(i, heartSpritePool.Count);
+
                 heartSpritePool[i] = heartSpritePool[randomIndex];
                 heartSpritePool[randomIndex] = temp;
             }
@@ -441,18 +580,22 @@ public class PlayerLaser : MonoBehaviour
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
 
-        // ¡Ú [±âÁ¸ ·ÎÁ÷ ¿ø»óº¹±¸] ÀÌ¹Ì ÇÏÆ®°¡ ÀÖ°í, ¹Ù´Ò¶ó°¡ ¾Æ´Ï¶ó¸é 
-        // ´õ ÀÌ»ó °è»êÇÏÁö ¾Ê°í ±âÁ¸ ÇÏÆ®¸¦ ±×´ë·Î È°¼ºÈ­¸¸ ½ÃÅ°°í Áï½Ã ÇÔ¼ö¸¦ ³¡³À´Ï´Ù!
+        // â˜… ì´ë¯¸ í•˜íŠ¸ê°€ ìˆê³ , ë°”ë‹ë¼ê°€ ì•„ë‹ˆë¼ë©´ ë” ì´ìƒ ê³„ì‚°í•˜ì§€ ì•Šê³  ê¸°ì¡´ í•˜íŠ¸ë¥¼ ê·¸ëŒ€ë¡œ í™œì„±í™”ë§Œ ì‹œí‚¤ê³  ì¦‰ì‹œ í•¨ìˆ˜ë¥¼ ëëƒ…ë‹ˆë‹¤!
         if (existingHeart != null && !npc.CompareTag("Banilla"))
         {
             existingHeart.gameObject.SetActive(true);
+            if (PlayerUIScene.instance != null)
+            {
+                SpriteRenderer sr = existingHeart.GetComponent<SpriteRenderer>();
+                if (sr != null) PlayerUIScene.instance.SetUIHeart(sr.sprite);
+            }
             return;
         }
 
         SpriteRenderer heartSR = null;
         bool isNewHeart = false;
 
-        // ÇÏÆ® ¿ÀºêÁ§Æ® È®º¸ ´Ü°è
+        // í•˜íŠ¸ ì˜¤ë¸Œì íŠ¸ í™•ë³´ ë‹¨ê³„
         if (existingHeart != null)
         {
             existingHeart.gameObject.SetActive(true);
@@ -469,16 +612,15 @@ public class PlayerLaser : MonoBehaviour
             newHeart.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
 
             heartSR = newHeart.GetComponent<SpriteRenderer>();
-            isNewHeart = true; // »õ·Î »ı¼ºµÊÀ» Ç¥½Ã
+            isNewHeart = true; // ìƒˆë¡œ ìƒì„±ë¨ì„ í‘œì‹œ
         }
 
-        // ÇÏÆ® ÀÌ¹ÌÁö °áÁ¤ ´Ü°è
+        // í•˜íŠ¸ ì´ë¯¸ì§€ ê²°ì • ë‹¨ê³„
         if (heartSR != null)
         {
-            // ±âº»ÀûÀ¸·Î ±âÁ¸ ÇÏÆ®ÀÇ ÀÌ¹ÌÁö¸¦ À¯ÁöÇÕ´Ï´Ù.
             Sprite pickedSprite = heartSR.sprite;
 
-            // ¾Æ¿¹ »õ·Î »ı¼ºÇÏ´Â °æ¿ì¿¡¸¸ ·£´ı Ç®ÀÌ³ª ÇÇ¿¡¸£ °íÁ¤ ÇÏÆ®¸¦ Áı¾î³Ö½À´Ï´Ù.
+            // ì•„ì˜ˆ ìƒˆë¡œ ìƒì„±í•˜ëŠ” ê²½ìš°ì—ë§Œ ëœë¤ í’€ì´ë‚˜ í”¼ì—ë¥´ ê³ ì • í•˜íŠ¸ë¥¼ ì§‘ì–´ë„£ìŠµë‹ˆë‹¤.
             if (isNewHeart)
             {
                 pickedSprite = GetUniqueHeartSprite();
@@ -490,20 +632,20 @@ public class PlayerLaser : MonoBehaviour
                 }
             }
 
-            // ¡Ú ¹Ù´Ò¶ó Àü¿ë Ã³¸®: ÇÑ ¹ø ÇÏ¾á ÇÏÆ®·Î ¹Ù²î¸é ´õ ÀÌ»ó ¾Ö´Ï¸ŞÀÌÅÍ¸¦ °Ë»çÇÏÁö ¾Ê°í À¯ÁöÇÕ´Ï´Ù.
+            // â˜… ë°”ë‹ë¼ ì „ìš© ì²˜ë¦¬: í•œ ë²ˆ í•˜ì–€ í•˜íŠ¸ë¡œ ë°”ë€Œë©´ ë” ì´ìƒ ì• ë‹ˆë©”ì´í„°ë¥¼ ê²€ì‚¬í•˜ì§€ ì•Šê³  ìœ ì§€í•©ë‹ˆë‹¤.
             if (npc.CompareTag("Banilla"))
             {
                 CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
                 if (npcManager != null)
                 {
-                    // 1. ÇöÀç ÇÏÆ®°¡ 'ÇÏ¾á ÇÏÆ®'¶ó¸é? -> °Ë»ç ³¡! (¾Ö´Ï¸ŞÀÌÅÍ È®ÀÎÇÒ ÇÊ¿ä ¾øÀÌ À¯Áö)
+                    // 1. í˜„ì¬ í•˜íŠ¸ê°€ 'í•˜ì–€ í•˜íŠ¸'ë¼ë©´? -> ê²€ì‚¬ ë! (ì• ë‹ˆë©”ì´í„° í™•ì¸í•  í•„ìš” ì—†ì´ ìœ ì§€)
                     if (pickedSprite == npcManager.banillaWhiteHeart && npcManager.banillaWhiteHeart != null)
                     {
-                        // do nothing (ÀÌ¹Ì pickedSprite°¡ ÇÏ¾á ÇÏÆ®ÀÌ¹Ç·Î ±×´ë·Î ³»·Á°¨)
+                        // do nothing (ì´ë¯¸ pickedSpriteê°€ í•˜ì–€ í•˜íŠ¸ì´ë¯€ë¡œ ê·¸ëŒ€ë¡œ ë‚´ë ¤ê°)
                     }
                     else
                     {
-                        // 2. ¾ÆÁ÷ ÇÏ¾á ÇÏÆ®°¡ ¾Æ´Ò ¶§¸¸ ÇÑ ¹ø ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ¸¦ È®ÀÎÇÕ´Ï´Ù.
+                        // 2. ì•„ì§ í•˜ì–€ í•˜íŠ¸ê°€ ì•„ë‹ ë•Œë§Œ í•œ ë²ˆ ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœë¥¼ í™•ì¸í•©ë‹ˆë‹¤.
                         Animator banillaAnim = npc.GetComponentInChildren<Animator>();
                         if (banillaAnim == null) banillaAnim = npc.GetComponentInParent<Animator>();
 
@@ -513,7 +655,7 @@ public class PlayerLaser : MonoBehaviour
                             isSmiling = banillaAnim.GetCurrentAnimatorStateInfo(0).IsName("Banilla_Smile");
                         }
 
-                        // ¿ô°í ÀÖ´Ù¸é ÇÏ¾á ÇÏÆ®·Î ±³Ã¼! (´ÙÀ½ ¸¶¿ì½º HoverºÎÅÍ´Â À§ 1¹ø Á¶°Ç¿¡ °É·Á¼­ ÀÌ °Ë»ç¸¦ ¾È ÇÔ)
+                        // ì›ƒê³  ìˆë‹¤ë©´ í•˜ì–€ í•˜íŠ¸ë¡œ êµì²´
                         if (isSmiling && npcManager.banillaWhiteHeart != null)
                         {
                             pickedSprite = npcManager.banillaWhiteHeart;
@@ -525,8 +667,16 @@ public class PlayerLaser : MonoBehaviour
                     }
                 }
             }
+            if (pickedSprite != null)
+            {
+                heartSR.sprite = pickedSprite; // NPC ë¨¸ë¦¬ ìœ„ í•˜íŠ¸ì— ì´ë¯¸ì§€ ì ìš©
 
-            if (pickedSprite != null) heartSR.sprite = pickedSprite;
+                // UI í•˜íŠ¸ ì—°ë™
+                if (PlayerUIScene.instance != null)
+                {
+                    PlayerUIScene.instance.SetUIHeart(pickedSprite);
+                }
+            }
             heartSR.color = new Color(1f, 1f, 1f, 1f);
             heartSR.sortingOrder = 0;
         }
@@ -536,16 +686,36 @@ public class PlayerLaser : MonoBehaviour
     {
         Transform existingHeart = npc.transform.Find("NpcHeartItem");
         if (existingHeart != null) existingHeart.gameObject.SetActive(false);
+
+        // â˜… NPC ë¨¸ë¦¬ ìœ„ í•˜íŠ¸ê°€ êº¼ì§ˆ ë•Œ UI í•˜íŠ¸ë„ ê°™ì´ ìˆ¨ê¹€
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.HideUIHeart();
+        }
     }
 
     public void CheckAndLockTarget()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
-        if (hit.collider != null && hit.collider.CompareTag("NPC"))
+        // â˜… [í•µì‹¬ ìˆ˜ì •] í´ë¦­í•  ë•Œë„ RaycastAllì„ ì¨ì„œ ëª¨ë“  ê±¸ ëš«ê³  ê²€ì‚¬í•©ë‹ˆë‹¤.
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+
+        GameObject targetNpc = null;
+
+        // ë§ˆìš°ìŠ¤ ì•„ë˜ ê²¹ì¹œ ì• ë“¤ ì¤‘ì— ë‚¨í•™ìƒ(NPC)ë§Œ ê³¨ë¼ëƒ…ë‹ˆë‹¤!
+        foreach (RaycastHit2D hit in hits)
         {
-            currentBurningNpc = hit.collider.gameObject;
+            if (hit.collider != null && hit.collider.CompareTag("NPC"))
+            {
+                targetNpc = hit.collider.gameObject;
+                break;
+            }
+        }
+
+        if (targetNpc != null)
+        {
+            currentBurningNpc = targetNpc;
             lockedTargetPos = currentBurningNpc.transform.position;
             isFiring = true;
 
@@ -578,13 +748,32 @@ public class PlayerLaser : MonoBehaviour
             var move = currentBurningNpc.GetComponent<NpcRandomPatrol>();
             if (move != null) move.enabled = false;
 
-            Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
-            foreach (Collider2D col in overlappingColliders)
+            if (currentBurningNpc.name.Contains("Pierre"))
             {
-                GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
-                if (girl != null && girl.gameObject != hit.collider.gameObject)
+                CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+                if (npcManager != null)
                 {
-                    girl.LookAtAttackedNpc(currentBurningNpc);
+                    foreach (GameObject girlObj in npcManager.spawnedGirls)
+                    {
+                        if (girlObj != null)
+                        {
+                            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+                            if (girl != null) girl.LookAtAttackedNpc(currentBurningNpc);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
+                foreach (Collider2D col in overlappingColliders)
+                {
+                    GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
+                    // â˜… ê¸°ì¡´ì˜ hit.collider.gameObject ëŒ€ì‹  ì°¾ì•„ë‚¸ targetNpcë¡œ ë³€ê²½
+                    if (girl != null && girl.gameObject != targetNpc)
+                    {
+                        girl.LookAtAttackedNpc(currentBurningNpc);
+                    }
                 }
             }
         }
@@ -644,10 +833,29 @@ public class PlayerLaser : MonoBehaviour
         }
         if (laserObject != null && !isInCompetitionMode) laserObject.SetActive(false);
         if (targetPoint != null) targetPoint.SetActive(false);
+
+        if (PlayerUIScene.instance != null)
+        {
+            PlayerUIScene.instance.SetNormalBG();
+        }
     }
 
     public void TriggerAllNpcsExit()
     {
+        // ì¼ë°˜ ë‚¨npc í•˜íŠ¸ë¥¼ ë‹¤ ëª¨ì•˜ì„ ë•Œ í”¼ì—ë¥´ í˜ì´ì¦ˆ BGMìœ¼ë¡œ ë³€ê²½
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.PlayPierrePhaseBGM();
+        }
+
+        // 1. â˜… [ê°€ì¥ ì¤‘ìš”] ë‚¨í•™ìƒ ìŠ¤í¬ë„ˆ ê¸°ê³„ì˜ ì „ì›ë¶€í„° êº¼ì„œ ë” ì´ìƒ ì•ˆ ë‚˜ì˜¤ê²Œ ë§‰ìŠµë‹ˆë‹¤!
+        GameObject spawner = GameObject.Find("NPC_Spawner");
+        if (spawner != null)
+        {
+            spawner.SetActive(false);
+        }
+
+        // 2. ì—¬í•™ìƒ NPCë“¤ í‡´ì¥ ë° ì†Œë©¸
         GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
         foreach (GameObject girlObj in girlNpcs)
         {
@@ -655,18 +863,33 @@ public class PlayerLaser : MonoBehaviour
             if (girl != null) girl.WalkAwayAndDestroy();
         }
 
-        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject boyObj in boyNpcs)
+        // 3. ì”¬ì— ì¡´ì¬í•˜ëŠ” ëª¨ë“  ë‚¨í•™ìƒ NPCì™€ ê¸°ì¡´ í”¼ì—ë¥´ë¥¼ ì‹¹ ë‹¤ ì¡ì•„ì„œ ì‚­ì œ!
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
         {
-            Destroy(boyObj);
+            if (obj != null)
+            {
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
         }
 
+        // 4. ë³´ìŠ¤ ì»·ì‹  ì„¸íŒ…
         CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
         if (npcManager != null) npcManager.SpawnAndPlayCutscene();
     }
 
-    public void TriggerPierreEnding()
+    public void TriggerPierreEnding(Vector3 heartPos)
     {
+        // í”¼ì—ë¥´ í•˜íŠ¸ë¥¼ ì–»ì—ˆì„ ë•Œ ë°”ë‹ë¼(ìµœì¢…) í˜ì´ì¦ˆ BGMìœ¼ë¡œ ë³€ê²½
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.PlayBanillaPhaseBGM();
+        }
+
+        // 1. ì—¬í•™ìƒ NPCë“¤ í‡´ì¥ ë° ì†Œë©¸
         GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
         foreach (GameObject girlObj in girlNpcs)
         {
@@ -674,16 +897,52 @@ public class PlayerLaser : MonoBehaviour
             if (girl != null) girl.WalkAwayAndDestroy();
         }
 
-        GameObject[] boyNpcs = GameObject.FindGameObjectsWithTag("NPC");
-        foreach (GameObject boyObj in boyNpcs) Destroy(boyObj);
+        // 2. â˜… [ìˆ˜ì •] ì”¬ì— ì¡´ì¬í•˜ëŠ” ëª¨ë“  ì˜¤ë¸Œì íŠ¸ë¥¼ ê²€ì‚¬í•˜ì—¬ ë‚¨í•™ìƒ NPCë¥¼ í”ì ë„ ì—†ì´ ì‚­ì œí•©ë‹ˆë‹¤.
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj != null)
+            {
+                // íƒœê·¸ê°€ NPCì´ê±°ë‚˜, ì´ë¦„ì— BoyNpc ë˜ëŠ” Pierreê°€ í¬í•¨ë˜ì–´ ìˆë‹¤ë©´ ë³µì œë³¸((Clone))ê¹Œì§€ ì „ë¶€ ì‚­ì œ!
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
+        }
 
         CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
-        if (npcManager != null) npcManager.OnPlayerGetPierreHeart();
+        if (npcManager != null) npcManager.OnPlayerGetPierreHeart(heartPos);
     }
 
-    // ==========================================
-    // ¡Ú ¹Ù´Ò¶ó ´ë°á ¸ğµå ÇÔ¼ö (SpriteRenderer ´ëÀÀ) ¡Ú
-    // ==========================================
+    public void TriggerBanillaEnding()
+    {
+        // 1. ì—¬í•™ìƒ NPCë“¤ í‡´ì¥ ë° ì†Œë©¸
+        GameObject[] girlNpcs = GameObject.FindGameObjectsWithTag("GirlNpc");
+        foreach (GameObject girlObj in girlNpcs)
+        {
+            GirlNpcReaction girl = girlObj.GetComponent<GirlNpcReaction>();
+            if (girl != null) girl.WalkAwayAndDestroy();
+        }
+
+        // 2. â˜… [ìˆ˜ì •] ë°”ë‹ë¼ ì—”ë”© ë•Œë„ ìƒˆë¡œ ìƒì„±ëœ ë‚¨í•™ìƒê¹Œì§€ ì‹¹ ë‹¤ ì¡ì•„ì„œ ì‚­ì œí•©ë‹ˆë‹¤.
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj != null)
+            {
+                if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
+                {
+                    Destroy(obj);
+                }
+            }
+        }
+
+        CutsceneNpcManager npcManager = FindAnyObjectByType<CutsceneNpcManager>();
+        if (npcManager != null) npcManager.OnPlayerGetBanillaHeart();
+    }
+
+    // ë°”ë‹ë¼ ëŒ€ê²° ëª¨ë“œ
     public void EnterCompetitionMode(Vector2 target, Color color)
     {
         isInCompetitionMode = true;
@@ -694,7 +953,6 @@ public class PlayerLaser : MonoBehaviour
             SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = color;
         }
-        // ´ë°á Áß ·¹ÀÌÀú µÎ²²¸¦ Å°¿ó´Ï´Ù.
         laserWidth = 0.1f; 
 
         if (laserObject != null) laserObject.SetActive(true);
@@ -710,7 +968,6 @@ public class PlayerLaser : MonoBehaviour
             SpriteRenderer sr = laserObject.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = originalLaserColor;
         }
-        // ·¹ÀÌÀú µÎ²² ¿ø»óº¹±¸
         laserWidth = originalWidth; 
         
         if (laserObject != null) laserObject.SetActive(false);

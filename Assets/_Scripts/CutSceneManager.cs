@@ -5,84 +5,118 @@ using System.Collections.Generic;
 
 public class CutsceneNpcManager : MonoBehaviour
 {
-    [Header("½ºÆùÇÒ NPC ÇÁ¸®ÆÕ")]
+    [Header("ìŠ¤í°í•  NPC í”„ë¦¬íŒ¹")]
     public GameObject pierrePrefab;
     public GameObject banillaPrefab;
     public GameObject[] newGirlPrefabs;
     public float girlSpawnSpacing = 1.5f;
 
-    [Header("½ºÆù ÁÂÇ¥")]
+    [Header("ìŠ¤í° ì¢Œí‘œ")]
     public Vector3 pierreSpawnPosition;
     public Vector3 banillaSpawnPosition;
 
-    [Header("½Ã³×¸¶¸Ó½Å Ä«¸Ş¶ó ¼³Á¤")]
+    [Header("ì‹œë„¤ë§ˆë¨¸ì‹  ì¹´ë©”ë¼ ì„¤ì •")]
     public CinemachineBrain mainBrain;
     public CinemachineCamera vcamPierre;
     public CinemachineCamera vcamBanilla;
     public CinemachineCamera vcamGirlsWalk;
     public CinemachineCamera vcamPlayer;
 
-    [Header("ÇÃ·¹ÀÌ¾î Á¦¾î")]
+    [Header("í”Œë ˆì´ì–´ ì œì–´")]
     public MonoBehaviour playerMoveScript;
+    public MonoBehaviour playerAttackScript;
     public Rigidbody2D playerRb;
     public PlayerLaser playerLaserScript;
 
-    [Header("ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌ¼Ç (Á÷Á¢ ¿¬°á)")]
+    [Header("í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´ì…˜ (ì§ì ‘ ì—°ê²°)")]
     public Animator playerAnim;
 
-    [Header("¿©ÇĞ»ı ÀÌµ¿ ¼³Á¤")]
+    [Header("ì—¬í•™ìƒ ì´ë™ ì„¤ì •")]
     public float girlWalkSpeed = 3f;
+    public float girlStopSpacing = 1.0f;
+    public float girlYSpread = 0.3f;
+    public float distanceToPierre = 1.5f;
 
-    [Header("·¹ÀÌÀú °æÀï ¼³Á¤")]
+    [Header("ë ˆì´ì € ê²½ìŸ ì„¤ì •")]
     public Color playerCompetitionLaserColor = new Color(1f, 0.4f, 0.7f);
 
-    [Tooltip("ÇÃ·¹ÀÌ¾î(¼îÄİ¶ó)°¡ ÇÑ ¹ø ¿¬Å¸ÇÒ ¶§ ¹Ğ¾î³»´Â Èû")]
-    public float playerPushPower = 0.04f;
-    [Tooltip("°¡¸¸È÷ ÀÖÀ» ¶§ ¹Ù´Ò¶ó°¡ ¹Ğ°í µé¾î¿À´Â ¼Óµµ (ÃÊ´ç)")]
-    public float banillaPushSpeed = 0.15f;
+    [Tooltip("í”Œë ˆì´ì–´(ì‡¼ì½œë¼)ê°€ í•œ ë²ˆ ì—°íƒ€í•  ë•Œ ë°€ì–´ë‚´ëŠ” í˜")]
+    public float playerPushPower = 0.05f;
+    [Tooltip("ê°€ë§Œíˆ ìˆì„ ë•Œ ë°”ë‹ë¼ê°€ ë°€ê³  ë“¤ì–´ì˜¤ëŠ” ì†ë„ (ì´ˆë‹¹)")]
+    public float banillaPushSpeed = 0.5f;
 
     private GameObject banillaLaserObj;
-    private List<GameObject> spawnedGirls = new List<GameObject>();
+    private List<GameObject> banillaLaserEffects = new List<GameObject>();
+    public List<GameObject> spawnedGirls = new List<GameObject>();
     private GameObject instanceBanilla;
     private Animator banillaAnimator;
     private Transform banillaTransform;
 
-    // (±âÁ¸ º¯¼öµé ¾Æ·¡ÂÊ Àû´çÇÑ °÷¿¡ Ãß°¡ÇÏ¼¼¿ä)
-    [Header("¹Ù´Ò¶ó ´ë°á Àü¿ë ÇÏÆ® ÀÌ¹ÌÁö (½Â¸® ÈÄ ±³Ã¼¿ë)")]
-    public Sprite banillaBlackHeart; // ¿ø·¡ÀÇ °ËÀº ÇÏÆ®
-    public Sprite banillaWhiteHeart; // ÀÌ°åÀ» ¶§ ÇÏ¾á ÇÏÆ®
+    [Header("ë°”ë‹ë¼ ëŒ€ê²° ì „ìš© í•˜íŠ¸ ì´ë¯¸ì§€ (ìŠ¹ë¦¬ í›„ êµì²´ìš©)")]
+    public Sprite banillaBlackHeart;
+    public Sprite banillaWhiteHeart;
 
     private bool isLaserDuelActive = false;
     private Vector2 duelMidwayPoint;
 
-    // ÁÙ´Ù¸®±â ÁøÇàµµ (0.0f = ¹Ù´Ò¶ó ¿Ï½Â / 0.5f = Á¤Áß¾Ó ½ÃÀÛ / 1.0f = ¼îÄİ¶ó ¿Ï½Â)
     private float duelProgress = 0.5f;
 
     public bool canStartDuel = false;
 
-    // 1. ½ÃÀÛ ½Ã ·¹ÀÌÀú °­Á¦ ¼û±è
+    [Header("ë§ˆìˆ ë´‰ ì œì–´")]
+    public Animator magicStickAnim;
+    public Animator banillaStickAnim;
+
     void Start()
     {
         ForceHideBanillaLaser();
     }
 
-    // ´ë°á ÁßÀÏ ¶§ ½Ç½Ã°£À¸·Î ·¹ÀÌÀú ÁÙ´Ù¸®±â °è»ê ¹× ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å °¨Áö
     void Update()
     {
+        if (!isLaserDuelActive && banillaLaserObj != null && banillaLaserObj.activeSelf)
+        {
+            banillaLaserObj.SetActive(false);
+        }
+
         if (!isLaserDuelActive) return;
 
-        // 1. °¡¸¸È÷ ÀÖÀ¸¸é ¹Ù´Ò¶ó°¡ ÇÃ·¹ÀÌ¾î(¼îÄİ¶ó) ÂÊÀ¸·Î Á¡Á¡ ¹Ğ°í µé¾î¿È (ÁøÇàµµ °¨¼Ò)
         duelProgress -= banillaPushSpeed * Time.deltaTime;
         duelProgress = Mathf.Clamp(duelProgress, 0f, 1f);
 
-        // ¹Ù²ï ÁøÇàµµ¿¡ ¸ÂÃç ½Ç½Ã°£À¸·Î Ãæµ¹ ÁöÁ¡ °è»ê
         UpdateDuelLasers();
 
-        // ¡Ú ÆĞ¹è Á¶°Ç: ½Ã°£ÀÌ Áö³ª¼­ °ÔÀÌÁö°¡ 0ÀÌ µÇ¸é ÆĞ¹è Ã³¸®
         if (duelProgress <= 0.0f)
         {
-            Debug.Log("¹Ù´Ò¶ó ½Â¸®! (¼îÄİ¶ó°¡ ¹Ğ¸²)");
+            Debug.Log("ë°”ë‹ë¼ ìŠ¹ë¦¬! (ì‡¼ì½œë¼ê°€ ë°€ë¦¼)");
             OnPlayerLoseCompetition();
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (!isLaserDuelActive)
+        {
+            if (banillaLaserObj != null && banillaLaserObj.activeSelf)
+                banillaLaserObj.SetActive(false);
+
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null && effect.activeSelf)
+                    effect.SetActive(false);
+            }
+        }
+        else
+        {
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null)
+                {
+                    Vector3 newPos = duelMidwayPoint;
+                    newPos.z = effect.transform.position.z;
+                    effect.transform.position = newPos;
+                }
+            }
         }
     }
 
@@ -90,33 +124,50 @@ public class CutsceneNpcManager : MonoBehaviour
     {
         if (banillaTransform == null || playerRb == null) return;
 
-        // ½ÃÀÛ ÁöÁ¡µé È®º¸
-        Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null ? playerLaserScript.firePoint.position : playerRb.transform.position;
-        Vector3 banillaFirePos = banillaLaserObj != null ? banillaLaserObj.transform.position : banillaTransform.position;
+        Vector3 playerFirePos = playerLaserScript != null && playerLaserScript.firePoint != null
+            ? playerLaserScript.firePoint.position
+            : playerRb.transform.position;
+        Vector3 banillaFirePos = banillaLaserObj != null
+            ? banillaLaserObj.transform.position
+            : banillaTransform.position;
 
-        // duelProgress ºñÀ²¿¡ µû¶ó ½Ç½Ã°£ Ãæµ¹Á¡ µ¿Àû ÀÌµ¿ (Lerp)
         duelMidwayPoint = Vector2.Lerp(playerFirePos, banillaFirePos, duelProgress);
 
-        // ÇÃ·¹ÀÌ¾î ·¹ÀÌÀú ½Ç½Ã°£ °»½Å
         if (playerLaserScript != null)
         {
             playerLaserScript.EnterCompetitionMode(duelMidwayPoint, playerCompetitionLaserColor);
         }
 
-        // ¹Ù´Ò¶ó ·¹ÀÌÀú ½Ç½Ã°£ °»½Å
         if (banillaLaserObj != null)
         {
             FireBanillaLaser(banillaFirePos, duelMidwayPoint);
+        }
+
+        if (banillaLaserEffects != null)
+        {
+            foreach (GameObject effect in banillaLaserEffects)
+            {
+                if (effect != null)
+                {
+                    Vector3 newPos = duelMidwayPoint;
+                    newPos.z = effect.transform.position.z;
+                    effect.transform.position = newPos;
+                }
+            }
         }
     }
 
     private void ForceHideBanillaLaser()
     {
-        GameObject banillaObj = GameObject.FindWithTag("Banilla");
+        GameObject banillaObj = instanceBanilla;
+        if (banillaObj == null) banillaObj = GameObject.FindWithTag("Banilla");
+
         if (banillaObj != null)
         {
             banillaTransform = banillaObj.transform;
             if (banillaAnimator == null) banillaAnimator = banillaObj.GetComponentInChildren<Animator>();
+
+            banillaLaserEffects.Clear();
 
             Transform[] allChildren = banillaObj.GetComponentsInChildren<Transform>(true);
             foreach (Transform child in allChildren)
@@ -125,13 +176,16 @@ public class CutsceneNpcManager : MonoBehaviour
                 {
                     banillaLaserObj = child.gameObject;
                     banillaLaserObj.SetActive(false);
-                    break;
+                }
+                else if (child.name == "44x_0" || child.name == "54x_0")
+                {
+                    child.gameObject.SetActive(false);
+                    banillaLaserEffects.Add(child.gameObject);
                 }
             }
         }
     }
 
-    // 2. ¿ÀÇÁ´× ÄÆ½Å
     public void SpawnAndPlayCutscene()
     {
         spawnedGirls.Clear();
@@ -151,7 +205,20 @@ public class CutsceneNpcManager : MonoBehaviour
         {
             for (int i = 0; i < newGirlPrefabs.Length; i++)
             {
-                Vector3 spawnPos = new Vector3(banillaSpawnPosition.x + ((i + 1) * girlSpawnSpacing), pierreSpawnPosition.y - 1.1f, 0);
+                float zigzagY = 0f;
+                if (i != 0)
+                {
+                    zigzagY = (i % 2 == 0) ? girlYSpread : -girlYSpread;
+                }
+
+                float yOffset = -1.5f;
+
+                Vector3 spawnPos = new Vector3(
+                    banillaSpawnPosition.x + ((i + 1) * girlSpawnSpacing),
+                    pierreSpawnPosition.y + yOffset + zigzagY,
+                    0
+                );
+
                 GameObject girl = Instantiate(newGirlPrefabs[i], spawnPos, Quaternion.identity);
                 SetGirlAIEnabled(girl, false);
                 spawnedGirls.Add(girl);
@@ -167,7 +234,10 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamBanilla.gameObject.SetActive(false);
         vcamGirlsWalk.gameObject.SetActive(false);
 
+        // â˜… í”Œë ˆì´ì–´ ì´ë™ê³¼ ê³µê²©(ë ˆì´ì €) ìŠ¤í¬ë¦½íŠ¸ ë„ê¸°
         playerMoveScript.enabled = false;
+        if (playerLaserScript != null) playerLaserScript.enabled = false;
+
         playerRb.linearVelocity = Vector2.zero;
 
         if (playerAnim != null)
@@ -191,12 +261,12 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamPierre.gameObject.SetActive(true);
         vcamPlayer.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(4f);
 
         vcamBanilla.gameObject.SetActive(true);
         vcamPierre.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(3f);
 
         if (spawnedGirls.Count > 0 && spawnedGirls[0] != null)
         {
@@ -220,7 +290,10 @@ public class CutsceneNpcManager : MonoBehaviour
 
         SyncPlayerMoveDirection(false);
         if (mainBrain != null) mainBrain.enabled = false;
+
+        // â˜… ì»·ì”¬ ëë‚˜ë©´ í”Œë ˆì´ì–´ ì´ë™ê³¼ ê³µê²©(ë ˆì´ì €) ìŠ¤í¬ë¦½íŠ¸ ë‹¤ì‹œ ì¼œê¸°
         playerMoveScript.enabled = true;
+        if (playerLaserScript != null) playerLaserScript.enabled = true;
 
         foreach (GameObject girl in spawnedGirls)
         {
@@ -270,19 +343,30 @@ public class CutsceneNpcManager : MonoBehaviour
         while (!allArrived)
         {
             allArrived = true;
-            foreach (GameObject girl in spawnedGirls)
+
+            for (int i = 0; i < spawnedGirls.Count; i++)
             {
+                GameObject girl = spawnedGirls[i];
                 if (girl != null)
                 {
-                    Vector3 targetPos = new Vector3(pierreSpawnPosition.x, girl.transform.position.y, 0);
+                    float targetX = pierreSpawnPosition.x - distanceToPierre - ((spawnedGirls.Count - 1 - i) * girlStopSpacing);
+
+                    Vector3 targetPos = new Vector3(targetX, girl.transform.position.y, 0);
+
                     girl.transform.position = Vector3.MoveTowards(
                         girl.transform.position,
                         targetPos,
                         girlWalkSpeed * Time.deltaTime
                     );
+
                     if (Mathf.Abs(girl.transform.position.x - targetPos.x) > 0.05f)
                     {
                         allArrived = false;
+                    }
+                    else
+                    {
+                        Animator anim = girl.GetComponent<Animator>();
+                        if (anim != null) anim.SetBool("isWalking", false);
                     }
                 }
             }
@@ -318,40 +402,37 @@ public class CutsceneNpcManager : MonoBehaviour
         }
     }
 
-    // ¡Ú ¼îÄİ¶ó ½Â¸® ½Ã È£ÃâµÇ¾î ¹Ù´Ò¶óÀÇ ¹Ì¼Ò ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ÄÑ´Â ÇÙ½É ±â´É
-    // ¡Ú ¼îÄİ¶ó°¡ ¿ÏÀüÈ÷ ÀÌ°åÀ» ¶§ ¹Ù´Ò¶ó¸¦ ¹Ì¼Ò »óÅÂ·Î '°­Á¦ ÀüÈ¯'ÇÏ´Â ÇÔ¼ö
     private void TriggerBanillaSmile()
     {
         if (banillaAnimator != null)
         {
-            // 1. ±âÁ¸¿¡ ¼¼ÆÃÇØµÎ½Å 'toSmile' Æ®¸®°Å¸¦ ÀÛµ¿½ÃÅµ´Ï´Ù.
             banillaAnimator.SetTrigger("toSmile");
 
-            // 2. ¡Ú[°­Á¦ ÇØ°áÃ¥] ¸¸¾à Æ®¸®°Å Á¶°ÇÀÌ ¾ÃÈ÷´õ¶óµµ ¹«Á¶°Ç ¹Ì¼Ò¸¦ Áşµµ·Ï 
-            //    ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ ÀÌ¸§À» Á÷Á¢ È£ÃâÇÏ¿© °­Á¦·Î Æ²¾î¹ö¸³´Ï´Ù.
-            //    (¾Ö´Ï¸ŞÀÌÅÍ Ã¢¿¡ ÀÖ´Â ¹Ì¼Ò ¾Ö´Ï¸ŞÀÌ¼Ç ºí·Ï ÀÌ¸§ÀÌ "Banilla_Smile"ÀÌ ¸Â´ÂÁö ²À È®ÀÎÇÏ¼¼¿ä!)
             try
             {
                 banillaAnimator.Play("Banilla_Smile");
-                Debug.Log("¹Ù´Ò¶ó ¹Ì¼Ò ¾Ö´Ï¸ŞÀÌ¼Ç(Banilla_Smile) °­Á¦ Àç»ı ¿Ï·á!");
+                Debug.Log("ë°”ë‹ë¼ ë¯¸ì†Œ ì• ë‹ˆë©”ì´ì…˜(Banilla_Smile) ê°•ì œ ì¬ìƒ ì™„ë£Œ!");
             }
             catch (System.Exception e)
             {
-                Debug.LogError("¾Ö´Ï¸ŞÀÌ¼Ç °­Á¦ Àç»ı ½ÇÆĞ: " + e.Message);
+                Debug.LogError("ì• ë‹ˆë©”ì´ì…˜ ê°•ì œ ì¬ìƒ ì‹¤íŒ¨: " + e.Message);
             }
         }
     }
 
-    public void OnPlayerGetPierreHeart()
+    public void OnPlayerGetPierreHeart(Vector3 heartPos)
     {
         canStartDuel = false;
         ForceHideBanillaLaser();
-        StartCoroutine(PierreHeartCutsceneSequence());
+        StartCoroutine(PierreHeartCutsceneSequence(heartPos));
     }
 
-    private IEnumerator PierreHeartCutsceneSequence()
+    private IEnumerator PierreHeartCutsceneSequence(Vector3 heartPos)
     {
+        // â˜… í”Œë ˆì´ì–´ ì´ë™ê³¼ ê³µê²©(ë ˆì´ì €) ìŠ¤í¬ë¦½íŠ¸ ë„ê¸°
         playerMoveScript.enabled = false;
+        if (playerLaserScript != null) playerLaserScript.enabled = false;
+
         playerRb.linearVelocity = Vector2.zero;
 
         if (playerAnim != null)
@@ -373,13 +454,45 @@ public class CutsceneNpcManager : MonoBehaviour
         vcamGirlsWalk.gameObject.SetActive(false);
 
         vcamPlayer.gameObject.SetActive(true);
-        yield return new WaitForSeconds(3f);
+
+        if (magicStickAnim != null)
+        {
+            Vector3 centerPos = Camera.main.transform.position;
+            centerPos.z = magicStickAnim.transform.position.z;
+
+            magicStickAnim.transform.position = centerPos;
+
+            magicStickAnim.gameObject.SetActive(true);
+            if (magicStickAnim.isActiveAndEnabled)
+            {
+                magicStickAnim.Play("MagicStick");
+            }
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        if (magicStickAnim != null && magicStickAnim.isActiveAndEnabled)
+        {
+            magicStickAnim.Play("Chocolate_Stick");
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        if (HeartUIManager.instance != null)
+        {
+            HeartUIManager.instance.ChangeHeartToStickUI(true);
+        }
+
+        if (magicStickAnim != null)
+        {
+            magicStickAnim.gameObject.SetActive(false);
+        }
 
         SetBanillaCrying(true);
 
         vcamPlayer.gameObject.SetActive(false);
         vcamBanilla.gameObject.SetActive(true);
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSeconds(4f);
 
         vcamBanilla.gameObject.SetActive(false);
         vcamPlayer.gameObject.SetActive(true);
@@ -399,7 +512,10 @@ public class CutsceneNpcManager : MonoBehaviour
         {
             if (playerMoveScript != null)
             {
+                // â˜… ì»·ì”¬ ëë‚˜ë©´ í”Œë ˆì´ì–´ ì´ë™ê³¼ ê³µê²©(ë ˆì´ì €) ìŠ¤í¬ë¦½íŠ¸ ë‹¤ì‹œ ì¼œê¸°
                 playerMoveScript.enabled = true;
+                if (playerLaserScript != null) playerLaserScript.enabled = true;
+
                 playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
             }
         }
@@ -407,12 +523,11 @@ public class CutsceneNpcManager : MonoBehaviour
         yield return null;
     }
 
-    // Å¬¸¯ ½Ã ·¹ÀÌÀú ´ë°á ½ÃÀÛ ÇÔ¼ö
     public void StartLaserDuel()
     {
         if (!canStartDuel && !isLaserDuelActive)
         {
-            Debug.Log("ÀÌ¹Ì ´ë°áÀÌ ½Â¸®·Î Á¾·áµÇ¾ú½À´Ï´Ù.");
+            Debug.Log("ì´ë¯¸ ëŒ€ê²°ì´ ìŠ¹ë¦¬ë¡œ ì¢…ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
             return;
         }
         if (banillaTransform == null) return;
@@ -424,7 +539,7 @@ public class CutsceneNpcManager : MonoBehaviour
             UpdateDuelLasers();
             if (duelProgress >= 1.0f)
             {
-                Debug.Log("¼îÄİ¶ó ¿¬Å¸·Î 1.0 µµ´Ş! ½Â¸® ÇÔ¼ö Áï½Ã ½ÇÇà!");
+                Debug.Log("ì‡¼ì½œë¼ ì—°íƒ€ë¡œ 1.0 ë„ë‹¬! ìŠ¹ë¦¬ í•¨ìˆ˜ ì¦‰ì‹œ ì‹¤í–‰!");
                 OnPlayerWinCompetition();
             }
             return;
@@ -432,7 +547,7 @@ public class CutsceneNpcManager : MonoBehaviour
 
         isLaserDuelActive = true;
         duelProgress = 0.5f;
-        Debug.Log("ÇÃ·¹ÀÌ¾î vs ¹Ù´Ò¶ó ·¹ÀÌÀú °æÀï ½ÃÀÛ!");
+        Debug.Log("í”Œë ˆì´ì–´ vs ë°”ë‹ë¼ ë ˆì´ì € ê²½ìŸ ì‹œì‘!");
 
         if (playerMoveScript != null) playerMoveScript.enabled = false;
         if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
@@ -474,13 +589,15 @@ public class CutsceneNpcManager : MonoBehaviour
         if (banillaLaserObj == null) return;
 
         banillaLaserObj.SetActive(true);
+        foreach (GameObject effect in banillaLaserEffects)
+        {
+            if (effect != null) effect.SetActive(true);
+        }
 
         SpriteRenderer sr = banillaLaserObj.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
             sr.enabled = true;
-            sr.sortingLayerName = "Objects";
-            sr.sortingOrder = 999;
         }
 
         Vector2 direction = targetPos - startPos;
@@ -498,45 +615,35 @@ public class CutsceneNpcManager : MonoBehaviour
         }
 
         float finalXScale = (distance / baseWidth) / parentScaleX;
-        banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, 1f);
+
+        float currentZScale = banillaLaserObj.transform.localScale.z;
+        banillaLaserObj.transform.localScale = new Vector3(finalXScale, currentYScale, currentZScale);
     }
 
     public void StartBanillaCompetition() { SetBanillaCrying(false); }
-    // ÇÃ·¹ÀÌ¾î°¡ Á³À» ¶§
+
     public void OnPlayerLoseCompetition()
     {
-        // 1. ¹Ù´Ò¶ó°¡ ´Ù½Ã ¿ì´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Æ²¾îÁİ´Ï´Ù.
         SetBanillaCrying(true);
-
-        // 2. ´ë°á »óÅÂ¸¦ ²ô°í È­¸éÀÇ ·¹ÀÌÀú¸¦ ½Ï Áö¿ó´Ï´Ù.
         ExitLaserDuel();
 
-        // 3. ¡Ú ¼îÄİ¶ó¿¡°Ô ¹Ù´Ò¶óÀÇ À§Ä¡(banillaTransform)¸¦ ³Ñ°ÜÁÖ¸é¼­ ³Ë¹éÀ» ½ÇÇàÇÕ´Ï´Ù!
         if (playerLaserScript != null && banillaTransform != null)
         {
             playerLaserScript.StartPlayerKnockback(banillaTransform);
-            Debug.Log("¼îÄİ¶ó ÆĞ¹è! ³Ë¹é ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà");
+            Debug.Log("ì‡¼ì½œë¼ íŒ¨ë°°! ë„‰ë°± ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰");
         }
     }
 
-    // ÇÃ·¹ÀÌ¾î°¡ ¿Ï½ÂÇÏ¸é ÀÌ ÇÔ¼ö°¡ È£ÃâµÇ¾î ¹Ì¼Ò Áş´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³ª°©´Ï´Ù!
     public void OnPlayerWinCompetition()
     {
-        // ½Â¸® ÄÆ¾ÀÀÌ ³ª¿À¸é ¹Ù´Ò¶ó¸¦ ´õÀÌ»ó Å¬¸¯ÇÒ¼ö¾ø°Ô Àá±İ Ã³¸®
         canStartDuel = false;
-
-        // 1. ·¹ÀÌÀú ¿ÀºêÁ§Æ®µéÀ» ¸ÕÀú È­¸é¿¡¼­ Áï½Ã Áö¿ó´Ï´Ù.
         ExitLaserDuel();
-
-        // 2. ±× Á÷ÈÄ ¹Ù´Ò¶ó¿¡°Ô 'toSmile' Æ®¸®°Å¸¦ ´øÁ® ¹Ì¼Ò ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÇÇàÇÕ´Ï´Ù.
         TriggerBanillaSmile();
 
-        // 3. ¡Ú ´ë°áÀÌ ¼º°øÀûÀ¸·Î ³¡³µÀ¸´Ï ¼îÄİ¶óÀÇ ÀÌµ¿ ½ºÅ©¸³Æ®¸¦ ÄÑ¼­ Á¶ÀÛ±ÇÀ» µ¹·ÁÁİ´Ï´Ù.
         if (playerMoveScript != null)
         {
             playerMoveScript.enabled = true;
 
-            // ³Ë¹é º¹±¸ ¶§ ¾²¼Ì´ø ¹é¹«ºù(¹æÇâ ¿À·ù) ¹æÁö ÃÊ±âÈ­ ÇÔ¼ö¸¦ ¿©±â¼­µµ ½÷Áİ´Ï´Ù.
             try
             {
                 playerMoveScript.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver);
@@ -544,7 +651,6 @@ public class CutsceneNpcManager : MonoBehaviour
             catch { }
         }
 
-        // ¼îÄİ¶ó°¡ ÀÚ¿¬½º·´°Ô ´ë±â »óÅÂ·Î µ¹¾Æ°¡µµ·Ï ÆÄ¶ó¹ÌÅÍ¸¦ Á¤¸®ÇØ Áİ´Ï´Ù.
         if (playerAnim != null)
         {
             playerAnim.SetBool("isAttacking", false);
@@ -554,21 +660,17 @@ public class CutsceneNpcManager : MonoBehaviour
         StartCoroutine(BanillaFadeOutAndDropHeart());
     }
 
-    // ¡Ú »õ·Ó°Ô Ãß°¡µÇ´Â ¹Ù´Ò¶ó Á¤È­ ¼Ò¸ê ¹× ÇÏ¾á ÇÏÆ® µå·Ó ÄÚ·çÆ¾
     private IEnumerator BanillaFadeOutAndDropHeart()
     {
-        // ´ë°á ÁßÀÌ´ø ¹Ù´Ò¶ó ¿ÀºêÁ§Æ® È®º¸ (±âÁ¸ ½ºÆù ÀÎ½ºÅÏ½º ¶Ç´Â ÅÂ±× °Ë»ö)
         GameObject banillaObj = instanceBanilla;
         if (banillaObj == null) banillaObj = GameObject.FindWithTag("Banilla");
         if (banillaObj == null) yield break;
 
-        // Àá½Ã ¹Ì¼Ò Áş´Â ¸ğ½ÀÀ» ¾ÆÁÖ Àá±ñ(¿¹: 0.5ÃÊ) º¸¿©ÁØ µÚ ÆäÀÌµå¾Æ¿ô ÇÏ·Á¸é ¿©±â¿¡ Ãß°¡ °¡´ÉÇÕ´Ï´Ù.
         yield return new WaitForSeconds(0.3f);
 
-        // 1. ¹Ù´Ò¶ó¿Í ÀÚ½Ä ¿ÀºêÁ§Æ®µéÀÇ ¸ğµç SpriteRenderer¸¦ ½Ï ±Ü¾î¿É´Ï´Ù.
         SpriteRenderer[] renderers = banillaObj.GetComponentsInChildren<SpriteRenderer>();
 
-        float fadeDuration = 1.5f; // 1.5ÃÊ µ¿¾È ¼­¼­È÷ ÆäÀÌµå ¾Æ¿ô
+        float fadeDuration = 1.5f;
         float elapsed = 0f;
 
         while (elapsed < fadeDuration)
@@ -576,7 +678,6 @@ public class CutsceneNpcManager : MonoBehaviour
             elapsed += Time.deltaTime;
             float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
 
-            // ¸ğµç ½ºÇÁ¶óÀÌÆ®ÀÇ ¾ËÆÄ(Åõ¸íµµ)°ªÀ» µ¿½Ã¿¡ ÁÙ¿©³ª°©´Ï´Ù.
             foreach (SpriteRenderer sr in renderers)
             {
                 if (sr != null)
@@ -589,57 +690,139 @@ public class CutsceneNpcManager : MonoBehaviour
             yield return null;
         }
 
-        // 2. ¿ÏÀüÈ÷ »ç¶óÁø ¹Ù´Ò¶óÀÇ ¸¶Áö¸· ¿ùµå ÁÂÇ¥¸¦ Á¤È®È÷ ±â·ÏÇÕ´Ï´Ù.
         Vector3 dropPos = banillaObj.transform.position;
 
-        // 3. ±âÁ¸ PlayerLaser¿¡ ¼³Á¤µÈ ¹Ù´Ú ¿ÀÇÁ¼Â °ªÀ» °¡Á®¿Í µ¿ÀÏÇÑ ³ôÀÌÀÇ ¹Ù´Ú ¶óÀÎ(floorY)À» °è»êÇÕ´Ï´Ù.
-        float floorY = playerRb.transform.position.y - 1.5f; // ±âº» ¹æ¾î¿ë ÃÖ¼Ò°ª
+        float floorY = playerRb.transform.position.y - 1.5f;
         if (playerLaserScript != null)
         {
             floorY = playerRb.transform.position.y + playerLaserScript.dropYOffset;
         }
 
-        // 4. ±âÁ¸ ³²ÀÚ NPCµé°ú µ¿ÀÏÇÑ ÇÁ¸®·¦À» »ı¼ºÇÏ°í, ÇÏÆ® ½ºÅ©¸³Æ®¸¦ ÃßÃâÇØ ÃÊ±âÈ­ÇÕ´Ï´Ù.
         if (playerLaserScript != null && playerLaserScript.droppedHeartPrefab != null && banillaWhiteHeart != null)
         {
-            // ÇÏÆ® ÇÁ¸®ÆÕ »ı¼º
             GameObject droppedHeart = Instantiate(playerLaserScript.droppedHeartPrefab, dropPos, Quaternion.identity);
 
-            // ÇÏÆ® ÄÄÆ÷³ÍÆ® È¹µæ
             DroppedHeart heartScript = droppedHeart.GetComponent<DroppedHeart>();
             if (heartScript == null) heartScript = droppedHeart.GetComponentInChildren<DroppedHeart>();
 
             if (heartScript != null)
             {
                 heartScript.isBanillaWhiteHeart = true;
-                // ¡Ú ÇÙ½É: ¸Å´ÏÀú Ã¢°í¿¡ µî·ÏÇØ µĞ 'ÇÏ¾á ÇÏÆ®(banillaWhiteHeart)' ½ºÅ²À» ÁÖÀÔÇÏ¿© Åö ¶³¾î¶ß¸³´Ï´Ù!
                 heartScript.Initialize(banillaWhiteHeart, dropPos, floorY);
             }
         }
 
-        // 5. ¿¬ÃâÀÌ ¿Ïº®ÇÏ°Ô ³¡³µÀ¸¹Ç·Î Åõ¸íÇØÁø ¹Ù´Ò¶ó º»Ã¼¸¦ ¾À¿¡¼­ ¿ÏÀüÈ÷ »èÁ¦(¼Ò¸ê)ÇÕ´Ï´Ù.
         Destroy(banillaObj);
 
-        Debug.Log("¹Ù´Ò¶ó Á¤È­ ¿Ï·á: ÆäÀÌµå¾Æ¿ô ¹× ÇÏ¾á ÇÏÆ® µå·Ó ¼º°ø!");
+        Debug.Log("ë°”ë‹ë¼ ì •í™” ì™„ë£Œ: í˜ì´ë“œì•„ì›ƒ ë° í•˜ì–€ í•˜íŠ¸ ë“œë¡­ ì„±ê³µ!");
+    }
+
+    public void OnPlayerGetBanillaHeart()
+    {
+        StartCoroutine(BanillaHeartCutsceneSequence());
+    }
+
+    private IEnumerator BanillaHeartCutsceneSequence()
+    {
+        // 1. ì‡¼ì½œë¼ ê°•ì œ ì •ì§€
+        // â˜… í”Œë ˆì´ì–´ ì´ë™ê³¼ ê³µê²©(ë ˆì´ì €) ìŠ¤í¬ë¦½íŠ¸ ë„ê¸°
+        playerMoveScript.enabled = false;
+        if (playerLaserScript != null) playerLaserScript.enabled = false;
+
+        playerRb.linearVelocity = Vector2.zero;
+
+        if (playerAnim != null)
+        {
+            playerAnim.SetBool("isRun", false);
+            playerAnim.SetBool("isWalk", false);
+            playerAnim.SetBool("isIdle", true);
+            playerAnim.Play("Idle");
+        }
+
+        vcamPlayer.gameObject.SetActive(true);
+
+        // 2. ë°”ë‹ë¼ ìš”ìˆ ë´‰ì„ í™”ë©´ ì¤‘ì•™ìœ¼ë¡œ ë¶€ë¥´ê³  MagicStick_B ì‹¤í–‰
+        if (banillaStickAnim != null)
+        {
+            Vector3 centerPos = Camera.main.transform.position;
+            centerPos.z = banillaStickAnim.transform.position.z;
+            banillaStickAnim.transform.position = centerPos;
+
+            banillaStickAnim.gameObject.SetActive(true);
+            if (banillaStickAnim.isActiveAndEnabled)
+            {
+                banillaStickAnim.Play("MagicStick_B");
+            }
+        }
+
+        // 3. 3ì´ˆ ëŒ€ê¸°
+        yield return new WaitForSeconds(3f);
+
+        // 4. Banilla_Stick ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ê°•ì œ ì „í™˜
+        if (banillaStickAnim != null && banillaStickAnim.isActiveAndEnabled)
+        {
+            banillaStickAnim.Play("Banilla_Stick");
+        }
+
+        // 5. 2ì´ˆ ëŒ€ê¸° í›„ ìš”ìˆ ë´‰ UI êµì²´
+        yield return new WaitForSeconds(2f);
+
+        if (HeartUIManager.instance != null)
+            HeartUIManager.instance.ChangeHeartToStickUI(false);
+
+        if (banillaStickAnim != null)
+        {
+            banillaStickAnim.gameObject.SetActive(false);
+        }
+
+        // â˜…â˜…â˜… ë‘ ìš”ìˆ ë´‰ í™”ë©´ ì¤‘ì•™ í™•ëŒ€ ì—°ì¶œ â˜…â˜…â˜…
+        yield return new WaitForSeconds(0.5f);
+
+        bool zoomComplete = false;
+
+        if (HeartUIManager.instance != null)
+        {
+            HeartUIManager.instance.PlaySticksZoomToCenter(() => {
+                zoomComplete = true;
+            });
+        }
+        else
+        {
+            zoomComplete = true;
+        }
+
+        // í™•ëŒ€ ì—°ì¶œì´ ëë‚  ë•Œê¹Œì§€ ëŒ€ê¸°
+        yield return new WaitUntil(() => zoomComplete);
+
+        // í™•ëŒ€ëœ ìƒíƒœ ì ì‹œ ìœ ì§€
+        yield return new WaitForSeconds(1f);
+
+        // ë¯¸ë‹ˆê²Œì„ í´ë¦¬ì–´ ì²˜ë¦¬
+        if (MiniTeam.Core.MiniGameManager.Instance != null)
+        {
+            MiniTeam.Core.MiniGameManager.Instance.OnMiniGameClear();
+        }
     }
 
     private void ExitLaserDuel()
     {
         isLaserDuelActive = false;
 
-        // ¼îÄİ¶ó ·¹ÀÌÀú ²ô±â
         if (playerLaserScript != null)
         {
             playerLaserScript.ExitCompetitionMode();
         }
 
-        // ¹Ù´Ò¶ó ·¹ÀÌÀú ²ô±â
         if (banillaLaserObj != null)
         {
             banillaLaserObj.SetActive(false);
         }
 
-        // ¼îÄİ¶óÀÇ °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ ÇØÁ¦ (ÇÊ¿ä½Ã)
+        foreach (GameObject effect in banillaLaserEffects)
+        {
+            if (effect != null) effect.SetActive(false);
+        }
+
         if (playerAnim != null)
         {
             playerAnim.SetBool("isAttacking", false);

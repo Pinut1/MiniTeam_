@@ -10,6 +10,10 @@ public class PlayerMove : MonoBehaviour
     public float runDistanceThreshold = 6.0f;
     public float stopDistance = 0.5f;
 
+    [Header("Boundary Settings")]
+    public float minBoundaryX = -14f;
+    public float maxBoundaryX = 35f;
+
     [Header("Flip Settings (Pivot Fix)")]
     public float flipOffset = 1.2f;
 
@@ -52,7 +56,16 @@ public class PlayerMove : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             isInputAttacking = true;
-            if (Input.GetMouseButtonDown(0) && anim != null) anim.SetTrigger("DoBackAttack");
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (anim != null) anim.SetTrigger("DoBackAttack");
+                
+                // BackAttack 효과음 재생 시작
+                if (BgmManager.Instance != null)
+                {
+                    BgmManager.Instance.PlayBackAttackSFX();
+                }
+            }
             if (anim != null) anim.SetBool("isAttacking", true);
             if (rb != null) rb.linearVelocity = Vector2.zero;
         }
@@ -63,6 +76,16 @@ public class PlayerMove : MonoBehaviour
         }
 
         bool isAnimatorInAttackState = anim != null && anim.GetCurrentAnimatorStateInfo(0).IsName("BackAttack");
+        
+        // 공격 중이 아닐 때 오디오 정지
+        if (!isInputAttacking && !isAnimatorInAttackState)
+        {
+            if (BgmManager.Instance != null)
+            {
+                BgmManager.Instance.StopBackAttackSFX();
+            }
+        }
+
         if (isInputAttacking || isAnimatorInAttackState)
         {
             if (rb != null) rb.linearVelocity = Vector2.zero;
@@ -92,9 +115,28 @@ public class PlayerMove : MonoBehaviour
         {
             isMoving = true;
             moveInput = (mouseWorldPos.x > transform.position.x) ? 1f : -1f;
-            isRunning = (distanceX >= runDistanceThreshold);
+            
+            // 경계 밖으로 나가려 하면 이동력 강제 0 처리
+            if (transform.position.x <= minBoundaryX && moveInput < 0)
+            {
+                moveInput = 0f;
+                isMoving = false;
+            }
+            if (transform.position.x >= maxBoundaryX && moveInput > 0)
+            {
+                moveInput = 0f;
+                isMoving = false;
+            }
+            
+            isRunning = (distanceX >= runDistanceThreshold) && isMoving;
             currentSpeed = isRunning ? runSpeed : walkSpeed;
         }
+
+        // 플레이어가 이미 경계를 넘어갔을 경우 억지로라도 안으로 밀어넣기
+        Vector3 pos = transform.position;
+        if (pos.x < minBoundaryX) pos.x = minBoundaryX;
+        if (pos.x > maxBoundaryX) pos.x = maxBoundaryX;
+        transform.position = pos;
 
         if (rb != null) rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
 
