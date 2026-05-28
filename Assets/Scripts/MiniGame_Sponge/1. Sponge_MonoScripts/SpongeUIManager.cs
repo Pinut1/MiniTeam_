@@ -32,6 +32,7 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject holderPoster;
     [SerializeField] private GameObject holderReceipt;
     [SerializeField] private GameObject holderStatement;
+    [SerializeField] private GameObject holderSponge;
 
     private Dictionary<string, GameObject> holderMap;
     private int selectedSlotIndex = 0;
@@ -90,6 +91,7 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject iconRecorder;
     [SerializeField] private GameObject iconReceipt;
     [SerializeField] private GameObject iconStatement;
+    [SerializeField] private GameObject iconSponge;
 
     private Dictionary<string, GameObject> iconMap;
 
@@ -97,7 +99,8 @@ public class SpongeUIManager : MonoBehaviour
     {
         { "press_00_07",           "receipt"   },
         { "re_press_01_02",        "statement" },
-        { "before_retestimony_03", "recorder"  }
+        { "before_retestimony_03", "recorder"  },
+        { "ending_17",             "sponge"    }
     };
 
     private bool questionPnlShown = false;
@@ -120,13 +123,15 @@ public class SpongeUIManager : MonoBehaviour
             { "recorder",  holderRecorder  },
             { "poster",    holderPoster    },
             { "receipt",   holderReceipt   },
-            { "statement", holderStatement }
+            { "statement", holderStatement },
+            { "sponge",    holderSponge    }
         };
         iconMap = new Dictionary<string, GameObject>
         {
             { "recorder",  iconRecorder  },
             { "receipt",   iconReceipt   },
-            { "statement", iconStatement }
+            { "statement", iconStatement },
+            { "sponge",    iconSponge    }
         };
     }
 
@@ -135,6 +140,7 @@ public class SpongeUIManager : MonoBehaviour
         evidencePnl.SetActive(false);
         if (recordPnl != null) recordPnl.SetActive(false);
         if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
+        if (holderSponge != null) holderSponge.SetActive(false);
     }
 
     // ── 이벤트 구독 ──────────────────────────────────────────────
