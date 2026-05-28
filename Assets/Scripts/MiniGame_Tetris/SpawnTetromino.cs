@@ -8,6 +8,7 @@ public class SpawnTetromino : MonoBehaviour
     public static SpawnTetromino Instance;
 
     private bool spawnTrigger;
+    public GameObject currentGhost; // 낙하 위치를 보여주는 고스트 블록
 
     // [Hold 기능용 변수 추가] 
     public int currentBlockIndex;     // 현재 화면에서 떨어지고 있는 블록의 번호
@@ -91,7 +92,17 @@ public class SpawnTetromino : MonoBehaviour
 
         Instantiate(Tetrominoes[index], transform.position, Quaternion.identity);
 
-        
+        // 고스트 블록 생성 및 세팅 (투명도 조절)
+        if (currentGhost != null) Destroy(currentGhost);
+        currentGhost = Instantiate(Tetrominoes[index], transform.position, Quaternion.identity);
+        if (currentGhost.TryGetComponent(out TetrisBlock ghostScript)) ghostScript.enabled = false;
+        foreach (SpriteRenderer sr in currentGhost.GetComponentsInChildren<SpriteRenderer>())
+        {
+            Color c = sr.color;
+            c.a = 0.3f;
+            sr.color = c;
+        }
+
         UpdateNextBlocks();
     }
 
@@ -107,8 +118,9 @@ public class SpawnTetromino : MonoBehaviour
         if (!canHold) return;
 
 
-        //1. 화면에서 떨어지고 있던 현재 블록 삭제.
+        //1. 화면에서 떨어지고 있던 현재 블록 삭제 및 고스트 파괴.
         Destroy(activeBlock);
+        if (currentGhost != null) Destroy(currentGhost);
 
         //2. 홀드 구역에 띄울 가짜(더미) 블록 생성.
         if (holdDummy != null) Destroy(holdDummy); //기존 HOLD칸의 더미 블록 삭제.
@@ -142,6 +154,18 @@ public class SpawnTetromino : MonoBehaviour
             heldBlockIndex = temp;
 
             Instantiate(Tetrominoes[currentBlockIndex], transform.position, Quaternion.identity);
+
+            // 고스트 블록 생성 (홀드 교체 시)
+            if (currentGhost != null) Destroy(currentGhost);
+            currentGhost = Instantiate(Tetrominoes[currentBlockIndex], transform.position, Quaternion.identity);
+            if (currentGhost.TryGetComponent(out TetrisBlock ghostScript)) ghostScript.enabled = false;
+            foreach (SpriteRenderer sr in currentGhost.GetComponentsInChildren<SpriteRenderer>())
+            {
+                Color c = sr.color;
+                c.a = 0.3f;
+                sr.color = c;
+            }
+
             canHold = false;
         }
 
@@ -218,6 +242,11 @@ public class SpawnTetromino : MonoBehaviour
         {
             Destroy(holdDummy);
             holdDummy = null;
+        }
+        if (currentGhost != null)
+        {
+            Destroy(currentGhost);
+            currentGhost = null;
         }
         if (nextDumies != null)
         {

@@ -63,6 +63,13 @@ namespace MiniTeam.Core
                 // 연출(WakeUp)을 실행, 다 끝나면 다음 메서드를 콜백.
                 HubUIManager.Instance.WakeUp(() =>
                 {
+                    // 눈 깜빡임 종료 후 BGM 재생 (피치 0.7)
+                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                    {
+                        SoundManager.Instance?.SetBGMPitch(0.7f);
+                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                    }
+
                     if (SpiralDiveCutscene.Instance != null)
                         SpiralDiveCutscene.Instance.PlayIfFirstTime(() => EnablePlayerInput());
                     else
@@ -71,13 +78,25 @@ namespace MiniTeam.Core
             }
             else
             {
-                HubUIManager.Instance.WakeUp();
+                HubUIManager.Instance.WakeUp(() =>
+                {
+                    // 눈 깜빡임 종료 후 BGM 재생 (피치 0.7)
+                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                    {
+                        SoundManager.Instance?.SetBGMPitch(0.7f);
+                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                    }
+                });
             }
            
         }
         public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
+
+            // 미니게임 진입 시 기존 BGM 및 효과음 강제 종료 (안전장치)
+            SoundManager.Instance?.StopBGM();
+            SoundManager.Instance?.StopAllSFX();
 
             // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
             playerMove.UnlockCursor();
@@ -93,7 +112,9 @@ namespace MiniTeam.Core
         {
             if (string.IsNullOrEmpty(currentScene)) return;
 
+            // 미니게임 탈출 시 모든 오디오 강제 종료
             SoundManager.Instance?.StopBGM();
+            SoundManager.Instance?.StopAllSFX();
 
             var op = SceneManager.UnloadSceneAsync(currentScene);
             currentScene = null;
@@ -133,6 +154,13 @@ namespace MiniTeam.Core
             {
                 EnablePlayerInput();
                 HubUIManager.Instance?.InitializeBottomUI(currentStage);
+            }
+
+            // 미니게임에서 허브로 복귀 시 허브 BGM 다시 재생 (피치 0.7)
+            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+            {
+                SoundManager.Instance?.SetBGMPitch(0.7f);
+                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
             }
         }
 

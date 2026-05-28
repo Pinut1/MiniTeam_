@@ -14,7 +14,6 @@ public class JudangChiDialogueManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float typingSpeed = 0.05f;
 
-
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -42,22 +41,40 @@ public class JudangChiDialogueManager : MonoBehaviour
                 HubUIManager.Instance.PlaySpecialAnimation(sentenceData.animationTriggerName);
             }
 
+            // 해당 문장 전용 보이스/효과음이 있다면 시작 시 재생
+            if (sentenceData.voiceClip != null)
+            {
+                MiniTeam.Core.AudioManager.Instance?.PlayVoice(sentenceData.voiceClip);
+            }
+
             dialogueText.text = "";
             bool skipTyping = false;
 
             // 한 글자씩 타이핑 효과 출력
             for (int i = 0; i < sentenceData.text.Length; i++)
             {
-                // 글자 출력 도중 클릭 시 즉시 스킵 플래그 활성화
+                // 글자 출력 도중 클릭 시 즉시 스킵 플래그 생성
                 if (Input.GetMouseButtonDown(0))
                 {
                     skipTyping = true;
                     break;
                 }
 
+                // Rich Text 태그 처리: < 로 시작하면 > 가 닫힐 때까지 한 번에 덧붙임
+                if (sentenceData.text[i] == '<')
+                {
+                    int closeIdx = sentenceData.text.IndexOf('>', i);
+                    if (closeIdx != -1)
+                    {
+                        dialogueText.text += sentenceData.text.Substring(i, closeIdx - i + 1);
+                        i = closeIdx; // 인덱스를 닫는 괄호 위치로 건너뜀
+                        continue;
+                    }
+                }
+
                 dialogueText.text += sentenceData.text[i];
 
-                // 타이핑 대기 시간 중에도 마우스 클릭 정밀 감지
+                // 타이핑 대기 시간 중에도 마우스 클릭 입력 감지지
                 float elapsed = 0f;
                 while (elapsed < typingSpeed)
                 {

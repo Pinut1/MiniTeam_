@@ -442,7 +442,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 754eccae27ae51441a580174fb74e8a2, type: 3}
     m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
@@ -944,7 +944,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -592745889, guid: 63f4ff49c3edb0f4793695c17a0a3648, type: 3}
+  m_Sprite: {fileID: 706884488, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1020,7 +1020,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478801608914441364, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: targetSceneName
-      value: SuSuRunScene
+      value: TestMiniScene
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1043,6 +1043,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95e8319c1028b03429233c7c843acded, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageDoor
+--- !u!1 &610218212
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 610218214}
+  - component: {fileID: 610218213}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &610218213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610218212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be38a20208093c84792ececc8b483dfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.AudioManager
+  bgmHub: {fileID: 8300000, guid: 9f575cbde4f9c0747ba61a6496345917, type: 3}
+  sfxClick: {fileID: 0}
+  sfxCancel: {fileID: 0}
+  sfxPopupOpen: {fileID: 0}
+  sfxSmallJudangchiAppear: {fileID: 8300000, guid: 1a62f25f0a5fb444da25655e107b185c, type: 3}
+  sfxInteract: {fileID: 0}
+  sfxGetItem: {fileID: 0}
+--- !u!4 &610218214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610218212}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &622138957
 GameObject:
   m_ObjectHideFlags: 0
@@ -1727,7 +1778,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866347347}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1735,8 +1786,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 200, y: 190}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 200, y: 200}
+  m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &866347349
 MonoBehaviour:
@@ -2279,6 +2330,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1123632818}
   m_CullTransparentMesh: 1
+--- !u!1 &1234845118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234845120}
+  - component: {fileID: 1234845119}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1234845119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234845118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 663f3d38826c2c14baa34349ebbf6f12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.SoundManager
+  masterVolume: 1
+  bgmVolume: 0.6
+  sfxVolume: 1
+--- !u!4 &1234845120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234845118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1302730628
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2337,7 +2435,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478801608914441364, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: targetSceneName
-      value: 1942_Shooting
+      value: TestMiniScene
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7472,7 +7570,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3ac3b2d805260aa48ac1cb43e8ee44d3, type: 3}
+  m_Sprite: {fileID: -1562844759, guid: fb6842765e8d65d40bd2607aa742347d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7612,7 +7710,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1547529012
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8371,7 +8469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478801608914441364, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: targetSceneName
-      value: Keroris
+      value: TestMiniScene
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8475,11 +8573,11 @@ MonoBehaviour:
   - {fileID: 962298526}
   objectImg: {fileID: 542294103}
   stageClearSprites:
-  - {fileID: -592745889, guid: 63f4ff49c3edb0f4793695c17a0a3648, type: 3}
-  - {fileID: -759783230, guid: 33683486638853a418b6db3f1534559d, type: 3}
-  - {fileID: 1967432918, guid: dda31ae42c7e9d54b9965184d6525739, type: 3}
-  - {fileID: -688924598, guid: 7c0fa79b7c4ae364da368d1fc678e85c, type: 3}
-  - {fileID: 1670167653, guid: 619412dec1131444d9195db24f4c7c60, type: 3}
+  - {fileID: 706884488, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: -997883463, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: 905361157, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: 428012300, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
+  - {fileID: -1266240735, guid: 571f22d13167b4c4c89f79af5c115204, type: 3}
 --- !u!4 &1995122238
 Transform:
   m_ObjectHideFlags: 0
@@ -8529,8 +8627,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 164.005, y: -111.005005}
-  m_SizeDelta: {x: 288.01, y: 72.01}
+  m_AnchoredPosition: {x: 164.005, y: -116.520004}
+  m_SizeDelta: {x: 288.01, y: 83.04}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2018284334
 MonoBehaviour:
@@ -8555,8 +8653,8 @@ MonoBehaviour:
   m_text: "\uAC00\uB098\uB2E4\uB77C\uB9C8\uBC14\uC0AC\uC544\n \uC790\uCC28\uCE74\uD0C0
     \uD30C\uD558 \n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3ff7bbabcd569f24b80254a4fb8e013b, type: 2}
-  m_sharedMaterial: {fileID: -7626581910164331711, guid: 3ff7bbabcd569f24b80254a4fb8e013b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d05341f78f08468459f796062838659b, type: 2}
+  m_sharedMaterial: {fileID: -5204273206140258790, guid: d05341f78f08468459f796062838659b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8671,7 +8769,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 101}
-  m_SizeDelta: {x: 328.01, y: 247.01001}
+  m_SizeDelta: {x: 328.01, y: 258.04}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2110867994
 MonoBehaviour:
@@ -8858,7 +8956,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478801608914441364, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: targetSceneName
-      value: Keroris
+      value: TestMiniScene
       objectReference: {fileID: 0}
     - target: {fileID: 8791659090588030990, guid: dc2f449de251f054eb0a901d07610e31, type: 3}
       propertyPath: m_Size.z
@@ -8903,3 +9001,5 @@ SceneRoots:
   - {fileID: 830557999}
   - {fileID: 622138961}
   - {fileID: 1423460445}
+  - {fileID: 610218214}
+  - {fileID: 1234845120}

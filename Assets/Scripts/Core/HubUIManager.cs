@@ -169,8 +169,16 @@ public class HubUIManager : MonoBehaviour
         else
         {
             if (digiviceObj != null) digiviceObj.SetActive(false);
+            
+            bool wasActive = judangchiSmallObj.activeSelf;
             judangchiSmallObj.SetActive(true);
             judangchiSmallObj.GetComponent<Button>().interactable = true;
+
+            // 안 보이다가 새로 켜질 때만 효과음 재생
+            if (!wasActive && MiniTeam.Core.AudioManager.Instance != null && MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear != null)
+            {
+                MiniTeam.Core.AudioManager.Instance.PlaySFX(MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear, 0.1f); 
+            }
         }
 
         // 오직 0단계이고 아직 컷신을 안 봤을 때만 최초 지연(0.75초) 출현 연출 적용

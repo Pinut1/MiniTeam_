@@ -88,3 +88,9 @@ Packages/com.coplaydev.unity-mcp/
 
 # Claude Code
 Assets/.claude/
+
+# AI Handoff Document
+/AI_HANDOFF.md
+
+# Temporary Korean Font characters list
+/korean_2350.txt
