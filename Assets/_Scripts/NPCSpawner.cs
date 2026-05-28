@@ -3,35 +3,41 @@ using System.Collections;
 
 public class NpcSpawner : MonoBehaviour
 {
-    [Header("ÇÁ¸®ÆÕ ¼³Á¤")]
+    [Header("ì˜¤í”„ë‹ ì œì–´")]
+    public bool isSpawningPaused = false; // ì´ ê°’ì´ trueë©´ ìŠ¤í°ì„ ë©ˆì¶¤
+
+    [Header("í”„ë¦¬íŒ¹ ì„¤ì •")]
     public GameObject[] boyPrefabs;
     public GameObject[] girlPrefabs;
 
-    [Header("½ºÆù À§Ä¡ ¹üÀ§")]
+    [Header("ìŠ¤í° ìœ„ì¹˜ ë²”ìœ„")]
     public float minX = -14f;
     public float maxX = 35f;
     public float minY = 0f;
     public float maxY = 0.5f;
 
-    [Header("¼ö·® ¼³Á¤")]
+    [Header("ìˆ˜ëŸ‰ ì„¤ì •")]
     public int minGirlCount = 7;
     public int maxGirlCount = 11;
 
-    [Header("¸®½ºÆù µô·¹ÀÌ ½Ã°£ ¼³Á¤")]
-    public float normalDelay = 3f; // ÇÏÆ®¸¦ ´Ù ¸ğ¾ÒÀ» ¶§ÀÇ ±âº» ´ë±â ½Ã°£
-    public float fastDelay = 0.5f; // ÇÏÆ®°¡ ºÎÁ·ÇÒ ¶§ÀÇ ºü¸¥ ´ë±â ½Ã°£
+    [Header("ë¦¬ìŠ¤í° ë”œë ˆì´ ì‹œê°„ ì„¤ì •")]
+    public float normalDelay = 3f; // í•˜íŠ¸ë¥¼ ë‹¤ ëª¨ì•˜ì„ ë•Œì˜ ê¸°ë³¸ ëŒ€ê¸° ì‹œê°„
+    public float fastDelay = 0.5f; // í•˜íŠ¸ê°€ ë¶€ì¡±í•  ë•Œì˜ ë¹ ë¥¸ ëŒ€ê¸° ì‹œê°„
 
-    [Header("ÇÏÆ® ¸Å´ÏÀú ¿¬°á")]
-    // ÀÎ½ºÆåÅÍ Ã¢¿¡¼­ ÇÏÀÌ¾î¶óÅ°ÀÇ HeartManager ¿ÀºêÁ§Æ®¸¦ ²ø¾î´Ù ³ÖÀ¸¼¼¿ä.
+    [Header("í•˜íŠ¸ ë§¤ë‹ˆì € ì—°ê²°")]
+    // ì¸ìŠ¤í™í„° ì°½ì—ì„œ í•˜ì´ì–´ë¼í‚¤ì˜ HeartManager ì˜¤ë¸Œì íŠ¸ë¥¼ ëŒì–´ë‹¤ ë„£ìœ¼ì„¸ìš”.
     public HeartUIManager heartManager;
 
-    // ¡Ú¡Ú¡Ú [»õ·Î Ãß°¡] ¹Ù´Ú Y À§Ä¡ ¼³Á¤ ¡Ú¡Ú¡Ú
-    [Header("¹Ù´Ú ·¹º§ ¼³Á¤")]
-    [Tooltip("³²ÀÚ NPC°¡ ¹«Á¶°Ç »ı¼ºµÇ¾î¾ß ÇÏ´Â ¹Ù´ÚÀÇ Y À§Ä¡ °ª")]
+    // â˜…â˜…â˜… [ìƒˆë¡œ ì¶”ê°€] ë°”ë‹¥ Y ìœ„ì¹˜ ì„¤ì • â˜…â˜…â˜…
+    [Header("ë°”ë‹¥ ë ˆë²¨ ì„¤ì •")]
+    [Tooltip("ë‚¨ì NPCê°€ ë¬´ì¡°ê±´ ìƒì„±ë˜ì–´ì•¼ í•˜ëŠ” ë°”ë‹¥ì˜ Y ìœ„ì¹˜ ê°’")]
     public float floorY = 0f;
 
-    void Start()
+    IEnumerator Start()
     {
+        // ì˜¤í”„ë‹ ì¤‘ì´ë©´ ëë‚  ë•Œê¹Œì§€ ìŠ¤í° ëŒ€ê¸°
+        yield return new WaitUntil(() => !isSpawningPaused);
+        
         SpawnAll();
     }
 
@@ -43,48 +49,49 @@ public class NpcSpawner : MonoBehaviour
             Vector3 spawnPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), transform.position.z);
             GameObject girl = Instantiate(girlPrefabs[Random.Range(0, girlPrefabs.Length)], spawnPos, Quaternion.identity, transform);
 
-            // ³²ÇĞ»ı »ı¼º ·ÎÁ÷À» Áï½Ã ½ÇÇà
+            // ë‚¨í•™ìƒ ìƒì„± ë¡œì§ì„ ì¦‰ì‹œ ì‹¤í–‰
             StartCoroutine(ManagePair(girl.transform));
         }
     }
 
     private IEnumerator ManagePair(Transform girl)
     {
-        // 1. Ã¹ »ı¼ºÀº Áï½Ã (¡ÚÃ¹ »ı¼º À§Ä¡µµ ¹Ù´ÚÀ¸·Î °íÁ¤¡Ú)
+        // 1. ì²« ìƒì„±ì€ ì¦‰ì‹œ (â˜…ì²« ìƒì„± ìœ„ì¹˜ë„ ë°”ë‹¥ìœ¼ë¡œ ê³ ì •â˜…)
         Vector3 firstSpawnPos = new Vector3(girl.position.x + 1.5f, floorY, transform.position.z);
         GameObject boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], firstSpawnPos, Quaternion.identity);
         boy.tag = "NPC";
 
-        // 2. ³²ÀÚ NPC°¡ »ç¶óÁ³À» ¶§ Á¶°Ç¿¡ µû¶ó Àç»ı¼º
+        // 2. ë‚¨ì NPCê°€ ì‚¬ë¼ì¡Œì„ ë•Œ ì¡°ê±´ì— ë”°ë¼ ì¬ìƒì„±
         while (girl != null)
         {
             if (boy == null)
             {
                 bool isHeartFull = false;
 
-                // ¿¬°áµÈ HeartUIManager°¡ ÀÖ´ÂÁö È®ÀÎ
+                // ì—°ê²°ëœ HeartUIManagerê°€ ìˆëŠ”ì§€ í™•ì¸
                 if (heartManager != null)
                 {
-                    // ¡ÚÁÖÀÇ: ¾Æ·¡ ÄÚµå´Â HeartUIManager ½ºÅ©¸³Æ®¿¡ ÀÖ´Â ½ÇÁ¦ º¯¼ö¸íÀ¸·Î º¯°æÇØ¾ß ÇÕ´Ï´Ù!¡Ú
-                    // ¿¹½Ã: heartManager.currentHearts >= 7 (ÇöÀç ÇÏÆ®°¡ 7°³ ÀÌ»óÀÎÁö È®ÀÎ)
+                    // â˜…ì£¼ì˜: ì•„ë˜ ì½”ë“œëŠ” HeartUIManager ìŠ¤í¬ë¦½íŠ¸ì— ìˆëŠ” ì‹¤ì œ ë³€ìˆ˜ëª…ìœ¼ë¡œ ë³€ê²½í•´ì•¼ í•©ë‹ˆë‹¤!â˜…
+                    // ì˜ˆì‹œ: heartManager.currentHearts >= 7 (í˜„ì¬ í•˜íŠ¸ê°€ 7ê°œ ì´ìƒì¸ì§€ í™•ì¸)
 
                     // isHeartFull = heartManager.currentHearts >= 7; 
                 }
                 else
                 {
-                    Debug.LogWarning("NpcSpawner¿¡ HeartUIManager°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+                    Debug.LogWarning("NpcSpawnerì— HeartUIManagerê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
                 }
 
-                // ÇÏÆ®°¡ ´Ù Ã¡À¸¸é normalDelay(3ÃÊ), ¾È Ã¡À¸¸é fastDelay(0.5ÃÊ) Àû¿ë
+                // í•˜íŠ¸ ìƒíƒœì— ë”°ë¥¸ ë”œë ˆì´
                 float waitTime = isHeartFull ? normalDelay : fastDelay;
 
                 yield return new WaitForSeconds(waitTime);
 
+                // ê¸°ë‹¤ë¦° í›„ì—ë„ ë‹¤ì‹œ í•œ ë²ˆ ì˜¤í”„ë‹ ì¤‘ì¸ì§€ í™•ì¸
+                yield return new WaitUntil(() => !isSpawningPaused);
+
                 if (girl != null)
                 {
-                    // ¡Ú¡Ú¡Ú [¼öÁ¤µÈ ÇÙ½É ºÎºĞ] ¡Ú¡Ú¡Ú
-                    // ¿©ÀÚ NPCÀÇ Y À§Ä¡¸¦ »ç¿ëÇÏÁö ¾Ê°í, °íÁ¤µÈ floorY °ªÀ» »ç¿ëÇÕ´Ï´Ù.
-                    // ÀÌ·¸°Ô ÇÏ¸é ¿©ÀÚ NPC°¡ °è´Ü À§¿¡ ÀÖ¾îµµ, ³²ÀÚ NPC´Â ¹Ù´Ú¿¡¼­ »ı¼ºµË´Ï´Ù.
+                    // ë°”ë‹¥ì— ì†Œë…„ ìŠ¤í°
                     Vector3 spawnPos = new Vector3(girl.position.x + 1.5f, floorY, transform.position.z);
                     boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], spawnPos, Quaternion.identity);
                     boy.tag = "NPC";

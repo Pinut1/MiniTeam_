@@ -4,11 +4,23 @@ using UnityEngine;
 
 public class OpeningSceneController : MonoBehaviour
 {
-    [Header("½ÃÀÛ ¼³Á¤")]
-    public string dialogueFileName = "Opening"; // Resources/Dialogues/ Æú´õ ³» ÆÄÀÏ¸í
+    [Header("ëŒ€í™” íŒŒì¼")]
+    public string dialogueFileName = "Sugar"; // Resources/Dialogues/ í´ë” ë‚´ íŒŒì¼ëª…
 
-    [Header("ÂüÁ¶")]
-    public CutsceneNpcManager npcManager; // NPC ¿òÁ÷ÀÓÀÌ ÇÊ¿äÇÏ¸é ¿¬°á
+    [Header("ë°°ê²½ìŒì•… ì„¤ì •")]
+    public AudioClip openingBGM;
+    public AudioClip gameplayBGM;
+
+    [Header("ìºë¦­í„° í‘œì •(UI)")]
+    public GameObject smileImage; // Chocolate_Smile ì—°ê²°
+    public GameObject sadImage;   // Chocolate_Sad ì—°ê²°
+
+    [Header("í”Œë ˆì´ì–´ ì¡°ì‘")]
+    public MonoBehaviour playerController; // í”Œë ˆì´ì–´ ì›€ì§ì„ ìŠ¤í¬ë¦½íŠ¸ ì—°ê²°
+    public MonoBehaviour[] npcControllers; // NPC ì´ë™ ìŠ¤í¬ë¦½íŠ¸ë“¤ (ë°°ì—´)
+
+    [Header("ì»·ì‹  ë§¤ë‹ˆì €")]
+    public CutsceneNpcManager npcManager; // NPC ì›€ì§ì„ì´ í•„ìš”í•˜ë©´ ì—°ê²°
 
     void Start()
     {
@@ -17,14 +29,48 @@ public class OpeningSceneController : MonoBehaviour
 
     IEnumerator OpeningSequence()
     {
-        // 1. ¾À ½ÃÀÛ ½Ã Á¶ÀÛ ±İÁö
-        // ÇÃ·¹ÀÌ¾î Ä³¸¯ÅÍ°¡ ÀÖ´Ù¸é ¿©±â¼­ ºñÈ°¼ºÈ­ÇÏ¼¼¿ä.
-        // ¿¹: playerController.enabled = false;
+        Debug.Log("[Opening] ì˜¤í”„ë‹ ì‹œí€€ìŠ¤ ì‹œì‘!");
 
-        // 2. ´ë»ç µ¥ÀÌÅÍ ·Îµå
+        // ì˜¤í”„ë‹ BGMì€ BgmManagerê°€ ì‹œì‘ë  ë•Œ(Awake) ìë™ìœ¼ë¡œ ì¼œì§‘ë‹ˆë‹¤.
+        // í˜¹ì‹œ ëª¨ë¥´ë‹ˆ í™•ì‹¤í•˜ê²Œ ì˜¤í”„ë‹ ì¬ìƒì„ ë‹¤ì‹œ í˜¸ì¶œí•©ë‹ˆë‹¤.
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.PlayOpeningBGM();
+        }
+        
+        // NpcSpawner ìŠ¤í° ì¼ì‹œì •ì§€
+        NpcSpawner spawner = FindObjectOfType<NpcSpawner>();
+        if (spawner != null)
+        {
+            spawner.isSpawningPaused = true;
+            Debug.Log("[Opening] NPC ìë™ ìƒì„± ì¼ì‹œì •ì§€");
+        }
+
+        // 1. í”Œë ˆì´ì–´ ì¡°ì‘ ë§‰ê¸°
+        if (playerController != null)
+        {
+            playerController.enabled = false;
+            Debug.Log("[Opening] í”Œë ˆì´ì–´ ì¡°ì‘ ë¹„í™œì„±í™”");
+        }
+        else
+        {
+            Debug.LogWarning("[Opening] playerControllerê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
+        }
+
+        // NPC ì›€ì§ì„ë„ ë§‰ê¸°
+        if (npcControllers != null)
+        {
+            foreach (var npc in npcControllers)
+            {
+                if (npc != null) npc.enabled = false;
+            }
+            Debug.Log("[Opening] NPC ì¡°ì‘ ë¹„í™œì„±í™”");
+        }
+
+        // 2. ëŒ€í™” ë¡œë“œ
         DialogueDB.Instance.Load(dialogueFileName);
 
-        // 3. ´ë»ç ¼ø¼­´ë·Î Ãâ·Â
+        // 3. ëŒ€ì‚¬ ìˆœì„œëŒ€ë¡œ ì¶œë ¥
         string[] dialogueKeys = {
             "scene_opening_01",
             "scene_opening_02",
@@ -34,24 +80,74 @@ public class OpeningSceneController : MonoBehaviour
             "scene_opening_06"
         };
 
-        foreach (string key in dialogueKeys)
+        for (int i = 0; i < dialogueKeys.Length; i++)
         {
+            // 1, 4, 5ë²ˆì§¸ ëŒ€ì‚¬(ì¸ë±ìŠ¤ 0, 3, 4)ëŠ” ì›ƒëŠ” í‘œì •
+            if (i == 0 || i == 3 || i == 4)
+            {
+                if (smileImage != null) smileImage.SetActive(true);
+                if (sadImage != null) sadImage.SetActive(false);
+            }
+            // 2, 3ë²ˆì§¸ ëŒ€ì‚¬(ì¸ë±ìŠ¤ 1, 2)ëŠ” ìŠ¬í”ˆ í‘œì •
+            else if (i == 1 || i == 2)
+            {
+                if (smileImage != null) smileImage.SetActive(false);
+                if (sadImage != null) sadImage.SetActive(true);
+            }
+
+            string key = dialogueKeys[i];
             string text = DialogueDB.Instance.Get(key);
-            yield return StartCoroutine(MapDialogueUI.Instance.Show(text));
+            Debug.Log($"[Opening] ëŒ€í™” ì¶œë ¥ ì‹œë„: {key} -> {text}");
+            
+            if (Opening_Dialogue.Instance == null)
+            {
+                Debug.LogError("[Opening] Opening_Dialogue.Instanceê°€ NULLì…ë‹ˆë‹¤! UIê°€ ì”¬ì— ì—†ê±°ë‚˜ Awakeê°€ í˜¸ì¶œë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+                break;
+            }
+            
+            bool isLast = (i == dialogueKeys.Length - 1);
+            yield return StartCoroutine(Opening_Dialogue.Instance.Show(text, isLast));
+            Debug.Log($"[Opening] ëŒ€í™” ì¶œë ¥ ì™„ë£Œ: {key}");
         }
 
-        // 4. ´ë»ç ³¡³­ ÈÄ ·ÎÁ÷
-        Debug.Log("´ë»ç ¿Ï·á! ÀÌÁ¦ °ÔÀÓ ½ÃÀÛ");
+        // 4. ì»·ì‹  ì‹œì‘
+        Debug.Log("[Opening] ëŒ€í™” ì¢…ë£Œ. ì»·ì‹  ì‹œì‘!");
 
-        // ¿©±â¿¡ NPC ¿òÁ÷ÀÓ ÄÆ¾ÀÀ» ½ÇÇàÇÏ°Å³ª, ¹Ù·Î °ÔÀÓ ÇÃ·¹ÀÌ·Î ÀüÈ¯
+        // ì—¬ê¸°ì— NPC ì›€ì§ì„ ì»·ì”¬ì„ ì‹¤í–‰í•˜ê±°ë‚˜, ë°”ë¡œ ê²Œì„ í”Œë ˆì´ë¡œ ì „í™˜
         if (npcManager != null)
         {
+            Debug.Log("[Opening] npcManager.SpawnAndPlayCutscene í˜¸ì¶œ");
             npcManager.SpawnAndPlayCutscene();
         }
         else
         {
-            // NPC ÄÆ¾À ¾øÀÌ ¹Ù·Î °ÔÀÓ ½ÃÀÛ ½Ã Á¶ÀÛ È°¼ºÈ­
-            // ¿¹: playerController.enabled = true;
+            Debug.LogWarning("[Opening] npcManagerê°€ ì—†ìŠµë‹ˆë‹¤. ì¦‰ì‹œ í”Œë ˆì´ì–´ ë° NPC ì¡°ì‘ ë³µêµ¬.");
+            if (playerController != null)
+            {
+                playerController.enabled = true;
+            }
+            if (npcControllers != null)
+            {
+                foreach (var npc in npcControllers)
+                {
+                    if (npc != null) npc.enabled = true;
+                }
+            }
+        }
+        
+        // NpcSpawner ìŠ¤í° ë‹¤ì‹œ ì‹œì‘
+        NpcSpawner spawnerRef = FindObjectOfType<NpcSpawner>();
+        if (spawnerRef != null)
+        {
+            spawnerRef.isSpawningPaused = false;
+            Debug.Log("[Opening] NPC ìë™ ìƒì„± ì¬ê°œ");
+        }
+
+        // 5. ê²Œì„ í”Œë ˆì´ BGMìœ¼ë¡œ ì „í™˜ (ìì—°ìŠ¤ëŸ¬ìš´ í˜ì´ë“œ íš¨ê³¼ ì ìš©)
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.ChangeBGM(BgmManager.Instance.gameplayBgm);
+            Debug.Log("[Opening] ê²Œì„ í”Œë ˆì´ BGM ì¬ìƒ ì‹œì‘");
         }
     }
 }

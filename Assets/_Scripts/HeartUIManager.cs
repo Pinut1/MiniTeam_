@@ -11,36 +11,36 @@ public class HeartUIManager : MonoBehaviour
     public float uncollectedAlpha = 0.3f;
     public Sprite[] possibleHeartSprites;
 
-    [Header("º¸½º ÆäÀÌÁî¿ë ÇÏÆ® ½ºÅ²")]
+    [Header("ë³´ìŠ¤ í˜ì´ì¦ˆìš© í•˜íŠ¸ ìŠ¤í‚¨")]
     public Sprite rainbowHeartSprite;
     public Sprite vanillaWhiteHeartSprite;
 
-    [Header("ÃÖÁ¾ ¸¶¼úºÀ UI ¾ÆÀÌÄÜ")]
+    [Header("ìµœì¢… ë§ˆìˆ ë´‰ UI ì•„ì´ì½˜")]
     public Sprite chocolatStickIcon;
     public Sprite vanillaStickIcon;
 
-    [Header("º¸½º ÆäÀÌÁî UI Å©±â/À§Ä¡ ¼³Á¤")]
+    [Header("ë³´ìŠ¤ í˜ì´ì¦ˆ UI í¬ê¸°/ìœ„ì¹˜ ì„¤ì •")]
     public float bossHeartScale = 1.8f;
     public float magicStickScale = 2.8f;
     public float centerSpacing = 70f;
 
-    [Header("¿ä¼úºÀ È®´ë ¿¬Ãâ ¼³Á¤")]
-    public float zoomDuration = 1.5f;        // È®´ë+ÀÌµ¿ ½Ã°£
-    public float finalZoomScale = 5f;        // ÃÖÁ¾ È®´ë ¹èÀ²
-    public float delayBetweenSticks = 0f;    // µÎ ºÀ ½Ã°£Â÷ (0ÀÌ¸é µ¿½Ã)
-    public float stickMergeSpacing = 40f;    // Áß¾Ó¿¡¼­ µÎ ºÀ »çÀÌ °£°İ
+    [Header("ìš”ìˆ ë´‰ í™•ëŒ€ ì—°ì¶œ ì„¤ì •")]
+    public float zoomDuration = 1.5f;        // í™•ëŒ€+ì´ë™ ì‹œê°„
+    public float finalZoomScale = 5f;        // ìµœì¢… í™•ëŒ€ ë°°ìœ¨
+    public float delayBetweenSticks = 0f;    // ë‘ ë´‰ ì‹œê°„ì°¨ (0ì´ë©´ ë™ì‹œ)
+    public float stickMergeSpacing = 40f;    // ì¤‘ì•™ì—ì„œ ë‘ ë´‰ ì‚¬ì´ ê°„ê²©
 
     private bool[] isCollected;
     private bool isBossPhaseMode = false;
 
-    // ¡Ú ¿ø·¡ À§Ä¡/Å©±â ÀúÀå¿ë (¿¬Ãâ ÈÄ ¸®¼Â¿¡ »ç¿ë)
+    // â˜… ì›ë˜ ìœ„ì¹˜/í¬ê¸° ì €ì¥ìš© (ì—°ì¶œ í›„ ë¦¬ì…‹ì— ì‚¬ìš©)
     private Vector3[] originalPositions;
     private Vector3[] originalScales;
     private Vector3 boardCenterPos;
 
-    [Header("Á¾·á ¿¬Ãâ")]
+    [Header("ì¢…ë£Œ ì—°ì¶œ")]
     public GameObject finalMagicStickObject;
-    public float fadeOutDuration = 1.5f; // ÆäÀÌµå ¾Æ¿ô °É¸®´Â ½Ã°£ (±æ¼ö·Ï ÃµÃµÈ÷)
+    public float fadeOutDuration = 1.5f; // í˜ì´ë“œ ì•„ì›ƒ ê±¸ë¦¬ëŠ” ì‹œê°„ (ê¸¸ìˆ˜ë¡ ì²œì²œíˆ)
     public float postFadeDelay = 1.0f;
 
     void Awake()
@@ -125,7 +125,7 @@ public class HeartUIManager : MonoBehaviour
             if (layout != null) layout.enabled = false;
         }
 
-        // º¸µåÆÇ Á¤Áß¾Ó ÁÂÇ¥ °è»ê ¹× ÀúÀå
+        // ë³´ë“œíŒ ì •ì¤‘ì•™ ì¢Œí‘œ ê³„ì‚° ë° ì €ì¥
         boardCenterPos = Vector3.zero;
         int activeCount = 0;
         for (int i = 0; i < heartSlots.Length; i++)
@@ -185,7 +185,7 @@ public class HeartUIManager : MonoBehaviour
         }
     }
 
-    // ¡Ú¡Ú¡Ú [Ãß°¡] µÎ ¿ä¼úºÀÀÌ È­¸é Áß¾ÓÀ¸·Î È®´ëµÇ¸ç ÀÌµ¿ÇÏ´Â ¿¬Ãâ ¡Ú¡Ú¡Ú
+    // â˜…â˜…â˜… [ì¶”ê°€] ë‘ ìš”ìˆ ë´‰ì´ í™”ë©´ ì¤‘ì•™ìœ¼ë¡œ í™•ëŒ€ë˜ë©° ì´ë™í•˜ëŠ” ì—°ì¶œ â˜…â˜…â˜…
     public void PlaySticksZoomToCenter(System.Action onComplete = null)
     {
         StartCoroutine(ZoomSticksToCenterCoroutine(onComplete));
@@ -202,14 +202,14 @@ public class HeartUIManager : MonoBehaviour
         RectTransform pinkRect = heartSlots[0].GetComponent<RectTransform>();
         RectTransform blueRect = heartSlots[1].GetComponent<RectTransform>();
 
-        // 1. À§Ä¡ °è»ê (Áß¾ÓÀ¸·Î ¸ğÀ¸±â À§ÇÑ Å¸°Ù ¼³Á¤)
+        // 1. ìœ„ì¹˜ ê³„ì‚° (ì¤‘ì•™ìœ¼ë¡œ ëª¨ìœ¼ê¸° ìœ„í•œ íƒ€ê²Ÿ ì„¤ì •)
         Vector2 pos0 = pinkRect.anchoredPosition;
         Vector2 pos1 = blueRect.anchoredPosition;
         Vector2 spacingVector = pos1 - pos0;
         Vector2 pinkTargetPos = -spacingVector / 2f;
         Vector2 blueTargetPos = spacingVector / 2f;
 
-        // 2. ÀÌµ¿ ½ÃÀÛ (ÀÌ ºÎºĞÀ» ´Ù½Ã ³Ö¾îÁà¾ß ¿òÁ÷ÀÔ´Ï´Ù!)
+        // 2. ì´ë™ ì‹œì‘ (ì´ ë¶€ë¶„ì„ ë‹¤ì‹œ ë„£ì–´ì¤˜ì•¼ ì›€ì§ì…ë‹ˆë‹¤!)
         Coroutine pinkRoutine = StartCoroutine(ZoomSingleStick(pinkRect, pinkTargetPos, finalZoomScale, zoomDuration));
 
         if (delayBetweenSticks > 0)
@@ -217,16 +217,16 @@ public class HeartUIManager : MonoBehaviour
 
         Coroutine blueRoutine = StartCoroutine(ZoomSingleStick(blueRect, blueTargetPos, finalZoomScale, zoomDuration));
 
-        // 3. ÀÌµ¿ÀÌ ¿ÏÀüÈ÷ ³¡³¯ ¶§±îÁö ´ë±â
+        // 3. ì´ë™ì´ ì™„ì „íˆ ëë‚  ë•Œê¹Œì§€ ëŒ€ê¸°
         yield return new WaitForSeconds(zoomDuration);
 
-        // 4. ÀÌÁ¦ ÆäÀÌµå ¾Æ¿ô ½ÇÇà
+        // 4. ì´ì œ í˜ì´ë“œ ì•„ì›ƒ ì‹¤í–‰
         yield return StartCoroutine(FadeOutHearts(fadeOutDuration));
 
-        // 5. ¶äµéÀÌ±â
+        // 5. ëœ¸ë“¤ì´ê¸°
         yield return new WaitForSeconds(postFadeDelay);
 
-        // 6. MagicStick È°¼ºÈ­
+        // 6. MagicStick í™œì„±í™”
         if (finalMagicStickObject != null)
         {
             finalMagicStickObject.SetActive(true);
@@ -240,7 +240,7 @@ public class HeartUIManager : MonoBehaviour
         float elapsed = 0f;
         Color[] startColors = new Color[2];
 
-        // ÇöÀç ¾ËÆÄ°ª ÀúÀå
+        // í˜„ì¬ ì•ŒíŒŒê°’ ì €ì¥
         for (int i = 0; i < 2; i++)
             if (heartSlots[i] != null) startColors[i] = heartSlots[i].color;
 
@@ -275,7 +275,7 @@ public class HeartUIManager : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
 
-            // EaseOutQuad: Ã³À½ ºü¸£°í ³¡¿¡¼­ ºÎµå·´°Ô °¨¼Ó
+            // EaseOutQuad: ì²˜ìŒ ë¹ ë¥´ê³  ëì—ì„œ ë¶€ë“œëŸ½ê²Œ ê°ì†
             float easeT = 1f - (1f - t) * (1f - t);
 
             stick.anchoredPosition = Vector2.Lerp(startPos, targetPos, easeT);
@@ -284,12 +284,12 @@ public class HeartUIManager : MonoBehaviour
             yield return null;
         }
 
-        // ÃÖÁ¾°ª È®Á¤
+        // ìµœì¢…ê°’ í™•ì •
         stick.anchoredPosition = targetPos;
         stick.localScale = endScale;
     }
 
-    // ¡Ú ¿¬Ãâ ÈÄ ¿ø·¡ »óÅÂ·Î ¸®¼Â (ÇÊ¿ä ½Ã È£Ãâ)
+    // â˜… ì—°ì¶œ í›„ ì›ë˜ ìƒíƒœë¡œ ë¦¬ì…‹ (í•„ìš” ì‹œ í˜¸ì¶œ)
     public void ResetSticksToOriginal()
     {
         for (int i = 0; i < heartSlots.Length; i++)
