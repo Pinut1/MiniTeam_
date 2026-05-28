@@ -24,6 +24,8 @@ public class OpeningSceneController : MonoBehaviour
 
     void Start()
     {
+        // Additive 씬 로딩 시 현재 씬을 Active로 설정해야 Instantiate로 생성한 오브젝트가 Hub로 가지 않습니다.
+        UnityEngine.SceneManagement.SceneManager.SetActiveScene(gameObject.scene);
         StartCoroutine(OpeningSequence());
     }
 
