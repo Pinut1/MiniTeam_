@@ -14,8 +14,24 @@ namespace MiniTeam.Pokemon
 
         void Awake()
         {
-            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            if (Instance != null && Instance != this) 
+            { 
+                Destroy(this); // gameObject 전체가 아닌 중복 컴포넌트만 삭제
+                return; 
+            }
+            
+            // 만약 자신(Transform + DialogueDB) 외에 다른 컴포넌트가 같이 붙어 있다면
+            if (GetComponents<Component>().Length > 2) 
+            {
+                // 전용 빈 오브젝트를 생성하여 완전히 격리
+                GameObject dbHolder = new GameObject("DialogueDB_Global");
+                dbHolder.AddComponent<DialogueDB>(); 
+                Destroy(this); // 현재의 나는 삭제
+                return; // 새로 생성된 DB가 알아서 Instance를 설정하고 DontDestroyOnLoad 됨
+            }
+
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
 

@@ -10,10 +10,8 @@ public class OpeningManager : MonoBehaviour
 
     void Start()
     {
-        // 1. 공통 DialogueDB를 사용해 데이터 로드
-        DialogueDB.Instance.Load("Sugar");
-
-        StartCoroutine(RunSequence());
+        // OpeningSceneController와 중복 실행되므로 구버전 스크립트인 이 클래스는 작동하지 않도록 방어
+        return;
     }
 
     IEnumerator RunSequence()

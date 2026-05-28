@@ -9261,6 +9261,7 @@ GameObject:
   - component: {fileID: 1909595980}
   - component: {fileID: 1909595981}
   - component: {fileID: 1909595982}
+  - component: {fileID: 1909595983}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -9314,6 +9315,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d627167f57a55394c9645eb301808de4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Sponge.SpongeDebugger
+--- !u!114 &1909595983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909595979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 923b20f8d91e3da4e99a0beda6600601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Sponge.SpongeGameController
 --- !u!1 &1928270984
 GameObject:
   m_ObjectHideFlags: 0
