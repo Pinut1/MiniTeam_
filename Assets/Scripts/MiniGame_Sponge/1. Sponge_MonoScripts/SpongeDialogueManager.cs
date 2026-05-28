@@ -162,7 +162,12 @@ public class SpongeDialogueManager : MonoBehaviour
 
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
-        if (line.playObjectionAnim)
+        SpongeUIManager.Instance.HideNewEvidencePopup();
+        SpongeUIManager.Instance.TryShowEvidencePopupForLine(lineId);
+
+        if (gavelLineIds.Contains(line.lineId))
+            typingCoroutine = StartCoroutine(ShowLineWithGavel(line));
+        else if (line.playObjectionAnim)
             typingCoroutine = StartCoroutine(ShowLineWithObjection(line));
         else
             typingCoroutine = StartCoroutine(TypeLine(line));
@@ -171,6 +176,17 @@ public class SpongeDialogueManager : MonoBehaviour
     IEnumerator ShowLineWithObjection(SpongeDialogueLine line)
     {
         yield return StartCoroutine(SpongeUIManager.Instance.PlayObjectionAnim());
+        typingCoroutine = StartCoroutine(TypeLine(line));
+    }
+
+    private static readonly System.Collections.Generic.HashSet<string> gavelLineIds = new()
+    {
+        "re_press_choice_00_09", "re_press_choice_02_09", "evidence_01_09", "evidence_02_18", "ending_08"
+    };
+
+    IEnumerator ShowLineWithGavel(SpongeDialogueLine line)
+    {
+        yield return StartCoroutine(SpongeUIManager.Instance.PlayGavelAnim());
         typingCoroutine = StartCoroutine(TypeLine(line));
     }
 

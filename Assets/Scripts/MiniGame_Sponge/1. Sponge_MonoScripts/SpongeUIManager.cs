@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using MiniTeam.Core;
 /// <summary>
 /// 모든 UI패널 표시/숨김과 키 입력을 담당
 /// 1. ESC/Q/TAB 키 입력 감지 -> 현재 상태에 맞게 처리
@@ -75,8 +76,29 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private Animator innocenceAnimLeft;
     [SerializeField] private Animator innocenceAnimRight;
 
+    [Header("판사 망치 연출")]
+    [SerializeField] private GameObject judgeGavelBGImg;
+    [SerializeField] private GameObject judgeGavelImg;
+    [SerializeField] private GameObject judgeEffetImg;
+    [SerializeField] private GameObject judgeGavelImg1;
+
     [Header("레코드 패널 (대사 직접 증거 선택)")]
     [SerializeField] private GameObject recordPnl;
+
+    [Header("아이템 획득 팝업")]
+    [SerializeField] private GameObject newEvidenceImg;
+    [SerializeField] private GameObject iconRecorder;
+    [SerializeField] private GameObject iconReceipt;
+    [SerializeField] private GameObject iconStatement;
+
+    private Dictionary<string, GameObject> iconMap;
+
+    private static readonly Dictionary<string, string> evidencePopupMap = new()
+    {
+        { "press_00_07",           "receipt"   },
+        { "re_press_01_02",        "statement" },
+        { "before_retestimony_03", "recorder"  }
+    };
 
     private bool questionPnlShown = false;
     private bool isRecordPanelMode = false;
@@ -85,9 +107,8 @@ public class SpongeUIManager : MonoBehaviour
     public bool IsPlayingObjection { get; private set; }
     public bool IsPlayingTakeThat { get; private set; }
     public bool IsPlayingInnocence { get; private set; }
+    public bool IsPlayingGavel { get; private set; }
 
-    //[Header("옵션 패널")]
-    //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
 
     private void Awake()
     {
@@ -101,13 +122,19 @@ public class SpongeUIManager : MonoBehaviour
             { "receipt",   holderReceipt   },
             { "statement", holderStatement }
         };
+        iconMap = new Dictionary<string, GameObject>
+        {
+            { "recorder",  iconRecorder  },
+            { "receipt",   iconReceipt   },
+            { "statement", iconStatement }
+        };
     }
 
     private void Start()
     {
         evidencePnl.SetActive(false);
         if (recordPnl != null) recordPnl.SetActive(false);
-        // opitionsPnl.SetActive(true);
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
     }
 
     // ── 이벤트 구독 ──────────────────────────────────────────────
@@ -242,6 +269,24 @@ public class SpongeUIManager : MonoBehaviour
         IsPlayingInnocence = false;
     }
 
+    public IEnumerator PlayGavelAnim()
+    {
+        IsPlayingGavel = true;
+        judgeGavelBGImg.SetActive(true);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        judgeGavelImg.SetActive(true);
+        judgeEffetImg.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        judgeGavelBGImg.SetActive(false);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(false);
+        IsPlayingGavel = false;
+    }
+
     public IEnumerator PlayTakeThatAnim()
     {
         IsPlayingTakeThat = true;
@@ -266,6 +311,11 @@ public class SpongeUIManager : MonoBehaviour
     // ── 키 입력 처리 ─────────────────────────────────────────────
     private void Update()
     {
+        if (OptionsUIManager.Instance != null
+            && OptionsUIManager.Instance.optionsPanel != null
+            && OptionsUIManager.Instance.optionsPanel.activeSelf)
+            return;
+
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
 
         if (SpongeDialogueManager.Instance.IsChoiceActive)
@@ -550,6 +600,26 @@ public class SpongeUIManager : MonoBehaviour
             SpongeDialogueManager.Instance.SkipBeforeRetestimony();
     }
 
+    // ── 아이템 획득 팝업 ─────────────────────────────────────────
+    public void TryShowEvidencePopupForLine(string lineId)
+    {
+        if (newEvidenceImg == null) return;
+        if (!evidencePopupMap.TryGetValue(lineId, out var evidenceId)) return;
+
+        foreach (var kv in iconMap)
+            if (kv.Value != null) kv.Value.SetActive(false);
+
+        if (iconMap.TryGetValue(evidenceId, out var icon) && icon != null)
+            icon.SetActive(true);
+
+        newEvidenceImg.SetActive(true);
+    }
+
+    public void HideNewEvidencePopup()
+    {
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
+    }
+
     /// <summary>
     /// 증거 패널 닫기
     /// </summary>
@@ -562,22 +632,14 @@ public class SpongeUIManager : MonoBehaviour
             SpongeGameManager.Instance.ChangeState(stateBeforeEvidence);
     }
 
-    /*
     // ── 옵션 패널 ────────────────────────────────────────────────
-    /// <summary>
-    /// 옵션 패널 열기/닫기
-    /// </summary>
     public void ToggleOptionsPanel()
     {
-        optionsPnl.SetActive(!optionsPnl.activeSelf);
+        OptionsUIManager.Instance?.Toggle();
     }
-   
-    /// <summary>
-    /// 옵션 패널 닫기
-    /// </summary>
+
     public void CloseOptionsPanel()
     {
-        optionsPnl.SetActive(false);
-    } 
-    */
+        OptionsUIManager.Instance?.Close();
+    }
 }
