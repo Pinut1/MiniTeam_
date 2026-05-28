@@ -19,6 +19,9 @@ public class RandomLetterReveal : MonoBehaviour
     [Header("흔들림 방지 설정")]
     public bool useMonospace = true; // 강제 고정폭 사용 여부 (글자 흔들림 방지)
     public float monospaceWidth = 0.6f; // 글자간 간격 (em 단위)
+    
+    [Header("순서 설정")]
+    public bool randomRevealOrder = false; // 앞에서부터 순서대로 할지, 무작위 순서로 할지 결정
 
     // ⭐️ 오브젝트가 켜질 때(활성화될 때) 자동으로 효과가 시작되도록 OnEnable 사용
     private void OnEnable()
@@ -35,31 +38,55 @@ public class RandomLetterReveal : MonoBehaviour
         {
             string targetText = targetTexts[t];
             textComponent.text = "";
-            string currentRevealed = ""; // 지금까지 확정된 올바른 글자들
+            
+            // 현재 화면에 보여질 글자 배열 (처음엔 모두 빈칸)
+            char[] displayChars = new char[targetText.Length];
+            bool[] isRevealed = new bool[targetText.Length];
 
+            // 확정할 순서를 담은 리스트 만들기
+            System.Collections.Generic.List<int> revealOrder = new System.Collections.Generic.List<int>();
             for (int i = 0; i < targetText.Length; i++)
             {
-                // 띄어쓰기나 줄바꿈은 효과 없이 그냥 넘김
                 if (targetText[i] == ' ' || targetText[i] == '\n')
                 {
-                    currentRevealed += targetText[i];
-                    continue;
+                    isRevealed[i] = true; // 공백이나 줄바꿈은 미리 확정된 것으로 취급
+                    displayChars[i] = targetText[i];
                 }
+                else
+                {
+                    revealOrder.Add(i);
+                }
+            }
 
-                // 진짜 글자가 확정되기 전에 가짜(랜덤) 글자들을 타다닥! 보여줌
+            // 무작위 순서 옵션이 켜져있다면 리스트 섞기 (Fisher-Yates 셔플)
+            if (randomRevealOrder)
+            {
+                for (int i = 0; i < revealOrder.Count; i++)
+                {
+                    int temp = revealOrder[i];
+                    int randomIndex = Random.Range(i, revealOrder.Count);
+                    revealOrder[i] = revealOrder[randomIndex];
+                    revealOrder[randomIndex] = temp;
+                }
+            }
+
+            // 정해진 순서대로 하나씩 글자 확정해 나가기
+            foreach (int targetIndex in revealOrder)
+            {
+                // 글자 하나가 확정되기 전에 전체 미확정 글자들이 랜덤 문자로 깜빡이는 루프
                 for (int j = 0; j < randomChangesPerLetter; j++)
                 {
-                    char randomChar = randomChars[Random.Range(0, randomChars.Length)];
-
-                    // 만약 뒤에 남은 빈자리도 전부 무작위 문자로 채우고 싶다면 아래 로직을 씁니다.
-                    string suffix = "";
-                    for (int k = i + 1; k < targetText.Length; k++)
+                    // 아직 확정되지 않은 자리들은 모두 새로운 랜덤 문자로 갱신
+                    for (int k = 0; k < targetText.Length; k++)
                     {
-                        suffix += targetText[k] == ' ' ? " " : randomChars[Random.Range(0, randomChars.Length)].ToString();
+                        if (!isRevealed[k])
+                        {
+                            displayChars[k] = randomChars[Random.Range(0, randomChars.Length)];
+                        }
                     }
 
-                    // 확정된 글자 + 현재 깜빡이는 랜덤 글자 + 뒤에 남은 랜덤 글자들
-                    string output = currentRevealed + randomChar + suffix;
+                    // 텍스트 조합 및 표시
+                    string output = new string(displayChars);
                     if (useMonospace) output = $"<mspace={monospaceWidth}em>{output}</mspace>";
                     
                     textComponent.text = output;
@@ -68,11 +95,13 @@ public class RandomLetterReveal : MonoBehaviour
                     yield return new WaitForSecondsRealtime(revealSpeed / randomChangesPerLetter);
                 }
 
-                // 시간 경과 후, 진짜 글자로 확정
-                currentRevealed += targetText[i];
+                // 깜빡임이 끝나면 해당 자리를 진짜 글자로 영구 확정
+                isRevealed[targetIndex] = true;
+                displayChars[targetIndex] = targetText[targetIndex];
                 
-                if (useMonospace) textComponent.text = $"<mspace={monospaceWidth}em>{currentRevealed}</mspace>";
-                else textComponent.text = currentRevealed;
+                string finalOutput = new string(displayChars);
+                if (useMonospace) textComponent.text = $"<mspace={monospaceWidth}em>{finalOutput}</mspace>";
+                else textComponent.text = finalOutput;
             }
 
             // 모든 글자가 다 나온 뒤 다음 단어로 넘어가기 전 대기

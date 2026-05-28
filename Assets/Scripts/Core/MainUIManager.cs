@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using MiniTeam.Core;
 
 public class MainUIManager : MonoBehaviour
 {
@@ -217,5 +218,14 @@ public class MainUIManager : MonoBehaviour
         fadePanel.color = color;
 
         onComplete?.Invoke();
+    }
+
+    // OptionsUIManager가 DontDestroyOnLoad라서 발생하는 연결 끊김 버그 해결용 래퍼 함수
+    public void OpenOptions()
+    {
+        if (OptionsUIManager.Instance != null)
+        {
+            OptionsUIManager.Instance.Toggle();
+        }
     }
 }
