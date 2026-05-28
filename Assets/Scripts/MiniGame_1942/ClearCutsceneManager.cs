@@ -6,93 +6,81 @@ using TMPro;
 
 namespace MiniTeam.Shooting1942
 {
-    // 1942 클리어 컷씬: 플레이어 ↔ 파워퍼프걸 대화 → 오브젝트 획득 → 허브 복귀
     public class ClearCutsceneManager : MonoBehaviour
     {
-        [Serializable]
-        public struct DialogueLine
-        {
-            public string speakerName;
-            public Sprite speakerSprite;
-            [TextArea(2, 5)]
-            public string text;
-        }
-
-        [Header("대화 UI")]
-        public GameObject dialoguePanel;
-        public Image speakerImage;
-        public TextMeshProUGUI speakerNameText;
-        public TextMeshProUGUI dialogueText;
-        public TextMeshProUGUI nextHintText; // "▶ 계속하려면 Enter"
+        [Header("대화")]
+        public EntryCutsceneManager dialogue;  // SpeechBubble 시스템 재사용
 
         [Header("아이템 획득 UI")]
         public GameObject itemPanel;
         public Image itemImage;
         public TextMeshProUGUI itemNameText;
 
-        [Header("대사 목록 (Inspector에서 편집)")]
-        public DialogueLine[] lines;
-
         [Header("아이템 정보")]
         public Sprite itemSprite;
         public string itemName = "파워퍼프걸의 증표";
 
-        private Action onComplete;
-
-        public void Play(Action onComplete)
+        // BossController에서 폭발 전에 호출 — 대화만 재생
+        public void PlayDialogue(Action onComplete)
         {
-            this.onComplete = onComplete;
-            StartCoroutine(CutsceneRoutine());
+            StartCoroutine(DialogueRoutine(onComplete));
         }
 
-        IEnumerator CutsceneRoutine()
+        IEnumerator DialogueRoutine(Action onComplete)
         {
-            if (dialoguePanel != null) dialoguePanel.SetActive(true);
-            if (itemPanel     != null) itemPanel.SetActive(false);
-
-            foreach (var line in lines)
+            if (dialogue != null)
             {
-                ShowLine(line);
-                yield return WaitForInput();
+                bool done = false;
+                dialogue.Play("clear_", false, () => done = true);
+                yield return new WaitUntil(() => done);
             }
-
-            if (dialoguePanel != null) dialoguePanel.SetActive(false);
-
-            // 아이템 획득 연출
-            yield return ShowItemGet();
-
             onComplete?.Invoke();
         }
 
-        void ShowLine(DialogueLine line)
+        // ShootingGameController에서 폭발 후 호출 — 아이템 획득 연출만
+        public void Play(Action onComplete)
         {
-            if (speakerImage    != null) speakerImage.sprite = line.speakerSprite;
-            if (speakerImage    != null) speakerImage.gameObject.SetActive(line.speakerSprite != null);
-            if (speakerNameText != null) speakerNameText.text = line.speakerName;
-            if (dialogueText    != null) dialogueText.text    = line.text;
+            StartCoroutine(CutsceneRoutine(onComplete));
         }
 
-        IEnumerator WaitForInput()
+        IEnumerator CutsceneRoutine(Action onComplete)
         {
-            if (nextHintText != null) nextHintText.gameObject.SetActive(true);
-            yield return null; // 같은 프레임 입력 무시
-            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space));
-            if (nextHintText != null) nextHintText.gameObject.SetActive(false);
+            yield return StartCoroutine(ShowItemGet());
+            onComplete?.Invoke();
         }
 
         IEnumerator ShowItemGet()
         {
             if (itemPanel == null) yield break;
 
-            if (itemImage    != null) itemImage.sprite = itemSprite;
+            if (itemImage    != null) itemImage.sprite  = itemSprite;
             if (itemNameText != null) itemNameText.text = itemName;
-            itemPanel.SetActive(true);
 
-            // Hub에서 아이템 지급 조건으로 사용
             PlayerPrefs.SetInt("1942_Cleared", 1);
             PlayerPrefs.Save();
 
+            var cg = itemPanel.GetComponent<CanvasGroup>();
+            itemPanel.SetActive(true);
+
+            // 페이드인
+            if (cg != null)
+            {
+                cg.alpha = 0f;
+                for (float t = 0; t < 0.4f; t += Time.deltaTime)
+                { cg.alpha = t / 0.4f; yield return null; }
+                cg.alpha = 1f;
+            }
+
             yield return new WaitForSeconds(2.5f);
+
+            // 페이드아웃
+            if (cg != null)
+            {
+                for (float t = 0; t < 0.4f; t += Time.deltaTime)
+                { cg.alpha = 1f - t / 0.4f; yield return null; }
+                cg.alpha = 0f;
+            }
+
             itemPanel.SetActive(false);
         }
     }

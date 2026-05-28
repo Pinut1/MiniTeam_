@@ -1,111 +1,112 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using MiniTeam.Pokemon;
 
 namespace MiniTeam.Shooting1942
 {
     public class EntryCutsceneManager : MonoBehaviour
     {
-        [Serializable]
-        public struct DialogueLine
+        [Header("DialogueDB")]
+        [Tooltip("Resources/Dialogues/{dialogueFile}.json — entry_1, entry_2 ... 순서대로 읽음")]
+        public string dialogueFile = "1942";
+        [Tooltip("JSON 값 형식: \"화자|대사\". 이 이름과 같은 화자일 때만 위쪽 말풍선 + 등장 연출")]
+        public string mojoSpeaker = "모조조조";
+
+        [Header("모조조조 진입")]
+        public Sprite mojoSprite;
+        public float  mojoEntryX       =  0f;
+        public float  mojoSpawnY       =  8f;
+        public float  mojoTalkY        =  4f;
+        public float  mojoMoveDuration =  0.5f;
+
+        [Header("말풍선")]
+        public SpeechBubble bubble;
+
+        private GameObject mojoGO;
+
+        public void Play(Action onComplete) => Play("entry_", true, onComplete);
+
+        public void Play(string keyPrefix, Action onComplete) => Play(keyPrefix, true, onComplete);
+
+        public void Play(string keyPrefix, bool mojoAnimation, Action onComplete)
         {
-            public string speakerName;
-            [Tooltip("Left=0, Right=1, None=-1")]
-            public int speakerSide;   // 0: 왼쪽, 1: 오른쪽, -1: 화자 없음
-            [TextArea(2, 5)]
-            public string text;
-        }
-
-        [Header("스탠딩 이미지 (좌 / 우)")]
-        public Image leftCharaImage;
-        public Image rightCharaImage;
-        public Sprite leftSprite;   // Blossom 등
-        public Sprite rightSprite;  // Mojo Jojo 등
-
-        [Tooltip("비화자 이미지 어둡게")]
-        public float dimAlpha = 0.4f;
-
-        [Header("대화창 UI")]
-        public GameObject dialoguePanel;
-        public TextMeshProUGUI speakerNameText;
-        public TextMeshProUGUI dialogueText;
-        public TextMeshProUGUI nextHintText;
-
-        [Header("대사 목록")]
-        public DialogueLine[] lines;
-
-        [Header("연출")]
-        public CanvasGroup rootGroup;
-        public float fadeInDuration  = 0.3f;
-        public float fadeOutDuration = 0.3f;
-
-        public void Play(Action onComplete)
-        {
-            gameObject.SetActive(true);
-            StartCoroutine(CutsceneRoutine(onComplete));
-        }
-
-        IEnumerator CutsceneRoutine(Action onComplete)
-        {
-            // 초기화
-            if (leftCharaImage  != null) { leftCharaImage.sprite  = leftSprite;  leftCharaImage.gameObject.SetActive(leftSprite   != null); }
-            if (rightCharaImage != null) { rightCharaImage.sprite = rightSprite; rightCharaImage.gameObject.SetActive(rightSprite != null); }
-            SetCharaDim(-1);
-
-            if (rootGroup != null) rootGroup.alpha = 0f;
-            if (dialoguePanel != null) dialoguePanel.SetActive(true);
-
-            // 페이드 인
-            yield return StartCoroutine(Fade(rootGroup, 0f, 1f, fadeInDuration));
-
-            foreach (var line in lines)
+            Debug.Log($"[EntryCutscene] Play({keyPrefix}) | GO active:{gameObject.activeInHierarchy} | bubble:{bubble != null}");
+            DialogueDB.Instance.Load(dialogueFile);
+            if (bubble != null && bubble.group != null)
             {
-                ShowLine(line);
-                yield return WaitForInput();
+                bubble.group.alpha          = 0f;
+                bubble.group.blocksRaycasts = false;
+            }
+            StartCoroutine(CutsceneRoutine(keyPrefix, mojoAnimation, onComplete));
+        }
+
+        IEnumerator CutsceneRoutine(string keyPrefix, bool mojoAnimation, Action onComplete)
+        {
+            int index = 1;
+            while (true)
+            {
+                string raw = DialogueDB.Instance.Get($"{keyPrefix}{index}");
+                if (string.IsNullOrEmpty(raw) || raw.StartsWith("["))
+                    break;
+
+                int sep = raw.IndexOf('|');
+                string speaker = sep >= 0 ? raw.Substring(0, sep)  : "";
+                string text    = sep >= 0 ? raw.Substring(sep + 1) : raw;
+                bool isMojo = speaker == mojoSpeaker;
+
+                if (isMojo && mojoAnimation)
+                {
+                    EnsureMojo();
+                    yield return StartCoroutine(MoveMojo(mojoSpawnY, mojoTalkY));
+                }
+
+                yield return StartCoroutine(bubble.FadeIn(speaker, text, isMojo));
+                yield return StartCoroutine(WaitForInput());
+                yield return StartCoroutine(bubble.FadeOut());
+
+                if (isMojo && mojoAnimation)
+                {
+                    yield return StartCoroutine(MoveMojo(mojoTalkY, mojoSpawnY));
+                    mojoGO.SetActive(false);
+                }
+
+                index++;
             }
 
-            // 페이드 아웃
-            yield return StartCoroutine(Fade(rootGroup, 1f, 0f, fadeOutDuration));
-
-            gameObject.SetActive(false);
             onComplete?.Invoke();
         }
 
-        void ShowLine(DialogueLine line)
+        void EnsureMojo()
         {
-            if (speakerNameText != null) speakerNameText.text = line.speakerName;
-            if (dialogueText    != null) dialogueText.text    = line.text;
-            SetCharaDim(line.speakerSide);
+            if (mojoGO != null) { mojoGO.SetActive(true); return; }
+            mojoGO = new GameObject("Mojo_Cutscene");
+            mojoGO.transform.position    = new Vector3(mojoEntryX, mojoSpawnY, 0f);
+            mojoGO.transform.localScale  = new Vector3(0.16f, 0.16f, 1f);
+            var sr               = mojoGO.AddComponent<SpriteRenderer>();
+            sr.sprite            = mojoSprite;
+            sr.sortingLayerName  = "Enemy";
+            sr.sortingOrder      = 10;
         }
 
-        void SetCharaDim(int activeSide)
+        IEnumerator MoveMojo(float fromY, float toY)
         {
-            if (leftCharaImage  != null) leftCharaImage.color  = activeSide == 0 ? Color.white : new Color(1,1,1, dimAlpha);
-            if (rightCharaImage != null) rightCharaImage.color = activeSide == 1 ? Color.white : new Color(1,1,1, dimAlpha);
+            mojoGO.SetActive(true);
+            var from = new Vector3(mojoEntryX, fromY, 0f);
+            var to   = new Vector3(mojoEntryX, toY,   0f);
+            for (float t = 0; t < mojoMoveDuration; t += Time.deltaTime)
+            {
+                mojoGO.transform.position = Vector3.Lerp(from, to, t / mojoMoveDuration);
+                yield return null;
+            }
+            mojoGO.transform.position = to;
         }
 
         IEnumerator WaitForInput()
         {
-            if (nextHintText != null) nextHintText.gameObject.SetActive(true);
             yield return null;
-            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space));
-            if (nextHintText != null) nextHintText.gameObject.SetActive(false);
-        }
-
-        IEnumerator Fade(CanvasGroup group, float from, float to, float duration)
-        {
-            if (group == null) yield break;
-            float elapsed = 0f;
-            group.alpha = from;
-            while (elapsed < duration)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                group.alpha = Mathf.Lerp(from, to, elapsed / duration);
-                yield return null;
-            }
-            group.alpha = to;
+            yield return new WaitUntil(() =>
+                Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space));
         }
     }
 }
