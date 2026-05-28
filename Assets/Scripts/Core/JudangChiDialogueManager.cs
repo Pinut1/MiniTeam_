@@ -60,6 +60,18 @@ public class JudangChiDialogueManager : MonoBehaviour
                     break;
                 }
 
+                // Rich Text 태그 처리: < 로 시작하면 > 가 닫힐 때까지 한 번에 덧붙임
+                if (sentenceData.text[i] == '<')
+                {
+                    int closeIdx = sentenceData.text.IndexOf('>', i);
+                    if (closeIdx != -1)
+                    {
+                        dialogueText.text += sentenceData.text.Substring(i, closeIdx - i + 1);
+                        i = closeIdx; // 인덱스를 닫는 괄호 위치로 건너뜀
+                        continue;
+                    }
+                }
+
                 dialogueText.text += sentenceData.text[i];
 
                 // 타이핑 대기 시간 중에도 마우스 클릭 입력 감지지
