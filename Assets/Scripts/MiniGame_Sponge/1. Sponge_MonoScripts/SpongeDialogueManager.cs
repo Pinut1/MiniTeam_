@@ -163,6 +163,9 @@ public class SpongeDialogueManager : MonoBehaviour
 
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
+        SpongeUIManager.Instance.HideNewEvidencePopup();
+        SpongeUIManager.Instance.TryShowEvidencePopupForLine(lineId);
+
         if (gavelLineIds.Contains(line.lineId))
             typingCoroutine = StartCoroutine(ShowLineWithGavel(line));
         else if (line.playObjectionAnim)

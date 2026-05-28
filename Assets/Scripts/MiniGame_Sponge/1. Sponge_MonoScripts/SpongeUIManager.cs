@@ -84,6 +84,21 @@ public class SpongeUIManager : MonoBehaviour
     [Header("레코드 패널 (대사 직접 증거 선택)")]
     [SerializeField] private GameObject recordPnl;
 
+    [Header("아이템 획득 팝업")]
+    [SerializeField] private GameObject newEvidenceImg;
+    [SerializeField] private GameObject iconRecorder;
+    [SerializeField] private GameObject iconReceipt;
+    [SerializeField] private GameObject iconStatement;
+
+    private Dictionary<string, GameObject> iconMap;
+
+    private static readonly Dictionary<string, string> evidencePopupMap = new()
+    {
+        { "press_00_07",           "receipt"   },
+        { "re_press_01_02",        "statement" },
+        { "before_retestimony_03", "recorder"  }
+    };
+
     private bool questionPnlShown = false;
     private bool isRecordPanelMode = false;
     private SpongeDialogueLine recordPanelSourceLine;
@@ -108,12 +123,19 @@ public class SpongeUIManager : MonoBehaviour
             { "receipt",   holderReceipt   },
             { "statement", holderStatement }
         };
+        iconMap = new Dictionary<string, GameObject>
+        {
+            { "recorder",  iconRecorder  },
+            { "receipt",   iconReceipt   },
+            { "statement", iconStatement }
+        };
     }
 
     private void Start()
     {
         evidencePnl.SetActive(false);
         if (recordPnl != null) recordPnl.SetActive(false);
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
         // opitionsPnl.SetActive(true);
     }
 
@@ -259,7 +281,7 @@ public class SpongeUIManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         judgeGavelImg.SetActive(true);
         judgeEffetImg.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         judgeGavelBGImg.SetActive(false);
         judgeGavelImg.SetActive(false);
         judgeEffetImg.SetActive(false);
@@ -573,6 +595,26 @@ public class SpongeUIManager : MonoBehaviour
         // 재증언 전 대사 스킵
         else if (state == SpongeGameState.GameState.CrossExamination && SpongeDialogueManager.Instance.IsInDialogueSequence)
             SpongeDialogueManager.Instance.SkipBeforeRetestimony();
+    }
+
+    // ── 아이템 획득 팝업 ─────────────────────────────────────────
+    public void TryShowEvidencePopupForLine(string lineId)
+    {
+        if (newEvidenceImg == null) return;
+        if (!evidencePopupMap.TryGetValue(lineId, out var evidenceId)) return;
+
+        foreach (var kv in iconMap)
+            if (kv.Value != null) kv.Value.SetActive(false);
+
+        if (iconMap.TryGetValue(evidenceId, out var icon) && icon != null)
+            icon.SetActive(true);
+
+        newEvidenceImg.SetActive(true);
+    }
+
+    public void HideNewEvidencePopup()
+    {
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
     }
 
     /// <summary>
