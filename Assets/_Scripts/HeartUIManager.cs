@@ -202,6 +202,11 @@ public class HeartUIManager : MonoBehaviour
         RectTransform pinkRect = heartSlots[0].GetComponent<RectTransform>();
         RectTransform blueRect = heartSlots[1].GetComponent<RectTransform>();
 
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.PlayMagicStickGrowingBGM();
+        }
+
         // 1. 위치 계산 (중앙으로 모으기 위한 타겟 설정)
         Vector2 pos0 = pinkRect.anchoredPosition;
         Vector2 pos1 = blueRect.anchoredPosition;
@@ -229,6 +234,10 @@ public class HeartUIManager : MonoBehaviour
         // 6. MagicStick 활성화
         if (finalMagicStickObject != null)
         {
+            if (BgmManager.Instance != null)
+            {
+                BgmManager.Instance.PlayMagicStickTransformBGM();
+            }
             finalMagicStickObject.SetActive(true);
         }
 

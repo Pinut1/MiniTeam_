@@ -13,20 +13,20 @@ public class GirlNpcReaction : MonoBehaviour
     private GameObject npcLaser;
 
     private Coroutine reactionCoroutine;
-    private Vector3 lastTargetPos;      // ³²ÇĞ»ıÀÇ ÇÇ¹ş(°¡½¿) À§Ä¡¸¦ ±×´ë·Î ÀúÀå!
+    private Vector3 lastTargetPos;      // ë‚¨í•™ìƒì˜ í”¼ë²—(ê°€ìŠ´) ìœ„ì¹˜ë¥¼ ê·¸ëŒ€ë¡œ ì €ì¥!
     private bool isLaserActive = false;
     private GameObject targetBoyNpc;
 
-    [Header("·¹ÀÌÀú Á¤¹Ğ Á¶ÁØ ¼³Á¤")]
-    [SerializeField] private float eyeOffset;         // ¿©ÇĞ»ıÀÇ ´« ³ôÀÌ
-    [SerializeField] private float eyeForwardOffset;  // ¿©ÇĞ»ıÀÇ ´« ¾ÕÂÊÀ¸·Î ¿ÀÇÁ¼Â
-    [SerializeField] private float laserScaleFactor;  // ½ºÇÁ¶óÀÌÆ® ¹èÀ²
-    [SerializeField] private float laserThickness;   // ·¹ÀÌÀú ±½±â (Y-Scale)
+    [Header("ë ˆì´ì € ì •ë°€ ì¡°ì¤€ ì„¤ì •")]
+    [SerializeField] private float eyeOffset;         // ì—¬í•™ìƒì˜ ëˆˆ ë†’ì´
+    [SerializeField] private float eyeForwardOffset;  // ì—¬í•™ìƒì˜ ëˆˆ ì•ìª½ìœ¼ë¡œ ì˜¤í”„ì…‹
+    [SerializeField] private float laserScaleFactor;  // ìŠ¤í”„ë¼ì´íŠ¸ ë°°ìœ¨
+    [SerializeField] private float laserThickness;   // ë ˆì´ì € êµµê¸° (Y-Scale)
 
     [Header("Knockback Flying Settings")]
     private bool isFlyingAway = false;
-    public float flyArcHeight = 5f;     // Æ÷¹°¼± ³ôÀÌ
-    public float flyDuration = 1.2f;    // ³¯¾Æ°¡´Â ½Ã°£ (»ìÂ¦ ´ÜÃàÇØ¼­ ÂÌ±êÇÏ°Ô!)
+    public float flyArcHeight = 5f;     // í¬ë¬¼ì„  ë†’ì´
+    public float flyDuration = 1.2f;    // ë‚ ì•„ê°€ëŠ” ì‹œê°„ (ì‚´ì§ ë‹¨ì¶•í•´ì„œ ì«„ê¹ƒí•˜ê²Œ!)
     private Vector3 flyStartPos;
     private Vector3 flyTargetPos;
     private float flyTime = 0f;
@@ -37,7 +37,18 @@ public class GirlNpcReaction : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         moveScript = GetComponent<NpcRandomPatrol>();
 
-        Transform markTransform = transform.Find("Surprise_Mark");
+        // ìì‹ ì˜¤ë¸Œì íŠ¸ë“¤ ì¤‘ì—ì„œ ì´ë¦„ì— "Surprise_Mark"ê°€ í¬í•¨ëœ ê²ƒì„ ì°¾ìŠµë‹ˆë‹¤ (ê³„ì¸µ êµ¬ì¡° ìƒê´€ì—†ì´ ëª¨ë‘ íƒìƒ‰)
+        Transform[] allChildren = GetComponentsInChildren<Transform>(true);
+        Transform markTransform = null;
+        foreach (Transform child in allChildren)
+        {
+            if (child.name.Contains("Surprise_Mark"))
+            {
+                markTransform = child;
+                break;
+            }
+        }
+
         if (markTransform != null)
         {
             surpriseMark = markTransform.gameObject;
@@ -57,32 +68,32 @@ public class GirlNpcReaction : MonoBehaviour
         }
     }
 
-    // ¾Ö´Ï¸ŞÀÌÅÍ °è»êÀÌ ³¡³­ ÈÄ, °­Á¦·Î ·¹ÀÌÀú¸¦ ´«¿¡ ¹Ú°í Á¶ÁØ½ÃÅµ´Ï´Ù.
+    // ì• ë‹ˆë©”ì´í„° ê³„ì‚°ì´ ëë‚œ í›„, ê°•ì œë¡œ ë ˆì´ì €ë¥¼ ëˆˆì— ë°•ê³  ì¡°ì¤€ì‹œí‚µë‹ˆë‹¤.
     void LateUpdate()
     {
         if (isLaserActive && npcLaser != null)
         {
             float facingDirection = Mathf.Sign(transform.localScale.x);
-            // 1. ¹ß»çÁ¡(¿©ÇĞ»ı ´«) °è»ê (Offset Àû¿ë)
+            // 1. ë°œì‚¬ì (ì—¬í•™ìƒ ëˆˆ) ê³„ì‚° (Offset ì ìš©)
             Vector3 firePoint = transform.position + new Vector3(eyeForwardOffset * facingDirection, eyeOffset, 0);
 
-            // µµÂøÁ¡Àº ³Ñ°Ü¹ŞÀº ³²ÇĞ»ıÀÇ ÇÇ¹ş À§Ä¡ ±×´ë·Î »ç¿ë
+            // ë„ì°©ì ì€ ë„˜ê²¨ë°›ì€ ë‚¨í•™ìƒì˜ í”¼ë²— ìœ„ì¹˜ ê·¸ëŒ€ë¡œ ì‚¬ìš©
             Vector3 targetPos = lastTargetPos;
 
-            // 2. ·¹ÀÌÀú ½ÃÀÛ À§Ä¡¸¦ ¿©ÇĞ»ı ´«À¸·Î °íÁ¤
+            // 2. ë ˆì´ì € ì‹œì‘ ìœ„ì¹˜ë¥¼ ì—¬í•™ìƒ ëˆˆìœ¼ë¡œ ê³ ì •
             npcLaser.transform.position = firePoint;
 
-            // 3. ´«¿¡¼­ Å¸°ÙÀ» ÇâÇÏ´Â ¹æÇâ º¤ÅÍ °è»ê
+            // 3. ëˆˆì—ì„œ íƒ€ê²Ÿì„ í–¥í•˜ëŠ” ë°©í–¥ ë²¡í„° ê³„ì‚°
             Vector3 dir = targetPos - firePoint;
 
-            // È¸Àü: ·¹ÀÌÀú ½ºÇÁ¶óÀÌÆ®ÀÇ ¿À¸¥ÂÊ(Right) ¸éÀÌ Å¸°ÙÀ» ¹Ù¶óº¸µµ·Ï ¼³Á¤
+            // íšŒì „: ë ˆì´ì € ìŠ¤í”„ë¼ì´íŠ¸ì˜ ì˜¤ë¥¸ìª½(Right) ë©´ì´ íƒ€ê²Ÿì„ ë°”ë¼ë³´ë„ë¡ ì„¤ì •
             npcLaser.transform.right = dir;
 
-            // 4. ¿Ïº®ÇÑ ±æÀÌ Àû¿ë
+            // 4. ì™„ë²½í•œ ê¸¸ì´ ì ìš©
             SpriteRenderer sr = npcLaser.GetComponent<SpriteRenderer>();
             if (sr != null && sr.sprite != null)
             {
-                // Å¸°Ù±îÁöÀÇ ½ÇÁ¦ ¿ùµå °Å¸®
+                // íƒ€ê²Ÿê¹Œì§€ì˜ ì‹¤ì œ ì›”ë“œ ê±°ë¦¬
                 float currentDist = dir.magnitude;
 
                 float baseWidth = sr.sprite.bounds.size.x;
@@ -105,8 +116,8 @@ public class GirlNpcReaction : MonoBehaviour
 
     public void LookAtAttackedNpc(GameObject targetNpc)
     {
-        targetBoyNpc = targetNpc; // ³²ÇĞ»ı ÀúÀå
-        lastTargetPos = targetNpc.transform.position; // ±âÁ¸ ·¹ÀÌÀú Á¶ÁØ¿ë À§Ä¡ ÀúÀå
+        targetBoyNpc = targetNpc; // ë‚¨í•™ìƒ ì €ì¥
+        lastTargetPos = targetNpc.transform.position; // ê¸°ì¡´ ë ˆì´ì € ì¡°ì¤€ìš© ìœ„ì¹˜ ì €ì¥
 
         if (reactionCoroutine != null) StopCoroutine(reactionCoroutine);
         reactionCoroutine = StartCoroutine(ReactionSequence(targetNpc));
@@ -114,14 +125,14 @@ public class GirlNpcReaction : MonoBehaviour
 
     private IEnumerator ReactionSequence(GameObject targetNpc)
     {
-        // 1. ¹æÇâ ÀüÈ¯
+        // 1. ë°©í–¥ ì „í™˜
         Vector3 targetPos = targetNpc.transform.position;
         Vector3 scale = transform.localScale;
         if (targetPos.x > transform.position.x) scale.x = Mathf.Abs(scale.x);
         else scale.x = -Mathf.Abs(scale.x);
         transform.localScale = scale;
 
-        // 2. ÀÌµ¿ Á¤Áö ¹× ³î¶÷ ¸¶Å© ¿Â
+        // 2. ì´ë™ ì •ì§€ ë° ë†€ëŒ ë§ˆí¬ ì˜¨
         if (moveScript != null) moveScript.enabled = false;
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (anim != null)
@@ -134,27 +145,27 @@ public class GirlNpcReaction : MonoBehaviour
         if (npcLaser != null) npcLaser.SetActive(false);
         if (surpriseMark != null) surpriseMark.SetActive(true);
 
-        // 3. 1ÃÊ ´ë±â (³î¶ó´Â ½Ã°£)
+        // 3. 1ì´ˆ ëŒ€ê¸° (ë†€ë¼ëŠ” ì‹œê°„)
         yield return new WaitForSeconds(1f);
 
-        // 4. ³î¶÷ ¸¶Å© ²ô°í ¿©ÇĞ»ı °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç ¿Â!
+        // 4. ë†€ëŒ ë§ˆí¬ ë„ê³  ì—¬í•™ìƒ ê³µê²© ì• ë‹ˆë©”ì´ì…˜ ì˜¨!
 if (surpriseMark != null) surpriseMark.SetActive(false);
 if (anim != null) anim.SetBool("isAttacking", true);
 
-// ¿©ÇĞ»ıÀÌ ·¹ÀÌÀú¸¦ ½î´Â ¼ø°£, ³²ÇĞ»ı(¶Ç´Â ÇÇ¿¡¸£)À» ³ë¶õ»ö ºÒÅ¸±â·Î ¹Ù²Ş
+// ì—¬í•™ìƒì´ ë ˆì´ì €ë¥¼ ì˜ëŠ” ìˆœê°„, ë‚¨í•™ìƒ(ë˜ëŠ” í”¼ì—ë¥´)ì„ ë…¸ë€ìƒ‰ ë¶ˆíƒ€ê¸°ë¡œ ë°”ê¿ˆ
 if (targetBoyNpc != null)
 {
-    // ¡Ú [ÇÙ½É ¼öÁ¤] ÇÇ¿¡¸£ÀÇ ¾Ö´Ï¸ŞÀÌÅÍ°¡ ÀÚ½Ä ¸ğµ¨¸µ ÂÊ¿¡ ºÙ¾îÀÖÀ» °æ¿ì¸¦ ´ëºñÇØ GetComponentInChildrenÀ¸·Î ³Ğ°Ô Ã£½À´Ï´Ù.
+    // â˜… [í•µì‹¬ ìˆ˜ì •] í”¼ì—ë¥´ì˜ ì• ë‹ˆë©”ì´í„°ê°€ ìì‹ ëª¨ë¸ë§ ìª½ì— ë¶™ì–´ìˆì„ ê²½ìš°ë¥¼ ëŒ€ë¹„í•´ GetComponentInChildrenìœ¼ë¡œ ë„“ê²Œ ì°¾ìŠµë‹ˆë‹¤.
     Animator boyAnim = targetBoyNpc.GetComponentInChildren<Animator>();
     
     if (boyAnim != null)
     {
-        boyAnim.SetBool("isYellowBurn", true); // °áÅõ ¾Ö´Ï¸ŞÀÌ¼Ç ¹ßµ¿!
+        boyAnim.SetBool("isYellowBurn", true); // ê²°íˆ¬ ì• ë‹ˆë©”ì´ì…˜ ë°œë™!
     }
     else
     {
-        // ¸¸¾à ÀÌ ¸Ş½ÃÁö°¡ À¯´ÏÆ¼ ÄÜ¼Ö(Console)¿¡ ¶á´Ù¸é ÇÇ¿¡¸£¿¡°Ô ¾Ö´Ï¸ŞÀÌÅÍ°¡ ¾Æ¿¹ ¾ø´Â °Ì´Ï´Ù!
-        Debug.LogWarning(targetBoyNpc.name + " ¿ÀºêÁ§Æ®¿¡¼­ Animator¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù!");
+        // ë§Œì•½ ì´ ë©”ì‹œì§€ê°€ ìœ ë‹ˆí‹° ì½˜ì†”(Console)ì— ëœ¬ë‹¤ë©´ í”¼ì—ë¥´ì—ê²Œ ì• ë‹ˆë©”ì´í„°ê°€ ì•„ì˜ˆ ì—†ëŠ” ê²ë‹ˆë‹¤!
+        Debug.LogWarning(targetBoyNpc.name + " ì˜¤ë¸Œì íŠ¸ì—ì„œ Animatorë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤!");
     }
 }
 
@@ -205,7 +216,7 @@ isLaserActive = true;
             yield return null;
         }
 
-        Debug.Log(gameObject.name + " ³¯¾Æ°¡±â ¿Ï·á. »èÁ¦ÇÕ´Ï´Ù.");
+        Debug.Log(gameObject.name + " ë‚ ì•„ê°€ê¸° ì™„ë£Œ. ì‚­ì œí•©ë‹ˆë‹¤.");
         Destroy(gameObject);
     }
 
@@ -229,7 +240,7 @@ isLaserActive = true;
         }
     }
 
-    // ¡Ú PlayerLaser¿¡¼­ ÆĞ¹è ½Ã È£ÃâÇÏ´Â ÇÔ¼ö
+    // â˜… PlayerLaserì—ì„œ íŒ¨ë°° ì‹œ í˜¸ì¶œí•˜ëŠ” í•¨ìˆ˜
     public void WinAndLeaveScene()
     {
         Animator anim = GetComponent<Animator>();
@@ -241,55 +252,63 @@ isLaserActive = true;
             anim.SetBool("isSmile", true);
         }
 
-        // ±âÁ¸¿¡ NPC¸¦ ¸Éµ¹°Ô ÇÏ´ø ÀÌµ¿ ½ºÅ©¸³Æ®°¡ ÀÖ´Ù¸é ²¨¼­ Ãæµ¹À» ¸·½À´Ï´Ù.
+        // ê¸°ì¡´ì— NPCë¥¼ ë§´ëŒê²Œ í•˜ë˜ ì´ë™ ìŠ¤í¬ë¦½íŠ¸ê°€ ìˆë‹¤ë©´ êº¼ì„œ ì¶©ëŒì„ ë§‰ìŠµë‹ˆë‹¤.
         MonoBehaviour moveScript = GetComponent("NpcRandomPatrol") as MonoBehaviour;
         if (moveScript != null) moveScript.enabled = false;
 
-        // ¿ôÀ¸¸é¼­ ¹ÛÀ¸·Î ³ª°¡´Â ÄÚ·çÆ¾ ½ÃÀÛ!
+        // ì›ƒìœ¼ë©´ì„œ ë°–ìœ¼ë¡œ ë‚˜ê°€ëŠ” ì½”ë£¨í‹´ ì‹œì‘!
         StartCoroutine(LeaveSceneCoroutine());
     }
 
     private System.Collections.IEnumerator LeaveSceneCoroutine()
     {
-        // 0.5ÃÊ Á¤µµ Á¦ÀÚ¸®¿¡¼­ ¹æ±ß ¿ôÀ¸¸ç ½Â¸®¸¦ ¸¸³£ÇÕ´Ï´Ù.
+        // 0.5ì´ˆ ì •ë„ ì œìë¦¬ì—ì„œ ë°©ê¸‹ ì›ƒìœ¼ë©° ìŠ¹ë¦¬ë¥¼ ë§Œë½í•©ë‹ˆë‹¤.
         yield return new WaitForSeconds(0.5f);
 
-        float moveSpeed = 5.0f; // °É¾î³ª°¡´Â ¼Óµµ
-        float direction = 1f;   // ±âº» ¹æÇâ (1 = ¿À¸¥ÂÊ, -1 = ¿ŞÂÊ)
+        float moveSpeed = 5.0f; // ê±¸ì–´ë‚˜ê°€ëŠ” ì†ë„
+        float direction = 1f;   // ê¸°ë³¸ ë°©í–¥ (1 = ì˜¤ë¥¸ìª½, -1 = ì™¼ìª½)
 
-        // ¡Ú [ÇÙ½É 1] Ä«¸Ş¶ó¸¦ ±âÁØÀ¸·Î ¿©ÇĞ»ıÀÌ ¾î´À ÂÊ¿¡ ÀÖ´ÂÁö ÆÄ¾ÇÇÕ´Ï´Ù.
+        // â˜… [í•µì‹¬ 1] ì¹´ë©”ë¼ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì—¬í•™ìƒì´ ì–´ëŠ ìª½ì— ìˆëŠ”ì§€ íŒŒì•…í•©ë‹ˆë‹¤.
         Camera mainCam = Camera.main;
         if (mainCam != null)
         {
-            // ¿©ÇĞ»ıÀÌ Ä«¸Ş¶ó Áß½Éº¸´Ù ¿À¸¥ÂÊ¿¡ ÀÖÀ¸¸é ¿À¸¥ÂÊÀ¸·Î, ¿ŞÂÊ¿¡ ÀÖÀ¸¸é ¿ŞÂÊÀ¸·Î ³ª°©´Ï´Ù.
+            // ì—¬í•™ìƒì´ ì¹´ë©”ë¼ ì¤‘ì‹¬ë³´ë‹¤ ì˜¤ë¥¸ìª½ì— ìˆìœ¼ë©´ ì˜¤ë¥¸ìª½ìœ¼ë¡œ, ì™¼ìª½ì— ìˆìœ¼ë©´ ì™¼ìª½ìœ¼ë¡œ ë‚˜ê°‘ë‹ˆë‹¤.
             if (transform.position.x >= mainCam.transform.position.x)
             {
-                direction = 1f;  // È­¸é ¿À¸¥ÂÊÀ¸·Î ÅğÀå
+                direction = 1f;  // í™”ë©´ ì˜¤ë¥¸ìª½ìœ¼ë¡œ í‡´ì¥
             }
             else
             {
-                direction = -1f; // È­¸é ¿ŞÂÊÀ¸·Î ÅğÀå
+                direction = -1f; // í™”ë©´ ì™¼ìª½ìœ¼ë¡œ í‡´ì¥
             }
         }
 
-        // ¡Ú [ÇÙ½É 2] ³ª°¡´Â ¹æÇâÀ¸·Î °í°³¸¦ È× µ¹¸³´Ï´Ù (ÁÂ¿ì ¹İÀü Flip)
+        // â˜… [í•µì‹¬ 2] ë‚˜ê°€ëŠ” ë°©í–¥ìœ¼ë¡œ ê³ ê°œë¥¼ íœ™ ëŒë¦½ë‹ˆë‹¤ (ì¢Œìš° ë°˜ì „ Flip)
         Vector3 currentScale = transform.localScale;
 
-        // (ÁÖÀÇ: ¸¸¾à °ÔÀÓ ÇÃ·¹ÀÌ ½Ã ¿©ÇĞ»ıÀÌ ¹®¿öÅ©¸¦ ÇÑ´Ù¸é ¾Æ·¡ ÁÙÀÇ direction ¾Õ¿¡ ¸¶ÀÌ³Ê½º(-)¸¦ ºÙ¿©ÁÖ¼¼¿ä!)
+        // ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ì „í™˜
+        Animator anim = GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.SetBool("isSmile", false);
+            anim.SetBool("isWalking", true);
+        }
+
+        // (ì£¼ì˜: ë§Œì•½ ê²Œì„ í”Œë ˆì´ ì‹œ ì—¬í•™ìƒì´ ë¬¸ì›Œí¬ë¥¼ í•œë‹¤ë©´ ì•„ë˜ ì¤„ì˜ direction ì•ì— ë§ˆì´ë„ˆìŠ¤(-)ë¥¼ ë¶™ì—¬ì£¼ì„¸ìš”)
         currentScale.x = Mathf.Abs(currentScale.x) * direction;
         transform.localScale = currentScale;
 
-        // ¾à 4ÃÊ°£ È­¸é ¹ÛÀ¸·Î ½º¸£¸¤ ÀÌµ¿ÇÏ¸ç ³ª°©´Ï´Ù.
+        // ì•½ 4ì´ˆê°„ í™”ë©´ ë°–ìœ¼ë¡œ ìŠ¤ë¥´ë¥µ ì´ë™í•˜ë©° ë‚˜ê°‘ë‹ˆë‹¤.
         float time = 0f;
         while (time < 2f)
         {
             time += Time.deltaTime;
-            // Space.World¸¦ ºÙ¿©ÁÖ¸é Ä³¸¯ÅÍ°¡ µÚÁıÇôÀÖ¾îµµ ¹«Á¶°Ç Á¤ÇØÁø ¿ùµå ¹æÇâÀ¸·Î °É¾î°©´Ï´Ù.
+            // Space.Worldë¥¼ ë¶™ì—¬ì£¼ë©´ ìºë¦­í„°ê°€ ë’¤ì§‘í˜€ìˆì–´ë„ ë¬´ì¡°ê±´ ì •í•´ì§„ ì›”ë“œ ë°©í–¥ìœ¼ë¡œ ê±¸ì–´ê°‘ë‹ˆë‹¤.
             transform.Translate(Vector3.right * direction * moveSpeed * Time.deltaTime, Space.World);
             yield return null;
         }
 
-        // È­¸é ¹ÛÀ¸·Î ¿ÏÀüÈ÷ ³ª°¬À¸¸é ½º½º·Î »èÁ¦
+        // í™”ë©´ ë°–ìœ¼ë¡œ ì™„ì „íˆ ë‚˜ê°”ìœ¼ë©´ ìŠ¤ìŠ¤ë¡œ ì‚­ì œ
         Destroy(gameObject);
     }
 
@@ -298,11 +317,10 @@ isLaserActive = true;
         Animator anim = GetComponent<Animator>();
         if (anim != null)
         {
-            anim.SetBool("isWalking", true); // °È±â ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
-            anim.SetBool("isWalking", false);
+            anim.SetBool("isWalking", true); // ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ ì¼œê¸°
         }
 
-        // ÀÌµ¿ ½ºÅ©¸³Æ® Á¤Áö
+        // ì´ë™ ìŠ¤í¬ë¦½íŠ¸ ì •ì§€
         MonoBehaviour moveScript = GetComponent("NpcRandomPatrol") as MonoBehaviour;
         if (moveScript != null) moveScript.enabled = false;
 
@@ -311,10 +329,10 @@ isLaserActive = true;
 
     private System.Collections.IEnumerator WalkAwayCoroutine()
     {
-        // È­¸é °¡ÀåÀÚ¸® ¹æÇâ °è»ê (Ä«¸Ş¶ó ±âÁØ)
+        // í™”ë©´ ê°€ì¥ìë¦¬ ë°©í–¥ ê³„ì‚° (ì¹´ë©”ë¼ ê¸°ì¤€)
         float direction = transform.position.x > Camera.main.transform.position.x ? 1 : -1;
 
-        // ¹æÇâ ÀüÈ¯ (Flip)
+        // ë°©í–¥ ì „í™˜ (Flip)
         Vector3 scale = transform.localScale;
         scale.x = Mathf.Abs(scale.x) * direction;
         transform.localScale = scale;
@@ -322,7 +340,7 @@ isLaserActive = true;
         float speed = 5.0f;
         float timer = 0;
 
-        // 3ÃÊ°£ °È±â
+        // 3ì´ˆê°„ ê±·ê¸°
         while (timer < 3f)
         {
             transform.Translate(Vector3.right * direction * speed * Time.deltaTime, Space.World);
@@ -330,6 +348,6 @@ isLaserActive = true;
             yield return null;
         }
 
-        Destroy(gameObject); // ¼Ò¸ê
+        Destroy(gameObject); // ì†Œë©¸
     }
 }

@@ -9,6 +9,7 @@ public class BgmManager : MonoBehaviour
     private AudioSource gameplaySource;
     private AudioSource pierrePhaseSource;
     private AudioSource banillaPhaseSource;
+    private AudioSource cutsceneSource;
     private AudioSource sfxSource;
     private AudioSource backAttackSource;
 
@@ -17,6 +18,8 @@ public class BgmManager : MonoBehaviour
     public AudioClip gameplayBgm;  // 인스펙터에서 할당
     public AudioClip pierrePhaseBgm;  // 인스펙터에서 할당
     public AudioClip banillaPhaseBgm;  // 인스펙터에서 할당
+    public AudioClip magicStickGrowingBgm;  // 인스펙터에서 할당
+    public AudioClip magicStickTransformBgm;  // 인스펙터에서 할당
 
     [Header("효과음(SFX) 설정")]
     public AudioClip heartCollectSfx; // 인스펙터에서 할당
@@ -49,8 +52,10 @@ public class BgmManager : MonoBehaviour
         // 4. 바닐라 페이즈용 오디오 소스
         banillaPhaseSource = gameObject.AddComponent<AudioSource>();
         banillaPhaseSource.loop = true;
-        banillaPhaseSource.clip = banillaPhaseBgm;
-        if (banillaPhaseBgm != null) banillaPhaseBgm.LoadAudioData();
+        if (banillaPhaseBgm != null) { banillaPhaseSource.clip = banillaPhaseBgm; banillaPhaseBgm.LoadAudioData(); }
+
+        cutsceneSource = gameObject.AddComponent<AudioSource>();
+        cutsceneSource.loop = true;
 
         // 5. 효과음(SFX) 소스 생성
         sfxSource = gameObject.AddComponent<AudioSource>();
@@ -76,6 +81,7 @@ public class BgmManager : MonoBehaviour
         if (gameplaySource != null) gameplaySource.Stop();
         if (pierrePhaseSource != null) pierrePhaseSource.Stop();
         if (banillaPhaseSource != null) banillaPhaseSource.Stop();
+        if (cutsceneSource != null) cutsceneSource.Stop();
     }
 
     public void PlayOpeningBGM()
@@ -105,6 +111,28 @@ public class BgmManager : MonoBehaviour
     public void ChangeBGM(AudioClip newClip)
     {
         PlayGameBGM();
+    }
+
+    public void PlayMagicStickGrowingBGM()
+    {
+        StopAllBGM();
+        if (cutsceneSource != null && magicStickGrowingBgm != null)
+        {
+            cutsceneSource.loop = true;
+            cutsceneSource.clip = magicStickGrowingBgm;
+            cutsceneSource.Play();
+        }
+    }
+
+    public void PlayMagicStickTransformBGM()
+    {
+        StopAllBGM();
+        if (cutsceneSource != null && magicStickTransformBgm != null)
+        {
+            cutsceneSource.loop = false;
+            cutsceneSource.clip = magicStickTransformBgm;
+            cutsceneSource.Play();
+        }
     }
 
     public void PlaySFX(AudioClip clip)

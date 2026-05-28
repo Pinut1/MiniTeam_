@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class NpcRandomPatrol : MonoBehaviour
 {
-    [Header("ÀÌµ¿ ¹İ°æ ¼³Á¤")]
+    [Header("ì´ë™ ë°˜ê²½ ì„¤ì •")]
     public float patrolDistance = 3.0f;
 
-    [Header("¼Óµµ ¼³Á¤ (·£´ı ¹üÀ§)")]
+    [Header("ì†ë„ ì„¤ì • (ëœë¤ ë²”ìœ„)")]
     public float minSpeed = 1.0f;
     public float maxSpeed = 2.5f;
 
-    [Header("´ë±â ½Ã°£ ¼³Á¤ (·£´ı ¹üÀ§)")]
+    [Header("ëŒ€ê¸° ì‹œê°„ ì„¤ì • (ëœë¤ ë²”ìœ„)")]
     public float minIdleTime = 1.0f;
     public float maxIdleTime = 3.0f;
 
-    [Header("ÇÇ¿¡¸£ Àü¿ë ¼³Á¤")]
+    [Header("í”¼ì—ë¥´ ì „ìš© ì„¤ì •")]
     public bool isPierre = false;
     public GameObject heartPrefab;
     public Sprite pierreHeartSprite;
@@ -24,6 +24,7 @@ public class NpcRandomPatrol : MonoBehaviour
     private float waitTimer;
 
     private bool isWaiting = false;
+    private bool isLeavingScene = false;
     private Animator anim;
 
     void Start()
@@ -35,8 +36,7 @@ public class NpcRandomPatrol : MonoBehaviour
 
     void Update()
     {
-        // ¡Ú [¼öÁ¤µÊ] ¹®Á¦ÀÇ ¿¡·¯¸¦ À¯¹ßÇÏ´ø GetBool ÄÚµå¸¦ ¿ÏÀüÈ÷ »èÁ¦Çß½À´Ï´Ù!
-        // PlayerLaser¿¡¼­ ·¹ÀÌÀú¸¦ ½î¸é ¾îÂ÷ÇÇ ÀÌ ½ºÅ©¸³Æ® ÀÚÃ¼¸¦ ²ô±â ¶§¹®¿¡ ¿¡·¯¸¦ À¯¹ßÇÏ¸ç ¿©±â¼­ °Ë»çÇÒ ÇÊ¿ä°¡ ¾ø½À´Ï´Ù.
+        if (isLeavingScene) return;
 
         if (isWaiting)
         {
@@ -101,9 +101,6 @@ public class NpcRandomPatrol : MonoBehaviour
         isWaiting = false;
     }
 
-    // =====================================================================
-    // ¡Ú ¾Ö´Ï¸ŞÀÌÅÍ¿¡ ÇØ´ç ÆÄ¶ó¹ÌÅÍ°¡ Á¸ÀçÇÏ´ÂÁö °Ë»çÇÏ´Â ¾ÈÀüÀåÄ¡
-    // =====================================================================
     private bool HasParameter(string paramName)
     {
         if (anim == null) return false;
@@ -152,29 +149,82 @@ public class NpcRandomPatrol : MonoBehaviour
         }
     }
 
-    // ¡Ú ÇÃ·¹ÀÌ¾î°¡ ÀÌ°åÀ» ¶§ (¸ğµç ³²ÇĞ»ı °øÅë Ã³¸®Áö¸¸ ÇÇ¿¡¸£¸¸ ¹«Áö°³ ÇÏÆ® µå·Ó)
+    public void WalkAwayAndDestroy()
+    {
+        // NPC Spawnerë‚˜ ì»·ì‹  ë•Œë¬¸ì— í‡´ì¥í•´ì•¼ í•  ë•Œ ê±·ê¸° ìƒíƒœë¡œ í™”ë©´ ë°–ìœ¼ë¡œ ë‚˜ê°
+        if (this != null && gameObject != null)
+        {
+            StartCoroutine(LeaveSceneCoroutine());
+        }
+    }
+
+    private System.Collections.IEnumerator LeaveSceneCoroutine()
+    {
+        isLeavingScene = true;
+        
+        if (anim != null)
+        {
+            if (HasParameter("isBurn")) anim.SetBool("isBurn", false);
+            if (HasParameter("isYellowBurn")) anim.SetBool("isYellowBurn", false);
+            anim.SetBool("isWalking", true);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        float moveSpeed = 5.0f;
+        float direction = 1f;
+
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            if (transform.position.x >= mainCam.transform.position.x)
+            {
+                direction = 1f;
+            }
+            else
+            {
+                direction = -1f;
+            }
+        }
+
+        Vector3 currentScale = transform.localScale;
+        currentScale.x = Mathf.Abs(currentScale.x) * direction;
+        transform.localScale = currentScale;
+
+        float time = 0f;
+        while (time < 2f)
+        {
+            time += Time.deltaTime;
+            transform.Translate(Vector3.right * direction * moveSpeed * Time.deltaTime, Space.World);
+            yield return null;
+        }
+
+        Destroy(gameObject);
+    }
+
+    // â˜… í”Œë ˆì´ì–´ê°€ ì´ê²¼ì„ ë•Œ (ëª¨ë“  ë‚¨í•™ìƒ ê³µí†µ ì²˜ë¦¬ì§€ë§Œ í”¼ì—ë¥´ë§Œ ë¬´ì§€ê°œ í•˜íŠ¸ ë“œë¡­)
     public void DropHeartAndDie()
     {
         if (heartPrefab != null)
         {
-            // ÇÇ¿¡¸£ Ã¼Å©¹Ú½º°¡ ÄÑÁ®ÀÖµç ²¨Á®ÀÖµç, ÀÎ½ºÆåÅÍ¿¡ Á÷Á¢ ³Ö¾îµĞ ±× ÇÏÆ® ÇÁ¸®ÆÕÀ» »ı¼ºÇÕ´Ï´Ù.
+            // í”¼ì—ë¥´ ì²´í¬ë°•ìŠ¤ê°€ ì¼œì ¸ìˆë“  êº¼ì ¸ìˆë“ , ì¸ìŠ¤í™í„°ì— ì§ì ‘ ë„£ì–´ë‘” ê·¸ í•˜íŠ¸ í”„ë¦¬íŒ¹ì„ ìƒì„±í•©ë‹ˆë‹¤.
             GameObject droppedHeart = Instantiate(heartPrefab, transform.position, Quaternion.identity);
 
-            // ¡Ú [ÇÙ½É] ÇÇ¿¡¸£ÀÏ °æ¿ì¿¡¸¸ ÇÏÆ®ÀÇ ½ºÇÁ¶óÀÌÆ®¸¦ ¹«Áö°³ ÇÏÆ®(Heart_9)·Î °­Á¦ º¯°æÇÕ´Ï´Ù.
+            // â˜… [í•µì‹¬] í”¼ì—ë¥´ì¼ ê²½ìš°ì—ë§Œ í•˜íŠ¸ì˜ ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ë¬´ì§€ê°œ í•˜íŠ¸(Heart_9)ë¡œ ê°•ì œ ë³€ê²½í•©ë‹ˆë‹¤.
             if (isPierre)
             {
-                // »ı¼ºµÈ ÇÏÆ® ¿ÀºêÁ§Æ®¿¡¼­ DroppedHeart ½ºÅ©¸³Æ®¸¦ Ã£½À´Ï´Ù.
+                // ìƒì„±ëœ í•˜íŠ¸ ì˜¤ë¸Œì íŠ¸ì—ì„œ DroppedHeart ìŠ¤í¬ë¦½íŠ¸ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
                 DroppedHeart heartScript = droppedHeart.GetComponent<DroppedHeart>();
                 if (heartScript == null) heartScript = droppedHeart.GetComponentInChildren<DroppedHeart>();
 
                 if (heartScript != null)
                 {
-                    // PlayerLaser¿¡¼­ ÁÖ¸Ó´Ï ¿¬µ¿ Ã³¸®¸¦ ÇÏ¹Ç·Î, 
-                    // ÇÏÆ®°¡ »ı¼ºµÈ Á÷ÈÄ SpriteRenderer¸¦ ¹«Áö°³ ½ºÇÁ¶óÀÌÆ®·Î ¹Ù·Î µ¤¾î¾º¿ö Áİ´Ï´Ù.
+                    // PlayerLaserì—ì„œ ì£¼ë¨¸ë‹ˆ ì—°ë™ ì²˜ë¦¬ë¥¼ í•˜ë¯€ë¡œ, 
+                    // í•˜íŠ¸ê°€ ìƒì„±ëœ ì§í›„ SpriteRendererë¥¼ ë¬´ì§€ê°œ ìŠ¤í”„ë¼ì´íŠ¸ë¡œ ë°”ë¡œ ë®ì–´ì”Œì›Œ ì¤ë‹ˆë‹¤.
                     SpriteRenderer heartSR = droppedHeart.GetComponent<SpriteRenderer>();
                     if (heartSR == null) heartSR = droppedHeart.GetComponentInChildren<SpriteRenderer>();
 
-                    // ÇÁ·ÎÁ§Æ® Ã¢ÀÇ "Heart_9" ½ºÇÁ¶óÀÌÆ® ÅØ½ºÃ³¸¦ ÀÎ½ºÆåÅÍ·Î ¹Ş¾Æ¿Í¼­ ²È¾ÆÁİ´Ï´Ù.
+                    // í”„ë¡œì íŠ¸ ì°½ì˜ "Heart_9" ìŠ¤í”„ë¼ì´íŠ¸ í…ìŠ¤ì²˜ë¥¼ ì¸ìŠ¤í™í„°ë¡œ ë°›ì•„ì™€ì„œ ê½‚ì•„ì¤ë‹ˆë‹¤.
                     if (pierreHeartSprite != null && heartSR != null)
                     {
                         heartSR.sprite = pierreHeartSprite;
