@@ -13,6 +13,8 @@ namespace MiniTeam.Tetris
 
         [Header("클리어 조건 세팅")]
         public int targetImpactCount = 4;
+        public float minImpactHeight = 0f;
+        public float maxImpactHeight = 10f;
         private int currentImpactCount = 0;
 
         [Header("사운드 세팅")]
@@ -63,7 +65,7 @@ namespace MiniTeam.Tetris
             isCutscenePlaying = true;
 
             // 1. 타격 지점 및 유효 범위 체크 (Y: 7.0 ~ 9.0)
-            bool isValidRange = spawnPos.y >= 7.0f && spawnPos.y <= 9.0f;
+            bool isValidRange = spawnPos.y >= minImpactHeight && spawnPos.y <= maxImpactHeight;
 
             // 시각적 디졸브 좌표는 Y: 8.0으로 고정
             Vector3 impactPoint = new Vector3(-2.3f, 8.0f, 0f);
