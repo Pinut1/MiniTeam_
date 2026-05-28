@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using MiniTeam.Core;
 /// <summary>
 /// 모든 UI패널 표시/숨김과 키 입력을 담당
 /// 1. ESC/Q/TAB 키 입력 감지 -> 현재 상태에 맞게 처리
@@ -108,8 +109,6 @@ public class SpongeUIManager : MonoBehaviour
     public bool IsPlayingInnocence { get; private set; }
     public bool IsPlayingGavel { get; private set; }
 
-    //[Header("옵션 패널")]
-    //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
 
     private void Awake()
     {
@@ -136,7 +135,6 @@ public class SpongeUIManager : MonoBehaviour
         evidencePnl.SetActive(false);
         if (recordPnl != null) recordPnl.SetActive(false);
         if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
-        // opitionsPnl.SetActive(true);
     }
 
     // ── 이벤트 구독 ──────────────────────────────────────────────
@@ -313,6 +311,11 @@ public class SpongeUIManager : MonoBehaviour
     // ── 키 입력 처리 ─────────────────────────────────────────────
     private void Update()
     {
+        if (OptionsUIManager.Instance != null
+            && OptionsUIManager.Instance.optionsPanel != null
+            && OptionsUIManager.Instance.optionsPanel.activeSelf)
+            return;
+
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
 
         if (SpongeDialogueManager.Instance.IsChoiceActive)
@@ -629,22 +632,14 @@ public class SpongeUIManager : MonoBehaviour
             SpongeGameManager.Instance.ChangeState(stateBeforeEvidence);
     }
 
-    /*
     // ── 옵션 패널 ────────────────────────────────────────────────
-    /// <summary>
-    /// 옵션 패널 열기/닫기
-    /// </summary>
     public void ToggleOptionsPanel()
     {
-        optionsPnl.SetActive(!optionsPnl.activeSelf);
+        OptionsUIManager.Instance?.Toggle();
     }
-   
-    /// <summary>
-    /// 옵션 패널 닫기
-    /// </summary>
+
     public void CloseOptionsPanel()
     {
-        optionsPnl.SetActive(false);
-    } 
-    */
+        OptionsUIManager.Instance?.Close();
+    }
 }
