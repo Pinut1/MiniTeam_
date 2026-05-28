@@ -43,6 +43,16 @@ namespace MiniTeam.Core
         {
             if (Input.GetKeyDown(KeyCode.Escape))
                 Toggle();
+
+            // R키를 누르면 강제로 미니게임 실패(Regame 효과) 처리
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
+                {
+                    ForceClose();
+                    MiniGameManager.Instance.OnMiniGameFail();
+                }
+            }
         }
 
         // ── 패널 열기/닫기 ───────────────────────
