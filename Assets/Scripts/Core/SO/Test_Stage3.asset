@@ -20,7 +20,7 @@ MonoBehaviour:
   - text: "\uBFCC\uC9C1!!!! \uC544 \uC26C\uC6D0\uD574~~"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: DDong
-    voiceClip: {fileID: 8300000, guid: 64099d88fb853ac4987ffac739b2cdf3, type: 3}
+    voiceClip: {fileID: 8300000, guid: d0f9b80e14d4b4442aea2f9d02e9812d, type: 3}
   - text: "\uC557. \uBC30\uAC00 \uBD88\uB7EC \uADF8\uB9CC \uC2E4\uC218\uB97C \uD588\uB2E4\uCE58...!!!"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: 
@@ -28,7 +28,7 @@ MonoBehaviour:
   - text: "\uD639\uC2DC..."
     expressionSprite: {fileID: 21300000, guid: f31671a02ea42a947ab7234273886b75, type: 3}
     animationTriggerName: 
-    voiceClip: {fileID: 0}
+    voiceClip: {fileID: 8300000, guid: 64099d88fb853ac4987ffac739b2cdf3, type: 3}
   - text: "\uC5D0\uC787!!!"
     expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
     animationTriggerName: 

@@ -67,30 +67,33 @@ namespace MiniTeam.Core
             if (optionsAnimator != null) optionsAnimator.SetTrigger("TurnOn");
         }
 
-        public void Close()
+        public void Close(System.Action onClosed = null)
         {
             isOpen = false;
-            Time.timeScale = 1f;
 
             if (optionsAnimator != null)
             {
                 optionsAnimator.SetTrigger("TurnOff");
                 if (closeCoroutine != null) StopCoroutine(closeCoroutine);
-                closeCoroutine = StartCoroutine(DisablePanelAfterAnimation());
+                closeCoroutine = StartCoroutine(DisablePanelAfterAnimation(onClosed));
             }
             else
             {
+                Time.timeScale = 1f;
                 if (optionsPanel != null) optionsPanel.SetActive(false);
+                onClosed?.Invoke();
             }
         }
 
-        private System.Collections.IEnumerator DisablePanelAfterAnimation()
+        private System.Collections.IEnumerator DisablePanelAfterAnimation(System.Action onClosed)
         {
             // Time.timeScale이 0인 상태에서 동작했을 수 있으므로 Realtime으로 대기합니다.
             yield return new WaitForSecondsRealtime(closeDelay);
-            if (!isOpen && optionsPanel != null)
+            if (!isOpen)
             {
-                optionsPanel.SetActive(false);
+                Time.timeScale = 1f;
+                if (optionsPanel != null) optionsPanel.SetActive(false);
+                onClosed?.Invoke();
             }
             closeCoroutine = null;
         }
@@ -99,6 +102,7 @@ namespace MiniTeam.Core
         public void ForceClose()
         {
             isOpen = false;
+            Time.timeScale = 1f; // 안전하게 시간 복원
             if (closeCoroutine != null)
             {
                 StopCoroutine(closeCoroutine);
@@ -115,11 +119,13 @@ namespace MiniTeam.Core
         // "나가기" 버튼 — 미니게임 중이면 허브로, 허브면 앱 종료
         public void OnExitClicked()
         {
-            Close();
-            if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
-                MiniGameManager.Instance.ExitMiniGame();
-            else
-                Application.Quit();
+            Close(() =>
+            {
+                if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
+                    MiniGameManager.Instance.ExitMiniGame();
+                else
+                    Application.Quit();
+            });
         }
 
         // ── 볼륨 슬라이더 ─────────────────────────
