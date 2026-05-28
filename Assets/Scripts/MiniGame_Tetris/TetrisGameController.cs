@@ -42,10 +42,10 @@ namespace MiniTeam.Tetris
                     if (SpawnTetromino.Instance != null)
                         SpawnTetromino.Instance.NewTetromino();
 
-                    // BGM 재생 연동
-                    if (bgmClip != null && SoundManager.Instance != null)
+                    // BGM 재생 연동 (로컬 AudioManager Facade 사용)
+                    if (bgmClip != null && AudioManager.Instance != null)
                     {
-                        SoundManager.Instance.PlayBGM(bgmClip);
+                        AudioManager.Instance.PlayBGM(bgmClip);
                     }
                 }));
             }
@@ -124,9 +124,9 @@ namespace MiniTeam.Tetris
         {
             Debug.Log("[Tetris] Game Clear!");
             CleanupRemainingBlocks();
-            if (SoundManager.Instance != null)
+            if (AudioManager.Instance != null)
             {
-                SoundManager.Instance.StopBGM();
+                AudioManager.Instance.StopBGM();
             }
             MiniGameManager.Instance?.OnMiniGameClear();
         }
@@ -134,9 +134,9 @@ namespace MiniTeam.Tetris
         public void OnGameFail()
         {
             CleanupRemainingBlocks();
-            if (SoundManager.Instance != null)
+            if (AudioManager.Instance != null)
             {
-                SoundManager.Instance.StopBGM();
+                AudioManager.Instance.StopBGM();
             }
             MiniGameManager.Instance?.OnMiniGameFail();
         }
