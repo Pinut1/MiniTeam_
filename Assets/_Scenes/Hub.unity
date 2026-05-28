@@ -8627,8 +8627,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 164.005, y: -111.005005}
-  m_SizeDelta: {x: 288.01, y: 72.01}
+  m_AnchoredPosition: {x: 164.005, y: -116.520004}
+  m_SizeDelta: {x: 288.01, y: 83.04}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2018284334
 MonoBehaviour:
@@ -8653,8 +8653,8 @@ MonoBehaviour:
   m_text: "\uAC00\uB098\uB2E4\uB77C\uB9C8\uBC14\uC0AC\uC544\n \uC790\uCC28\uCE74\uD0C0
     \uD30C\uD558 \n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3ff7bbabcd569f24b80254a4fb8e013b, type: 2}
-  m_sharedMaterial: {fileID: -7626581910164331711, guid: 3ff7bbabcd569f24b80254a4fb8e013b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d05341f78f08468459f796062838659b, type: 2}
+  m_sharedMaterial: {fileID: -5204273206140258790, guid: d05341f78f08468459f796062838659b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8769,7 +8769,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 101}
-  m_SizeDelta: {x: 328.01, y: 247.01001}
+  m_SizeDelta: {x: 328.01, y: 258.04}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2110867994
 MonoBehaviour:
