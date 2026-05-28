@@ -181,7 +181,7 @@ public class SpongeDialogueManager : MonoBehaviour
 
     private static readonly System.Collections.Generic.HashSet<string> gavelLineIds = new()
     {
-        "re_press_choice_00_09", "re_press_choice_02_08", "evidence_01_08", "evidence_02_17", "ending_07"
+        "re_press_choice_00_09", "re_press_choice_02_09", "evidence_01_09", "evidence_02_18", "ending_08"
     };
 
     IEnumerator ShowLineWithGavel(SpongeDialogueLine line)
