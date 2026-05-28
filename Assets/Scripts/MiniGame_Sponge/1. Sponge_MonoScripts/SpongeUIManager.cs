@@ -448,7 +448,10 @@ public class SpongeUIManager : MonoBehaviour
                       && sourceLine.validRecordEvidenceIds.Length > 0
                       && System.Array.Exists(sourceLine.validRecordEvidenceIds, id => id == evidenceId);
         if (isCorrect)
+        {
+            SpongeGameManager.Instance.RegisterEvidence(evidenceId);
             SpongeDialogueManager.Instance.ShowLine(sourceLine.nextLineId);
+        }
         else
             SpongeDialogueManager.Instance.ShowLine("evidence_fail_default_01");
     }
