@@ -1,33 +1,65 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class HeartUIManager : MonoBehaviour
 {
     public static HeartUIManager instance;
 
     [Header("UI Settings")]
-    public Image[] heartSlots;             // 10°³ÀÇ UI ½½·Ô
-    public Sprite[] possibleHeartSprites;  // µîÀå °¡´ÉÇÑ ÇÏÆ® Á¾·ùµé
-    public float uncollectedAlpha = 0.3f;  // ¹Ì¼öÁı »óÅÂ Åõ¸íµµ
+    public Image[] heartSlots;
+    public float uncollectedAlpha = 0.3f;
+    public Sprite[] possibleHeartSprites;
+
+    [Header("ë³´ìŠ¤ í˜ì´ì¦ˆìš© í•˜íŠ¸ ìŠ¤í‚¨")]
+    public Sprite rainbowHeartSprite;
+    public Sprite vanillaWhiteHeartSprite;
+
+    [Header("ìµœì¢… ë§ˆìˆ ë´‰ UI ì•„ì´ì½˜")]
+    public Sprite chocolatStickIcon;
+    public Sprite vanillaStickIcon;
+
+    [Header("ë³´ìŠ¤ í˜ì´ì¦ˆ UI í¬ê¸°/ìœ„ì¹˜ ì„¤ì •")]
+    public float bossHeartScale = 1.8f;
+    public float magicStickScale = 2.8f;
+    public float centerSpacing = 70f;
+
+    [Header("ìš”ìˆ ë´‰ í™•ëŒ€ ì—°ì¶œ ì„¤ì •")]
+    public float zoomDuration = 1.5f;        // í™•ëŒ€+ì´ë™ ì‹œê°„
+    public float finalZoomScale = 5f;        // ìµœì¢… í™•ëŒ€ ë°°ìœ¨
+    public float delayBetweenSticks = 0f;    // ë‘ ë´‰ ì‹œê°„ì°¨ (0ì´ë©´ ë™ì‹œ)
+    public float stickMergeSpacing = 40f;    // ì¤‘ì•™ì—ì„œ ë‘ ë´‰ ì‚¬ì´ ê°„ê²©
 
     private bool[] isCollected;
+    private bool isBossPhaseMode = false;
+
+    // â˜… ì›ë˜ ìœ„ì¹˜/í¬ê¸° ì €ì¥ìš© (ì—°ì¶œ í›„ ë¦¬ì…‹ì— ì‚¬ìš©)
+    private Vector3[] originalPositions;
+    private Vector3[] originalScales;
+    private Vector3 boardCenterPos;
+
+    [Header("ì¢…ë£Œ ì—°ì¶œ")]
+    public GameObject finalMagicStickObject;
+    public float fadeOutDuration = 1.5f; // í˜ì´ë“œ ì•„ì›ƒ ê±¸ë¦¬ëŠ” ì‹œê°„ (ê¸¸ìˆ˜ë¡ ì²œì²œíˆ)
+    public float postFadeDelay = 1.0f;
 
     void Awake()
     {
         if (instance == null) instance = this;
-
-        // °ÔÀÓ ½ÃÀÛ ½Ã ÇÏÆ® ½½·Ô °³¼ö¸¸Å­ isCollected ¹è¿­ ¹æÀ» ¹«Á¶°Ç »ı¼ºÇÕ´Ï´Ù!
         if (heartSlots != null)
         {
             isCollected = new bool[heartSlots.Length];
+            originalPositions = new Vector3[heartSlots.Length];
+            originalScales = new Vector3[heartSlots.Length];
 
-            // ½ÃÀÛÇÒ ¶§ ¸ğµç UI ÇÏÆ®¸¦ ¹İÅõ¸íÇÏ°Ô ¸¸µì´Ï´Ù.
             for (int i = 0; i < heartSlots.Length; i++)
             {
                 if (heartSlots[i] != null)
                 {
                     SetAlpha(heartSlots[i], uncollectedAlpha);
-                    isCollected[i] = false; // ÀüºÎ ¼öÁı ¾È µÈ »óÅÂ·Î ÃÊ±âÈ­
+                    isCollected[i] = false;
+                    originalPositions[i] = heartSlots[i].transform.localPosition;
+                    originalScales[i] = heartSlots[i].transform.localScale;
                 }
             }
         }
@@ -35,32 +67,36 @@ public class HeartUIManager : MonoBehaviour
 
     public bool CollectHeart(Sprite collectedSprite)
     {
-        // ÁÖ¿ö¸ÔÀº ÇÏÆ® ¾ÆÀÌÅÛ¿¡ ±×¸²ÀÌ ¾Æ¿¹ ¾øÀ¸¸é Á¶¿ëÈ÷ Ãë¼Ò
-        if (collectedSprite == null)
+        if (collectedSprite == null) return false;
+
+        if (isBossPhaseMode)
         {
+            if (rainbowHeartSprite != null && collectedSprite.name == rainbowHeartSprite.name)
+            {
+                SetAlpha(heartSlots[0], 1f);
+                isCollected[0] = true;
+                return true;
+            }
+            else if (collectedSprite.name.Contains("White") || (vanillaWhiteHeartSprite != null && collectedSprite.name == vanillaWhiteHeartSprite.name))
+            {
+                heartSlots[1].sprite = collectedSprite;
+                SetAlpha(heartSlots[1], 1f);
+                isCollected[1] = true;
+                return true;
+            }
             return false;
         }
 
-        // È¤½Ã¶óµµ isCollected ¹è¿­ÀÌ ³¯¾Æ°¬´Ù¸é °­Á¦ Àç»ı¼º
-        if (isCollected == null || isCollected.Length != heartSlots.Length)
-        {
-            isCollected = new bool[heartSlots.Length];
-        }
-
-        // 10°³ÀÇ UI º¸µåÆÇ Ä­À» ÇÏ³ªÇÏ³ª °Ë»çÇÕ´Ï´Ù.
         for (int i = 0; i < heartSlots.Length; i++)
         {
-            // UI ½½·Ô ÀÚÃ¼°¡ ºñ¾îÀÖ°Å³ª, Source Image¿¡ ±×¸²ÀÌ ¾È µé¾îÀÖÀ¸¸é °Ç³Ê¶Ü!
             if (heartSlots[i] != null && heartSlots[i].sprite != null)
             {
-                // ¾ÆÁ÷ ¼öÁı ¾È ÇÑ Ä­ÀÌ°í, ¸ÔÀº ÇÏÆ®¶û ±×¸² ÀÌ¸§ÀÌ ¶È°°´Ù¸é!
                 if (!isCollected[i] && heartSlots[i].sprite.name == collectedSprite.name)
                 {
-                    isCollected[i] = true;         // ¼öÁı ¿Ï·á Ã³¸®
-                    SetAlpha(heartSlots[i], 1f);   // 100% ºÒÅõ¸íÇÏ°Ô ºÒ ÄÑ±â
-
+                    isCollected[i] = true;
+                    SetAlpha(heartSlots[i], 1f);
                     CheckAllHeartsCollected();
-                    return true; // UI Ã¤¿ì±â ¼º°ø!
+                    return true;
                 }
             }
         }
@@ -71,9 +107,199 @@ public class HeartUIManager : MonoBehaviour
     {
         for (int i = 0; i < isCollected.Length; i++)
         {
-            if (!isCollected[i]) return; // ÇÏ³ª¶óµµ ¾È ÄÑÁø °Ô ÀÖÀ¸¸é ¹Ù·Î Á¾·á
+            if (!isCollected[i]) return;
         }
-        FindAnyObjectByType<PlayerLaser>().TriggerAllNpcsExit();
+        SetupBossHeartsUI();
+
+        PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
+        if (laser != null) laser.TriggerAllNpcsExit();
+    }
+
+    private void SetupBossHeartsUI()
+    {
+        isBossPhaseMode = true;
+
+        if (heartSlots.Length > 0 && heartSlots[0] != null)
+        {
+            LayoutGroup layout = heartSlots[0].transform.parent.GetComponent<LayoutGroup>();
+            if (layout != null) layout.enabled = false;
+        }
+
+        // ë³´ë“œíŒ ì •ì¤‘ì•™ ì¢Œí‘œ ê³„ì‚° ë° ì €ì¥
+        boardCenterPos = Vector3.zero;
+        int activeCount = 0;
+        for (int i = 0; i < heartSlots.Length; i++)
+        {
+            if (heartSlots[i] != null)
+            {
+                boardCenterPos += heartSlots[i].transform.localPosition;
+                activeCount++;
+            }
+        }
+        if (activeCount > 0) boardCenterPos /= activeCount;
+
+        for (int i = 0; i < heartSlots.Length; i++)
+        {
+            isCollected[i] = false;
+            if (heartSlots[i] != null)
+            {
+                heartSlots[i].sprite = null;
+                SetAlpha(heartSlots[i], 0f);
+            }
+        }
+
+        if (heartSlots.Length > 0 && heartSlots[0] != null && rainbowHeartSprite != null)
+        {
+            heartSlots[0].sprite = rainbowHeartSprite;
+            SetAlpha(heartSlots[0], uncollectedAlpha);
+            heartSlots[0].transform.localPosition = boardCenterPos + new Vector3(-centerSpacing, 0f, 0f);
+            heartSlots[0].transform.localScale = new Vector3(bossHeartScale, bossHeartScale, 1f);
+        }
+
+        if (heartSlots.Length > 1 && heartSlots[1] != null && vanillaWhiteHeartSprite != null)
+        {
+            heartSlots[1].sprite = vanillaWhiteHeartSprite;
+            SetAlpha(heartSlots[1], uncollectedAlpha);
+            heartSlots[1].transform.localPosition = boardCenterPos + new Vector3(centerSpacing, 0f, 0f);
+            heartSlots[1].transform.localScale = new Vector3(bossHeartScale, bossHeartScale, 1f);
+        }
+    }
+
+    public void ChangeHeartToStickUI(bool isChocolat)
+    {
+        if (isChocolat)
+        {
+            if (heartSlots[0] != null && chocolatStickIcon != null)
+            {
+                heartSlots[0].sprite = chocolatStickIcon;
+                heartSlots[0].transform.localScale = new Vector3(magicStickScale, magicStickScale, 1f);
+            }
+        }
+        else
+        {
+            if (heartSlots[1] != null && vanillaStickIcon != null)
+            {
+                heartSlots[1].sprite = vanillaStickIcon;
+                heartSlots[1].transform.localScale = new Vector3(magicStickScale, magicStickScale, 1f);
+            }
+        }
+    }
+
+    // â˜…â˜…â˜… [ì¶”ê°€] ë‘ ìš”ìˆ ë´‰ì´ í™”ë©´ ì¤‘ì•™ìœ¼ë¡œ í™•ëŒ€ë˜ë©° ì´ë™í•˜ëŠ” ì—°ì¶œ â˜…â˜…â˜…
+    public void PlaySticksZoomToCenter(System.Action onComplete = null)
+    {
+        StartCoroutine(ZoomSticksToCenterCoroutine(onComplete));
+    }
+
+    private IEnumerator ZoomSticksToCenterCoroutine(System.Action onComplete)
+    {
+        if (heartSlots.Length < 2 || heartSlots[0] == null || heartSlots[1] == null)
+        {
+            onComplete?.Invoke();
+            yield return null;
+        }
+
+        RectTransform pinkRect = heartSlots[0].GetComponent<RectTransform>();
+        RectTransform blueRect = heartSlots[1].GetComponent<RectTransform>();
+
+        // 1. ìœ„ì¹˜ ê³„ì‚° (ì¤‘ì•™ìœ¼ë¡œ ëª¨ìœ¼ê¸° ìœ„í•œ íƒ€ê²Ÿ ì„¤ì •)
+        Vector2 pos0 = pinkRect.anchoredPosition;
+        Vector2 pos1 = blueRect.anchoredPosition;
+        Vector2 spacingVector = pos1 - pos0;
+        Vector2 pinkTargetPos = -spacingVector / 2f;
+        Vector2 blueTargetPos = spacingVector / 2f;
+
+        // 2. ì´ë™ ì‹œì‘ (ì´ ë¶€ë¶„ì„ ë‹¤ì‹œ ë„£ì–´ì¤˜ì•¼ ì›€ì§ì…ë‹ˆë‹¤!)
+        Coroutine pinkRoutine = StartCoroutine(ZoomSingleStick(pinkRect, pinkTargetPos, finalZoomScale, zoomDuration));
+
+        if (delayBetweenSticks > 0)
+            yield return new WaitForSeconds(delayBetweenSticks);
+
+        Coroutine blueRoutine = StartCoroutine(ZoomSingleStick(blueRect, blueTargetPos, finalZoomScale, zoomDuration));
+
+        // 3. ì´ë™ì´ ì™„ì „íˆ ëë‚  ë•Œê¹Œì§€ ëŒ€ê¸°
+        yield return new WaitForSeconds(zoomDuration);
+
+        // 4. ì´ì œ í˜ì´ë“œ ì•„ì›ƒ ì‹¤í–‰
+        yield return StartCoroutine(FadeOutHearts(fadeOutDuration));
+
+        // 5. ëœ¸ë“¤ì´ê¸°
+        yield return new WaitForSeconds(postFadeDelay);
+
+        // 6. MagicStick í™œì„±í™”
+        if (finalMagicStickObject != null)
+        {
+            finalMagicStickObject.SetActive(true);
+        }
+
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator FadeOutHearts(float duration)
+    {
+        float elapsed = 0f;
+        Color[] startColors = new Color[2];
+
+        // í˜„ì¬ ì•ŒíŒŒê°’ ì €ì¥
+        for (int i = 0; i < 2; i++)
+            if (heartSlots[i] != null) startColors[i] = heartSlots[i].color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (heartSlots[i] != null)
+                {
+                    Color c = startColors[i];
+                    c.a = alpha;
+                    heartSlots[i].color = c;
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private IEnumerator ZoomSingleStick(RectTransform stick, Vector2 targetPos, float targetScaleValue, float duration)
+    {
+        Vector2 startPos = stick.anchoredPosition;
+        Vector3 startScale = stick.localScale;
+        Vector3 endScale = new Vector3(targetScaleValue, targetScaleValue, 1f);
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // EaseOutQuad: ì²˜ìŒ ë¹ ë¥´ê³  ëì—ì„œ ë¶€ë“œëŸ½ê²Œ ê°ì†
+            float easeT = 1f - (1f - t) * (1f - t);
+
+            stick.anchoredPosition = Vector2.Lerp(startPos, targetPos, easeT);
+            stick.localScale = Vector3.Lerp(startScale, endScale, easeT);
+
+            yield return null;
+        }
+
+        // ìµœì¢…ê°’ í™•ì •
+        stick.anchoredPosition = targetPos;
+        stick.localScale = endScale;
+    }
+
+    // â˜… ì—°ì¶œ í›„ ì›ë˜ ìƒíƒœë¡œ ë¦¬ì…‹ (í•„ìš” ì‹œ í˜¸ì¶œ)
+    public void ResetSticksToOriginal()
+    {
+        for (int i = 0; i < heartSlots.Length; i++)
+        {
+            if (heartSlots[i] != null)
+            {
+                heartSlots[i].transform.localPosition = originalPositions[i];
+                heartSlots[i].transform.localScale = originalScales[i];
+            }
+        }
     }
 
     private void SetAlpha(Image img, float alpha)

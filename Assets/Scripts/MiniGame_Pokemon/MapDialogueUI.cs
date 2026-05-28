@@ -38,20 +38,40 @@ namespace MiniTeam.Pokemon
 
         public IEnumerator Show(string message)
         {
+            Debug.Log($"[MapDialogueUI] Show 시작: {message}");
             IsShowing = true;
             if (panel != null)
             {
-                panel.transform.SetAsLastSibling(); // 블랙아웃 위에 표시되도록 항상 최상위로
+                panel.transform.SetAsLastSibling(); // 블랙아웃 캔버스보다 위로
                 panel.SetActive(true);
+                Debug.Log("[MapDialogueUI] panel 활성화 됨");
             }
-            if (dialogueText != null) dialogueText.text = message;
+            else
+            {
+                Debug.LogWarning("[MapDialogueUI] panel이 NULL입니다! 화면에 UI가 보이지 않습니다.");
+            }
+
+            if (dialogueText != null) 
+            {
+                dialogueText.text = message;
+            }
+            else
+            {
+                Debug.LogWarning("[MapDialogueUI] dialogueText가 NULL입니다! 대사가 표시되지 않습니다.");
+            }
+
             if (confirmIndicator != null) confirmIndicator.SetActive(false);
 
+            Debug.Log("[MapDialogueUI] 0.3초 대기 시작");
             yield return new WaitForSeconds(0.3f); // 입력 씹힘 방지
+            Debug.Log("[MapDialogueUI] 0.3초 대기 끝. 키 입력 대기 시작");
 
             if (confirmIndicator != null) confirmIndicator.SetActive(true);
             waitingForInput = true;
+            
             yield return new WaitUntil(() => !waitingForInput);
+            
+            Debug.Log("[MapDialogueUI] 키 입력 완료! Show 코루틴 종료");
 
             if (panel != null) panel.SetActive(false);
             IsShowing = false;

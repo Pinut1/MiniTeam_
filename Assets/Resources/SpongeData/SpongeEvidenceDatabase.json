@@ -35,6 +35,12 @@
       "evidenceName": "명세표",
       "description": "'명세표' 안에 4월 26일이라고 적혀있다.\n자세히 보면 오전 10시 31분이라 적혀있다.\n ",
       "iconSpr": "Sponge_Evidence/statement"
+    },
+    {
+      "id": "sponge",
+      "evidenceName": "스폰지밥의 스펀지",
+      "description": "스폰지밥에게서 나온 스펀지다.",
+      "iconSpr": "Sponge_Evidence/sponge"
     }
   ]
 }

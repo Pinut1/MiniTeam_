@@ -7,15 +7,15 @@ public class DroppedHeart : MonoBehaviour
     private SpriteRenderer sr;
     private bool isCollected = false;
 
-    // ·¹ÀÌ´õ ¹üÀ§ (Update ½ºÄµ ¹æ½Ä À¯Áö)
+    // ë ˆì´ë” ë²”ìœ„ (Update ìŠ¤ìº” ë°©ì‹ ìœ ì§€)
     public float pickupRadius = 0.8f;
 
     public bool isPierreHeart = false;
 
-    [Header("¹Ù´Ò¶ó Á¤È­ ÇÏÆ® ¼³Á¤")]
-    public bool isBanillaWhiteHeart = false; // ¡Ú Ãß°¡µÊ: ÀÌ ÇÏÆ®°¡ ¹Ù´Ò¶ó°¡ ¶³¾î¶ß¸° ÇÏ¾á ÇÏÆ®ÀÎÁö ¿©ºÎ
+    [Header("ë°”ë‹ë¼ ì •í™” í•˜íŠ¸ ì„¤ì •")]
+    public bool isBanillaWhiteHeart = false; // â˜… ì¶”ê°€ë¨: ì´ í•˜íŠ¸ê°€ ë°”ë‹ë¼ê°€ ë–¨ì–´ëœ¨ë¦° í•˜ì–€ í•˜íŠ¸ì¸ì§€ ì—¬ë¶€
 
-    [Header("ÇÇ¿¡¸£ ÀÌÆåÆ® ¼³Á¤")]
+    [Header("í”¼ì—ë¥´ ì´í™íŠ¸ ì„¤ì •")]
     public GameObject pierreEffectPrefab;
 
     void Awake()
@@ -28,7 +28,7 @@ public class DroppedHeart : MonoBehaviour
         if (sr != null) sr.sprite = heartSprite;
         transform.position = spawnPos;
 
-        // Æ÷µ¿! Æ¢¾ú´Ù°¡ "Àü´Ş¹ŞÀº ¹Ù´Ú¼±"À¸·Î Åö ¶³¾îÁö´Â ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+        // í¬ë™! íŠ€ì—ˆë‹¤ê°€ "ì „ë‹¬ë°›ì€ ë°”ë‹¥ì„ "ìœ¼ë¡œ íˆ­ ë–¨ì–´ì§€ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
         StartCoroutine(DropAnimation(targetHorizontalLineY));
     }
 
@@ -43,7 +43,7 @@ public class DroppedHeart : MonoBehaviour
         float distance = Mathf.Abs(startPos.y - targetY);
         float curveHeight = distance * 0.3f;
 
-        // 1. °øÁß¿¡¼­ ¹Ù´ÚÀ¸·Î Æ÷¹°¼± ±×¸®¸ç ¶³¾îÁö±â
+        // 1. ê³µì¤‘ì—ì„œ ë°”ë‹¥ìœ¼ë¡œ í¬ë¬¼ì„  ê·¸ë¦¬ë©° ë–¨ì–´ì§€ê¸°
         while (time < duration)
         {
             time += Time.deltaTime;
@@ -58,7 +58,7 @@ public class DroppedHeart : MonoBehaviour
             yield return null;
         }
 
-        // 2. ¹Ù´Ú¿¡ ´ê¾ÒÀ» ¶§ Åë Æ¨±â´Â ¸À »ì¸®±â
+        // 2. ë°”ë‹¥ì— ë‹¿ì•˜ì„ ë•Œ í†µ íŠ•ê¸°ëŠ” ë§› ì‚´ë¦¬ê¸°
         time = 0;
         float bounceDuration = 0.1f;
         Vector3 bounceTarget = targetPos + new Vector3(0, 0.15f, 0);
@@ -81,7 +81,7 @@ public class DroppedHeart : MonoBehaviour
         transform.position = targetPos;
     }
 
-    // --- [Update ·¹ÀÌ´õ ½ºÄµ ¹æ½Ä À¯Áö] ---
+    // --- [Update ë ˆì´ë” ìŠ¤ìº” ë°©ì‹ ìœ ì§€] ---
     void Update()
     {
         if (isCollected) return;
@@ -93,62 +93,59 @@ public class DroppedHeart : MonoBehaviour
             if (hit.CompareTag("Player"))
             {
                 isCollected = true;
-                Debug.Log($"ÇÏÆ® È¹µæ ¿Ï·á! ÀÌ ÇÏÆ®°¡ ÇÇ¿¡¸£ ÇÏÆ®ÀÎ°¡¿ä? : {isPierreHeart} / ÇÏ¾á ÇÏÆ®ÀÎ°¡¿ä? : {isBanillaWhiteHeart}");
+                Debug.Log($"í•˜íŠ¸ íšë“ ì™„ë£Œ! ì´ í•˜íŠ¸ê°€ í”¼ì—ë¥´ í•˜íŠ¸ì¸ê°€ìš”? : {isPierreHeart} / í•˜ì–€ í•˜íŠ¸ì¸ê°€ìš”? : {isBanillaWhiteHeart}");
 
-                // --- 1. ÇÇ¿¡¸£ ÇÏÆ® Ã³¸® ·ÎÁ÷ ---
+                // í•˜íŠ¸ íšë“ íš¨ê³¼ìŒ ì¬ìƒ
+                if (BgmManager.Instance != null && BgmManager.Instance.heartCollectSfx != null)
+                {
+                    BgmManager.Instance.PlaySFX(BgmManager.Instance.heartCollectSfx);
+                }
+
+                // --- 1. í”¼ì—ë¥´ í•˜íŠ¸ ì²˜ë¦¬ ë¡œì§ ---
                 if (isPierreHeart)
                 {
-                    if (pierreEffectPrefab != null)
+                    PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
+                    if (laser != null)
                     {
-                        GameObject effect = Instantiate(pierreEffectPrefab, transform.position, Quaternion.identity);
-                        SpriteRenderer[] allRenderers = effect.GetComponentsInChildren<SpriteRenderer>(true);
-                        foreach (SpriteRenderer renderer in allRenderers)
-                        {
-                            renderer.sortingLayerName = "Magic";
-                            renderer.sortingOrder = 10;
-                        }
-                        Destroy(effect, 2.0f);
+                        Debug.Log("PlayerLaserë¥¼ ì°¾ì•„ì„œ TriggerPierreEndingì„ í˜¸ì¶œí•©ë‹ˆë‹¤!");
+                        laser.TriggerPierreEnding(transform.position);
                     }
+                }
+
+                // --- 2. â˜… ë°”ë‹ë¼ í•˜ì–€ í•˜íŠ¸ (ê²Œì„ í´ë¦¬ì–´) ì²˜ë¦¬ ë¡œì§ ---
+                if (isBanillaWhiteHeart)
+                {
+                    Debug.Log("ë°”ë‹ë¼ í•˜ì–€ í•˜íŠ¸ íšë“! ì»·ì‹  ì‹œì‘");
+
+                    // â˜…â˜…â˜… [ì£¼ì˜] ì˜ˆì „ì— ì—¬ê¸°ì— ìˆë˜ MiniGameManager.Instance.OnMiniGameClear(); ì½”ë“œëŠ” ê¼­ ì§€ì›Œì£¼ì„¸ìš”! â˜…â˜…â˜…
 
                     PlayerLaser laser = FindAnyObjectByType<PlayerLaser>();
                     if (laser != null)
                     {
-                        Debug.Log("PlayerLaser¸¦ Ã£¾Æ¼­ TriggerPierreEndingÀ» È£ÃâÇÕ´Ï´Ù!");
-                        laser.TriggerPierreEnding();
-                    }
-                }
-
-                // --- 2. ¡Ú ¹Ù´Ò¶ó ÇÏ¾á ÇÏÆ® (°ÔÀÓ Å¬¸®¾î) Ã³¸® ·ÎÁ÷ ---
-                if (isBanillaWhiteHeart)
-                {
-                    Debug.Log("°ÔÀÓ Å¬¸®¾î");
-
-                    if (MiniGameManager.Instance != null)
-                    {
-                        MiniGameManager.Instance.OnMiniGameClear();
+                        laser.TriggerBanillaEnding(); // ë ˆì´ì €ë¥¼ í†µí•´ ì»·ì‹ ì„ ë°œë™ì‹œí‚µë‹ˆë‹¤.
                     }
                     else
                     {
-                        Debug.LogWarning("MiniGameManager.Instance¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. (µğ¹ö±ë¿ë ·Î±×: MiniGameManager.Instance.OnMiniGameClear();)");
+                        Debug.LogWarning("MiniGameManager.Instanceë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. (ë””ë²„ê¹…ìš© ë¡œê·¸: MiniGameManager.Instance.OnMiniGameClear();)");
                     }
 
-                    // ¡Ú [¼öÁ¤ ¿Ï·á] ÇÃ·¹ÀÌ¾î(¼îÄİ¶ó) °­Á¦ Á¤Áö - ¾À ÀüÃ¼¿¡¼­ ¸ŞÀÎ ÄÄÆ÷³ÍÆ®¸¦ Á÷Á¢ Ã£¾Æ È®½ÇÇÏ°Ô ¸ØÃä´Ï´Ù.
+                    // â˜… [ìˆ˜ì • ì™„ë£Œ] í”Œë ˆì´ì–´(ì‡¼ì½œë¼) ê°•ì œ ì •ì§€ - ì”¬ ì „ì²´ì—ì„œ ë©”ì¸ ì»´í¬ë„ŒíŠ¸ë¥¼ ì§ì ‘ ì°¾ì•„ í™•ì‹¤í•˜ê²Œ ë©ˆì¶¥ë‹ˆë‹¤.
                     PlayerMove playerMove = FindAnyObjectByType<PlayerMove>();
                     if (playerMove != null)
                     {
                         playerMove.enabled = false;
 
-                        // ±âÁ¸¿¡ ¾²½Ã´ø ÀÔ·Â ÃÊ±âÈ­(¹Ì²ô·¯Áü ¹æÁö) ÇÔ¼ö °­Á¦ È£Ãâ
+                        // ê¸°ì¡´ì— ì“°ì‹œë˜ ì…ë ¥ ì´ˆê¸°í™”(ë¯¸ë„ëŸ¬ì§ ë°©ì§€) í•¨ìˆ˜ ê°•ì œ í˜¸ì¶œ
                         try { playerMove.gameObject.SendMessage("ForceWakeUpInputInit", SendMessageOptions.DontRequireReceiver); } catch { }
 
-                        // ¹°¸® ÀÌµ¿ °­Á¦ Á¤Áö (simulated¸¦ ²ôÁö ¾Ê¾Æ¼­ °øÁß¿¡ ¸ØÃß´Â ¹ö±× ¹æÁö)
+                        // ë¬¼ë¦¬ ì´ë™ ê°•ì œ ì •ì§€ (simulatedë¥¼ ë„ì§€ ì•Šì•„ì„œ ê³µì¤‘ì— ë©ˆì¶”ëŠ” ë²„ê·¸ ë°©ì§€)
                         Rigidbody2D playerRb = playerMove.GetComponent<Rigidbody2D>();
                         if (playerRb != null)
                         {
                             playerRb.linearVelocity = Vector2.zero;
                         }
 
-                        // ¾Ö´Ï¸ŞÀÌ¼ÇÀ» °­Á¦·Î Idle »óÅÂ·Î °íÁ¤
+                        // ì• ë‹ˆë©”ì´ì…˜ì„ ê°•ì œë¡œ Idle ìƒíƒœë¡œ ê³ ì •
                         Animator playerAnim = playerMove.GetComponentInChildren<Animator>();
                         if (playerAnim == null) playerAnim = playerMove.GetComponent<Animator>();
                         if (playerAnim != null)
@@ -161,7 +158,7 @@ public class DroppedHeart : MonoBehaviour
                         }
                     }
 
-                    // ·¹ÀÌÀú ½ºÅ©¸³Æ® ²ô±â (°ø°İ Â÷´Ü)
+                    // ë ˆì´ì € ìŠ¤í¬ë¦½íŠ¸ ë„ê¸° (ê³µê²© ì°¨ë‹¨)
                     PlayerLaser playerLaserScript = FindAnyObjectByType<PlayerLaser>();
                     if (playerLaserScript != null)
                     {
@@ -169,14 +166,14 @@ public class DroppedHeart : MonoBehaviour
                     }
                 }
 
-                // --- 3. °øÅë Ã³¸® (UI Ãß°¡ ¹× »èÁ¦) ---
+                // --- 3. ê³µí†µ ì²˜ë¦¬ (UI ì¶”ê°€ ë° ì‚­ì œ) ---
                 if (HeartUIManager.instance != null)
                 {
                     HeartUIManager.instance.CollectHeart(sr.sprite);
                 }
 
                 Destroy(gameObject);
-                break; // ·çÇÁ Å»Ãâ
+                break; // ë£¨í”„ íƒˆì¶œ
             }
         }
     }
