@@ -227,6 +227,15 @@ namespace MiniTeam.Shooting1942
             StopAllPatterns();
             if (moveCoroutine != null) StopCoroutine(moveCoroutine);
 
+            // 대화 먼저 재생
+            var clearCutscene = FindAnyObjectByType<ClearCutsceneManager>(FindObjectsInactive.Include);
+            if (clearCutscene != null)
+            {
+                bool done = false;
+                clearCutscene.PlayDialogue(() => done = true);
+                yield return new WaitUntil(() => done);
+            }
+
             // 보스 콜라이더 범위 기준으로 폭발 위치 랜덤 계산
             var col    = GetComponent<Collider2D>();
             var bounds = col != null ? col.bounds

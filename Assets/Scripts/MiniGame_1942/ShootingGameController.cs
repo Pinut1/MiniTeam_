@@ -82,16 +82,25 @@ namespace MiniTeam.Shooting1942
 
             EndGame();
 
-            if (spaceshipRewardObj != null)
-                spaceshipRewardObj.SetActive(true);
-
             var am = AudioManager.Instance;
             if (am != null) am.PlayBGM(am.bgmClear);
 
+            Debug.Log($"[1942] OnGameClear | clearCutscene:{clearCutscene != null}");
             if (clearCutscene != null)
-                clearCutscene.Play(ExitToHub);
+            {
+                clearCutscene.Play(() =>
+                {
+                    if (spaceshipRewardObj != null)
+                        spaceshipRewardObj.SetActive(true);
+                    Invoke(nameof(ExitToHub), resultHoldTime);
+                });
+            }
             else
+            {
+                if (spaceshipRewardObj != null)
+                    spaceshipRewardObj.SetActive(true);
                 Invoke(nameof(ExitToHub), resultHoldTime);
+            }
         }
 
         public void OnGameFail()
