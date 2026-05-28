@@ -31,14 +31,30 @@ public class PlayerMove : MonoBehaviour
     private bool waitForMouseMovement = false;
     private Vector3 lastMousePos;
 
+    private PlayerLaser playerLaser; // PlayerLaser 참조
+
     void Start()
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
+        playerLaser = GetComponent<PlayerLaser>();
     }
 
     void Update()
     {
+        // 클래시 모드(경쟁 중)일 때는 아예 움직이거나 마우스 공격 입력을 받지 못하도록 차단
+        if (playerLaser != null && playerLaser.isClashMode)
+        {
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+            if (anim != null)
+            {
+                anim.SetBool("isWalk", false);
+                anim.SetBool("isRun", false);
+                anim.SetBool("isIdle", true);
+            }
+            return;
+        }
+
         if (waitForMouseMovement)
         {
             if (Vector3.Distance(Input.mousePosition, lastMousePos) > 10f)

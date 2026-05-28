@@ -42,7 +42,7 @@ public class PlayerLaser : MonoBehaviour
     public Vector3 gaugeOffset = new Vector3(0, 1.5f, 0);
     private RectTransform gaugeRectTransform;
     private Camera mainCam;
-    private bool isClashMode = false;
+    public bool isClashMode = false;
 
     [Header("Difficulty by Girls (여학생 난이도 설정)")]
     public float difficultyRadius = 3.0f; // 주변 여학생을 탐색할 반경
@@ -150,14 +150,7 @@ public class PlayerLaser : MonoBehaviour
                     if (playerPinkGauge.fillAmount <= 0f)
                     {
                         LetGirlWinAndLeave();
-                        GameObject targetToDestroy = currentBurningNpc;
                         StartPlayerKnockback();
-
-                        if (targetToDestroy != null)
-                        {
-                            if (targetToDestroy.name.Contains("Pierre")) return;
-                            Destroy(targetToDestroy);
-                        }
                         return;
                     }
                 }
@@ -809,6 +802,11 @@ public class PlayerLaser : MonoBehaviour
         isClashMode = false;
         if (clashGaugeObject != null) clashGaugeObject.SetActive(false);
 
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.StopBackAttackSFX();
+        }
+
         if (currentBurningNpc != null)
         {
             Animator targetAnim = currentBurningNpc.GetComponent<Animator>();
@@ -871,7 +869,9 @@ public class PlayerLaser : MonoBehaviour
             {
                 if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
                 {
-                    Destroy(obj);
+                    NpcRandomPatrol patrol = obj.GetComponent<NpcRandomPatrol>();
+                    if (patrol != null && !patrol.isPierre) patrol.WalkAwayAndDestroy();
+                    else Destroy(obj);
                 }
             }
         }
@@ -906,7 +906,9 @@ public class PlayerLaser : MonoBehaviour
                 // 태그가 NPC이거나, 이름에 BoyNpc 또는 Pierre가 포함되어 있다면 복제본((Clone))까지 전부 삭제!
                 if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
                 {
-                    Destroy(obj);
+                    NpcRandomPatrol patrol = obj.GetComponent<NpcRandomPatrol>();
+                    if (patrol != null && !patrol.isPierre) patrol.WalkAwayAndDestroy();
+                    else Destroy(obj);
                 }
             }
         }
@@ -933,7 +935,9 @@ public class PlayerLaser : MonoBehaviour
             {
                 if (obj.CompareTag("NPC") || obj.name.Contains("BoyNpc") || obj.name.Contains("Pierre"))
                 {
-                    Destroy(obj);
+                    NpcRandomPatrol patrol = obj.GetComponent<NpcRandomPatrol>();
+                    if (patrol != null && !patrol.isPierre) patrol.WalkAwayAndDestroy();
+                    else Destroy(obj);
                 }
             }
         }

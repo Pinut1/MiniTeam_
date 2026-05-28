@@ -465,6 +465,7 @@ public class CutsceneNpcManager : MonoBehaviour
             magicStickAnim.gameObject.SetActive(true);
             if (magicStickAnim.isActiveAndEnabled)
             {
+                if (BgmManager.Instance != null) BgmManager.Instance.PlayMagicStickGrowingBGM();
                 magicStickAnim.Play("MagicStick");
             }
         }
@@ -473,6 +474,7 @@ public class CutsceneNpcManager : MonoBehaviour
 
         if (magicStickAnim != null && magicStickAnim.isActiveAndEnabled)
         {
+            if (BgmManager.Instance != null) BgmManager.Instance.PlayMagicStickTransformBGM();
             magicStickAnim.Play("Chocolate_Stick");
         }
 
@@ -486,6 +488,12 @@ public class CutsceneNpcManager : MonoBehaviour
         if (magicStickAnim != null)
         {
             magicStickAnim.gameObject.SetActive(false);
+        }
+
+        // 트랜스폼 애니메이션이 끝난 직후(요술봉 완성 후) 바로 바닐라 페이즈 BGM 재생
+        if (BgmManager.Instance != null)
+        {
+            BgmManager.Instance.PlayBanillaPhaseBGM();
         }
 
         SetBanillaCrying(true);
@@ -751,6 +759,7 @@ public class CutsceneNpcManager : MonoBehaviour
             banillaStickAnim.gameObject.SetActive(true);
             if (banillaStickAnim.isActiveAndEnabled)
             {
+                if (BgmManager.Instance != null) BgmManager.Instance.PlayMagicStickGrowingBGM();
                 banillaStickAnim.Play("MagicStick_B");
             }
         }
@@ -761,6 +770,7 @@ public class CutsceneNpcManager : MonoBehaviour
         // 4. Banilla_Stick 애니메이션으로 강제 전환
         if (banillaStickAnim != null && banillaStickAnim.isActiveAndEnabled)
         {
+            if (BgmManager.Instance != null) BgmManager.Instance.PlayMagicStickTransformBGM();
             banillaStickAnim.Play("Banilla_Stick");
         }
 
