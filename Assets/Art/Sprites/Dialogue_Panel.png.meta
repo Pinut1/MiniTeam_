@@ -153,7 +153,7 @@ TextureImporter:
         width: 802
         height: 316
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -162,6 +162,50 @@ TextureImporter:
       bones: []
       spriteID: 818c866aa49881f4e9d1dbc9683096a1
       internalID: 1831284062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue_Panel_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 319
+        width: 370
+        height: 517
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99c2bc89672345d44a02ae00bf0c7fd5
+      internalID: -429847700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue_Panel_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 311
+        width: 150
+        height: 404
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 622ec8a70558b184fb6f2a0c4777539f
+      internalID: -1850277711
       vertices: []
       indices: 
       edges: []
@@ -184,6 +228,8 @@ TextureImporter:
     nameFileIdTable:
       Dialogue_Panel_0: 1831284062
       Dialogue_Panel_1: 1753552408
+      Dialogue_Panel_2: -429847700
+      Dialogue_Panel_3: -1850277711
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

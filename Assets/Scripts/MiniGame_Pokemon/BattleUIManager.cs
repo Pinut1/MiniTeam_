@@ -200,9 +200,9 @@ namespace MiniTeam.Pokemon
             // 처음엔 트레이너(테일이) 스프라이트 표시
             if (trainerImage != null)     trainerImage.sprite   = trainer.trainerBattleSprite;
             if (trainerNameText != null)  trainerNameText.text  = trainer.pokemonName;
-            if (trainerLevelText != null) trainerLevelText.text = "Lv. ???";
-            if (playerNameText != null)   playerNameText.text   = "신태일";
-            if (playerLevelText != null)  playerLevelText.text  = "Lv. 1";
+            if (trainerLevelText != null) trainerLevelText.text = "Lv.???";
+            if (playerNameText != null)   playerNameText.text   = "개발자";
+            if (playerLevelText != null)  playerLevelText.text  = "Lv.1";
             if (messageText != null)      messageText.text      = $"{trainer.trainerName}이(가) 아구몬을 내보냈다!";
 
             // Enemy 슬라이더를 visible 위치로 즉시 리셋 (이전 배틀에서 비활성화됐을 수 있음)
