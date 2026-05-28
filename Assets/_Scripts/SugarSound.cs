@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class BgmManager : MonoBehaviour
+public class SugarSound : MonoBehaviour
 {
-    public static BgmManager Instance;
+    public static SugarSound Instance;
     
     private AudioSource openingSource;
     private AudioSource gameplaySource;
@@ -13,43 +13,43 @@ public class BgmManager : MonoBehaviour
     private AudioSource sfxSource;
     private AudioSource backAttackSource;
 
-    [Header("BGM 설정")]
-    public AudioClip openingBgm;    // 인스펙터에서 할당
-    public AudioClip gameplayBgm;  // 인스펙터에서 할당
-    public AudioClip pierrePhaseBgm;  // 인스펙터에서 할당
-    public AudioClip banillaPhaseBgm;  // 인스펙터에서 할당
-    public AudioClip magicStickGrowingBgm;  // 인스펙터에서 할당
-    public AudioClip magicStickTransformBgm;  // 인스펙터에서 할당
+    [Header("BGM ?�정")]
+    public AudioClip openingBgm;
+    public AudioClip gameplayBgm; 
+    public AudioClip pierrePhaseBgm;  
+    public AudioClip banillaPhaseBgm; 
+    public AudioClip magicStickGrowingBgm; 
+    public AudioClip magicStickTransformBgm; 
 
-    [Header("효과음(SFX) 설정")]
-    public AudioClip heartCollectSfx; // 인스펙터에서 할당
-    public AudioClip backAttackSfx; // 인스펙터에서 할당
-    public AudioClip knockbackSfx; // 인스펙터에서 할당
+    [Header("?�과??SFX) ?�정")]
+    public AudioClip heartCollectSfx;
+    public AudioClip backAttackSfx; 
+    public AudioClip knockbackSfx;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // 1. 오프닝용 오디오 소스 생성 및 미리 로드
+        // 1. ?�프?�용 ?�디???�스 ?�성 �?미리 로드
         openingSource = gameObject.AddComponent<AudioSource>();
         openingSource.loop = true;
         openingSource.clip = openingBgm;
         if (openingBgm != null) openingBgm.LoadAudioData();
 
-        // 2. 게임플레이용 오디오 소스 생성 및 미리 로드
+        // 2. 게임?�레?�용 ?�디???�스 ?�성 �?미리 로드
         gameplaySource = gameObject.AddComponent<AudioSource>();
         gameplaySource.loop = true;
         gameplaySource.clip = gameplayBgm;
         if (gameplayBgm != null) gameplayBgm.LoadAudioData();
 
-        // 3. 피에르 페이즈용 오디오 소스
+        // 3. ?�에�??�이즈용 ?�디???�스
         pierrePhaseSource = gameObject.AddComponent<AudioSource>();
         pierrePhaseSource.loop = true;
         pierrePhaseSource.clip = pierrePhaseBgm;
         if (pierrePhaseBgm != null) pierrePhaseBgm.LoadAudioData();
 
-        // 4. 바닐라 페이즈용 오디오 소스
+        // 4. 바닐???�이즈용 ?�디???�스
         banillaPhaseSource = gameObject.AddComponent<AudioSource>();
         banillaPhaseSource.loop = true;
         if (banillaPhaseBgm != null) { banillaPhaseSource.clip = banillaPhaseBgm; banillaPhaseBgm.LoadAudioData(); }
@@ -57,21 +57,21 @@ public class BgmManager : MonoBehaviour
         cutsceneSource = gameObject.AddComponent<AudioSource>();
         cutsceneSource.loop = true;
 
-        // 5. 효과음(SFX) 소스 생성
+        // 5. ?�과??SFX) ?�스 ?�성
         sfxSource = gameObject.AddComponent<AudioSource>();
         sfxSource.loop = false;
         
-        // 효과음 미리 메모리에 로드하여 재생 딜레이 완벽 제거
+        // ?�과??미리 메모리에 로드?�여 ?�생 ?�레???�벽 ?�거
         if (heartCollectSfx != null) heartCollectSfx.LoadAudioData();
         if (knockbackSfx != null) knockbackSfx.LoadAudioData();
 
-        // 6. BackAttack 전용 소스 생성
+        // 6. BackAttack ?�용 ?�스 ?�성
         backAttackSource = gameObject.AddComponent<AudioSource>();
-        backAttackSource.loop = true; // 공격 중일 때 루프될 수도 있으니 true로 하되, 멈추면 꺼짐
+        backAttackSource.loop = true; // 공격 중일 ??루프???�도 ?�으??true�??�되, 멈추�?꺼짐
         backAttackSource.clip = backAttackSfx;
         if (backAttackSfx != null) backAttackSfx.LoadAudioData();
 
-        // 시작하자마자 오프닝 음악 재생
+        // ?�작?�자마자 ?�프???�악 ?�생
         PlayOpeningBGM();
     }
 
@@ -118,7 +118,6 @@ public class BgmManager : MonoBehaviour
         StopAllBGM();
         if (cutsceneSource != null && magicStickGrowingBgm != null)
         {
-            cutsceneSource.loop = true;
             cutsceneSource.clip = magicStickGrowingBgm;
             cutsceneSource.Play();
         }
@@ -129,7 +128,6 @@ public class BgmManager : MonoBehaviour
         StopAllBGM();
         if (cutsceneSource != null && magicStickTransformBgm != null)
         {
-            cutsceneSource.loop = false;
             cutsceneSource.clip = magicStickTransformBgm;
             cutsceneSource.Play();
         }
@@ -157,5 +155,5 @@ public class BgmManager : MonoBehaviour
         {
             backAttackSource.Stop();
         }
-    }
-}
+    }}
+
