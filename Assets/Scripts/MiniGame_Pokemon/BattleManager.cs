@@ -89,15 +89,14 @@ namespace MiniTeam.Pokemon
 
         // ── 결과 코루틴 ──────────────────────────────
 
-        // 패배: 블랙아웃 → Map_Dialogue_Panel이 최상위로 올라와 "눈앞이 깜깜해졌다" 표시 → 리스폰
+        // 패배: 메시지 표시 → Die 상태(blackout + Dialogue_Parent만 남김)
         IEnumerator DefeatRoutine()
         {
             yield return new WaitForSeconds(1.2f);
-            BattleUIManager.Instance?.ShowBlackoutNow();
-            if (MapDialogueUI.Instance != null)
-                yield return StartCoroutine(MapDialogueUI.Instance.Show(L("battle_defeat")));
-            EndBattle();
-            PokemonGameController.Instance?.RespawnPlayer();
+            BattleUIManager.Instance?.ShowMessage(L("battle_defeat"));
+            yield return new WaitForSeconds(1.5f);
+            BattleUIManager.Instance?.ShowDieState();
+            FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
         }
 
         IEnumerator RunRoutine()

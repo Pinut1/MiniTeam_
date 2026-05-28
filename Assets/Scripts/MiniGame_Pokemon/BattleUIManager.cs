@@ -47,6 +47,12 @@ namespace MiniTeam.Pokemon
         [Header("블랙아웃")]
         public GameObject blackoutPanel;
 
+        [Header("Die 시 추가 비활성 패널")]
+        public GameObject enemyPanel;
+        public GameObject playerBattlePanel;
+        public GameObject enemyBattlePanel;
+        public GameObject agumonPanel;
+
         // 배틀 활성 상태 (StartMenuUI에서 참조)
         public bool IsBattleActive { get; private set; }
 
@@ -397,6 +403,35 @@ namespace MiniTeam.Pokemon
             ShowBlackoutNow();
             yield return new WaitForSeconds(duration);
             HideBlackout();
+        }
+
+        // 게임 패배 시 Die 상태 — blackoutPanel + Dialogue_Parent만 남기고 나머지 비활성
+        public void ShowDieState()
+        {
+            IsBattleActive  = false;
+            isCommandActive = false;
+            isItemActive    = false;
+            waitingConfirm  = false;
+
+            // battlePanel 내부 정리 (battlePanel 자체는 유지 → Dialogue_Parent 살아있음)
+            if (statusPanelLeft  != null) statusPanelLeft.gameObject.SetActive(false);
+            if (statusPanelRight != null) statusPanelRight.gameObject.SetActive(false);
+            if (commandPanel     != null) commandPanel.gameObject.SetActive(false);
+            if (enemySlider      != null) enemySlider.gameObject.SetActive(false);
+            if (itemPanel        != null) itemPanel.SetActive(false);
+            if (enemyPanel       != null) enemyPanel.SetActive(false);
+            if (playerBattlePanel != null) playerBattlePanel.SetActive(false);
+            if (enemyBattlePanel != null) enemyBattlePanel.SetActive(false);
+            if (agumonPanel      != null) agumonPanel.SetActive(false);
+            if (spawnedPokemon   != null) { Destroy(spawnedPokemon); spawnedPokemon = null; }
+
+            // 다른 최상위 패널 비활성화
+            if (StartMenuUI.Instance?.menuPanel != null) StartMenuUI.Instance.menuPanel.SetActive(false);
+            if (StartMenuUI.Instance?.bagPanel  != null) StartMenuUI.Instance.bagPanel.SetActive(false);
+            if (MapDialogueUI.Instance?.panel   != null) MapDialogueUI.Instance.panel.SetActive(false);
+
+            // blackoutPanel = Die_Panel 활성화
+            if (blackoutPanel != null) blackoutPanel.SetActive(true);
         }
     }
 }
