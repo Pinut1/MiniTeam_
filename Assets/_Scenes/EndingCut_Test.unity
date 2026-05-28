@@ -283,7 +283,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 109266470}
-  targetText: KIWOOK
+  targetTexts:
+  - KIWOOK
+  - HANNA
+  - HEIN
+  - YOUNGWK
+  - YAEZI
+  - JUNGMIN
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -510,7 +517,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 220686633}
-  targetText: HEIN
+  targetTexts:
+  - HELLO
+  - WORLD
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -680,7 +690,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 317486786}
-  targetText: YOUNGWK
+  targetTexts:
+  - HELLO
+  - WORLD
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -1855,7 +1868,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 858781067}
-  targetText: HANNA
+  targetTexts:
+  - HELLO
+  - WORLD
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -2176,16 +2192,8 @@ PlayableDirector:
     value: {fileID: 2118957191}
   - key: {fileID: -7656423574352945571, guid: 289f01885387898448e6e87e693c15d8, type: 2}
     value: {fileID: 109266467}
-  - key: {fileID: 2288099512465562737, guid: 289f01885387898448e6e87e693c15d8, type: 2}
-    value: {fileID: 858781063}
-  - key: {fileID: 2049376186156998716, guid: 289f01885387898448e6e87e693c15d8, type: 2}
-    value: {fileID: 220686629}
-  - key: {fileID: -4299325154401201041, guid: 289f01885387898448e6e87e693c15d8, type: 2}
-    value: {fileID: 317486782}
-  - key: {fileID: -4589618910501934359, guid: 289f01885387898448e6e87e693c15d8, type: 2}
-    value: {fileID: 1393437096}
-  - key: {fileID: 5026763043859014227, guid: 289f01885387898448e6e87e693c15d8, type: 2}
-    value: {fileID: 2027379171}
+  - key: {fileID: -8486791423080569310, guid: 289f01885387898448e6e87e693c15d8, type: 2}
+    value: {fileID: 1482484246}
   m_ExposedReferences:
     m_References:
     - 73926bdfb4fad894091c0d7a299cc13a: {fileID: 662785678}
@@ -2240,7 +2248,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
+  m_BackGroundColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -2694,7 +2702,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 1393437100}
-  targetText: YAEZI
+  targetTexts:
+  - HELLO
+  - WORLD
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -2890,6 +2901,82 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: acde16a32039d5b49835e1c5dec8c7e4, type: 3}
   m_PrefabInstance: {fileID: 1421067879}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1482484246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1482484249}
+  - component: {fileID: 1482484248}
+  - component: {fileID: 1482484247}
+  m_Layer: 0
+  m_Name: EndingSceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1482484247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482484246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalReceiver
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: d647e89595fb73c418fe7dabde4da890, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1482484248}
+          m_TargetAssemblyTypeName: MiniTeam.Core.EndingSceneManager, Assembly-CSharp
+          m_MethodName: GoToMainScene
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &1482484248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482484246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e15c06266ef1ff548a0e1ac2f0d837f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.EndingSceneManager
+  mainSceneName: Main
+--- !u!4 &1482484249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482484246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.94986, y: 28.15451, z: 3.577}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1498330720
 GameObject:
   m_ObjectHideFlags: 0
@@ -3727,7 +3814,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLetterReveal
   textComponent: {fileID: 2027379175}
-  targetText: JUNGMIN
+  targetTexts:
+  - HELLO
+  - WORLD
+  delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.5
   randomChangesPerLetter: 25
@@ -4090,3 +4180,4 @@ SceneRoots:
   - {fileID: 2118957190}
   - {fileID: 457376295}
   - {fileID: 170451238}
+  - {fileID: 1482484249}

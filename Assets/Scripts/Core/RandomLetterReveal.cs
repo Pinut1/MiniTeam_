@@ -9,8 +9,9 @@ public class RandomLetterReveal : MonoBehaviour
 
     [Header("효과 설정")]
     [TextArea]
-    public string targetText = "SYSTEM INITIALIZED..."; // 최종적으로 보여질 글자
-    public string randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"; // 섞일 랜덤 문자들
+    public string[] targetTexts = new string[] { "HELLO", "WORLD" }; // 순서대로 띄울 단어/문장들
+    public float delayBetweenWords = 1.0f; // 다음 단어로 넘어가기 전 대기 시간
+    public string randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"; // 섞일 랜덤 문자들들
 
     public float revealSpeed = 0.05f; // 한 글자가 확정되는 시간
     public int randomChangesPerLetter = 3; // 글자 하나가 확정되기 전에 랜덤 문자가 깜빡이는 횟수
@@ -30,45 +31,55 @@ public class RandomLetterReveal : MonoBehaviour
 
     private IEnumerator RevealRoutine()
     {
-        textComponent.text = "";
-        string currentRevealed = ""; // 지금까지 확정된 올바른 글자들
-
-        for (int i = 0; i < targetText.Length; i++)
+        for (int t = 0; t < targetTexts.Length; t++)
         {
-            // 띄어쓰기나 줄바꿈은 효과 없이 그냥 넘김
-            if (targetText[i] == ' ' || targetText[i] == '\n')
-            {
-                currentRevealed += targetText[i];
-                continue;
-            }
+            string targetText = targetTexts[t];
+            textComponent.text = "";
+            string currentRevealed = ""; // 지금까지 확정된 올바른 글자들
 
-            // 진짜 글자가 확정되기 전에 가짜(랜덤) 글자들을 타다닥! 보여줌
-            for (int j = 0; j < randomChangesPerLetter; j++)
+            for (int i = 0; i < targetText.Length; i++)
             {
-                char randomChar = randomChars[Random.Range(0, randomChars.Length)];
-
-                // 만약 뒤에 남은 빈자리도 전부 무작위 문자로 채우고 싶다면 아래 로직을 씁니다.
-                string suffix = "";
-                for (int k = i + 1; k < targetText.Length; k++)
+                // 띄어쓰기나 줄바꿈은 효과 없이 그냥 넘김
+                if (targetText[i] == ' ' || targetText[i] == '\n')
                 {
-                    suffix += targetText[k] == ' ' ? " " : randomChars[Random.Range(0, randomChars.Length)].ToString();
+                    currentRevealed += targetText[i];
+                    continue;
                 }
 
-                // 확정된 글자 + 현재 깜빡이는 랜덤 글자 + 뒤에 남은 랜덤 글자들
-                string output = currentRevealed + randomChar + suffix;
-                if (useMonospace) output = $"<mspace={monospaceWidth}em>{output}</mspace>";
-                
-                textComponent.text = output;
+                // 진짜 글자가 확정되기 전에 가짜(랜덤) 글자들을 타다닥! 보여줌
+                for (int j = 0; j < randomChangesPerLetter; j++)
+                {
+                    char randomChar = randomChars[Random.Range(0, randomChars.Length)];
 
-                // 아주 짧은 시간 대기 (타임스케일 영향 안 받게 Realtime 사용)
-                yield return new WaitForSecondsRealtime(revealSpeed / randomChangesPerLetter);
+                    // 만약 뒤에 남은 빈자리도 전부 무작위 문자로 채우고 싶다면 아래 로직을 씁니다.
+                    string suffix = "";
+                    for (int k = i + 1; k < targetText.Length; k++)
+                    {
+                        suffix += targetText[k] == ' ' ? " " : randomChars[Random.Range(0, randomChars.Length)].ToString();
+                    }
+
+                    // 확정된 글자 + 현재 깜빡이는 랜덤 글자 + 뒤에 남은 랜덤 글자들
+                    string output = currentRevealed + randomChar + suffix;
+                    if (useMonospace) output = $"<mspace={monospaceWidth}em>{output}</mspace>";
+                    
+                    textComponent.text = output;
+
+                    // 아주 짧은 시간 대기 (타임스케일 영향 안 받게 Realtime 사용)
+                    yield return new WaitForSecondsRealtime(revealSpeed / randomChangesPerLetter);
+                }
+
+                // 시간 경과 후, 진짜 글자로 확정
+                currentRevealed += targetText[i];
+                
+                if (useMonospace) textComponent.text = $"<mspace={monospaceWidth}em>{currentRevealed}</mspace>";
+                else textComponent.text = currentRevealed;
             }
 
-            // 시간 경과 후, 진짜 글자로 확정
-            currentRevealed += targetText[i];
-            
-            if (useMonospace) textComponent.text = $"<mspace={monospaceWidth}em>{currentRevealed}</mspace>";
-            else textComponent.text = currentRevealed;
+            // 모든 글자가 다 나온 뒤 다음 단어로 넘어가기 전 대기
+            if (t < targetTexts.Length - 1)
+            {
+                yield return new WaitForSecondsRealtime(delayBetweenWords);
+            }
         }
     }
 }
