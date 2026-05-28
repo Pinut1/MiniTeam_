@@ -37,7 +37,6 @@ namespace MiniTeam.Pokemon
         [Header("커맨드 버튼 (Grid 순서대로: 싸우다/가방/포켓몬/도망치다)")]
         public RectTransform[] commandRects; // 4개, 커서 위치 기준
         public RectTransform   commandCursor;
-        public Vector2         cursorOffset = new Vector2(-127.61f, -3.25f); // 버튼 기준 커서 오프셋
 
         [Header("아이템 선택 패널")]
         public GameObject      itemPanel;
@@ -133,10 +132,7 @@ namespace MiniTeam.Pokemon
             int idx = Mathf.Clamp(commandIndex, 0, commandRects.Length - 1);
             if (commandRects[idx] == null) return;
 
-            // Box(commandRects 부모) + 버튼 anchored + 오프셋 = 커서 위치
-            var boxRT = commandRects[idx].parent as RectTransform;
-            Vector2 boxPos = boxRT != null ? boxRT.anchoredPosition : Vector2.zero;
-            commandCursor.anchoredPosition = boxPos + commandRects[idx].anchoredPosition + cursorOffset;
+            commandCursor.position = commandRects[idx].position;
         }
 
         // ── 아이템 패널 네비게이션 (세로 목록) ──────────

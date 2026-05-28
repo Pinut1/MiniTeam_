@@ -105860,7 +105860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Pokemon.UIPanelSlider
   direction: 1
-  slideDist: 400
+  slideDist: 600
   duration: 0.25
 --- !u!1 &973933435
 GameObject:
@@ -105928,11 +105928,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1067517732}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 141.2, y: -118.2}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 36, y: -25.599998}
   m_SizeDelta: {x: 36, y: 32}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1.5, y: -0.3}
 --- !u!114 &975334500
 MonoBehaviour:
   m_ObjectHideFlags: 0
