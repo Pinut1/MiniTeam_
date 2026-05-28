@@ -137,6 +137,9 @@ public class JudangChiController : MonoBehaviour
 
     private IEnumerator PlayEndingSequence()
     {
+        // 엔딩 씬 진입 시 허브 BGM 중단
+        MiniTeam.Core.AudioManager.Instance?.StopBGM();
+
         // (선택) 여기서 화면을 천천히 까맣게 페이드아웃 시키는 UI 연출을 넣으면 맛있습니다.
         //  yield return StartCoroutine(HubUIManager.Instance.PlayFadeOut());
 
