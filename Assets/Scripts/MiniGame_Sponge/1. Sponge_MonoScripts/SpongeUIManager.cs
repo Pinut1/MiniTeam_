@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using MiniTeam.Core;
 /// <summary>
 /// 모든 UI패널 표시/숨김과 키 입력을 담당
 /// 1. ESC/Q/TAB 키 입력 감지 -> 현재 상태에 맞게 처리
@@ -60,18 +61,54 @@ public class SpongeUIManager : MonoBehaviour
     [SerializeField] private GameObject objectionObj;
     [SerializeField] private Animator objectionAnim;
 
+    [Header("레코드 패널 증거 제시 연출")]
+    [SerializeField] private GameObject takeThatObj;
+    [SerializeField] private Animator takeThatAnim;
+
     [Header("심문 시작 패널")]
     [SerializeField] private GameObject questionPnlLeft;
     [SerializeField] private GameObject questionPnlRight;
     [SerializeField] private Animator questionAnimLeft;
     [SerializeField] private Animator questionAnimRight;
 
+    [Header("무죄 판결 연출")]
+    [SerializeField] private GameObject innocencePnl;
+    [SerializeField] private Animator innocenceAnimLeft;
+    [SerializeField] private Animator innocenceAnimRight;
+
+    [Header("판사 망치 연출")]
+    [SerializeField] private GameObject judgeGavelBGImg;
+    [SerializeField] private GameObject judgeGavelImg;
+    [SerializeField] private GameObject judgeEffetImg;
+    [SerializeField] private GameObject judgeGavelImg1;
+
+    [Header("레코드 패널 (대사 직접 증거 선택)")]
+    [SerializeField] private GameObject recordPnl;
+
+    [Header("아이템 획득 팝업")]
+    [SerializeField] private GameObject newEvidenceImg;
+    [SerializeField] private GameObject iconRecorder;
+    [SerializeField] private GameObject iconReceipt;
+    [SerializeField] private GameObject iconStatement;
+
+    private Dictionary<string, GameObject> iconMap;
+
+    private static readonly Dictionary<string, string> evidencePopupMap = new()
+    {
+        { "press_00_07",           "receipt"   },
+        { "re_press_01_02",        "statement" },
+        { "before_retestimony_03", "recorder"  }
+    };
+
     private bool questionPnlShown = false;
+    private bool isRecordPanelMode = false;
+    private SpongeDialogueLine recordPanelSourceLine;
     public bool IsPlayingHoldit { get; private set; }
     public bool IsPlayingObjection { get; private set; }
+    public bool IsPlayingTakeThat { get; private set; }
+    public bool IsPlayingInnocence { get; private set; }
+    public bool IsPlayingGavel { get; private set; }
 
-    //[Header("옵션 패널")]
-    //[SerializeField] private GameObject opitionsPnl; // 메인 UI 완성시 연결 예정
 
     private void Awake()
     {
@@ -83,14 +120,21 @@ public class SpongeUIManager : MonoBehaviour
             { "recorder",  holderRecorder  },
             { "poster",    holderPoster    },
             { "receipt",   holderReceipt   },
-            { "bankstatement", holderStatement }
+            { "statement", holderStatement }
+        };
+        iconMap = new Dictionary<string, GameObject>
+        {
+            { "recorder",  iconRecorder  },
+            { "receipt",   iconReceipt   },
+            { "statement", iconStatement }
         };
     }
 
     private void Start()
     {
         evidencePnl.SetActive(false);
-        // opitionsPnl.SetActive(true);
+        if (recordPnl != null) recordPnl.SetActive(false);
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
     }
 
     // ── 이벤트 구독 ──────────────────────────────────────────────
@@ -194,6 +238,69 @@ public class SpongeUIManager : MonoBehaviour
         IsPlayingObjection = false;
     }
 
+    public IEnumerator PlayInnocenceAnim()
+    {
+        IsPlayingInnocence = true;
+        SpongeDialogueManager.Instance.SetTextBox(false);
+        innocencePnl.SetActive(true);
+        innocenceAnimLeft.gameObject.SetActive(true);
+        innocenceAnimRight.gameObject.SetActive(false);
+
+        innocenceAnimLeft.Play("InnocenceLeft");
+        yield return null;
+        yield return new WaitForSeconds(innocenceAnimLeft.GetCurrentAnimatorStateInfo(0).length);
+
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+
+        innocenceAnimRight.gameObject.SetActive(true);
+        innocenceAnimRight.Play("InnocenceRight");
+        yield return null;
+        yield return new WaitForSeconds(innocenceAnimRight.GetCurrentAnimatorStateInfo(0).length);
+
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+
+        yield return new WaitForSeconds(2f);
+        innocencePnl.SetActive(false);
+        SpongeDialogueManager.Instance.SetTextBox(true);
+        IsPlayingInnocence = false;
+    }
+
+    public IEnumerator PlayGavelAnim()
+    {
+        IsPlayingGavel = true;
+        judgeGavelBGImg.SetActive(true);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        judgeGavelImg.SetActive(true);
+        judgeEffetImg.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        judgeGavelBGImg.SetActive(false);
+        judgeGavelImg.SetActive(false);
+        judgeEffetImg.SetActive(false);
+        judgeGavelImg1.SetActive(false);
+        IsPlayingGavel = false;
+    }
+
+    public IEnumerator PlayTakeThatAnim()
+    {
+        IsPlayingTakeThat = true;
+        whitePnl.SetActive(true);
+        yield return new WaitForSeconds(flashDuration);
+        whitePnl.SetActive(false);
+        takeThatObj.SetActive(true);
+        takeThatAnim.Play("TakeThatAnim");
+        yield return null;
+        yield return new WaitForSeconds(takeThatAnim.GetCurrentAnimatorStateInfo(0).length);
+        takeThatObj.SetActive(false);
+        IsPlayingTakeThat = false;
+    }
+
     IEnumerator PresentEvidenceSequence(string evidenceId)
     {
         CloseEvidencePanel();
@@ -204,6 +311,11 @@ public class SpongeUIManager : MonoBehaviour
     // ── 키 입력 처리 ─────────────────────────────────────────────
     private void Update()
     {
+        if (OptionsUIManager.Instance != null
+            && OptionsUIManager.Instance.optionsPanel != null
+            && OptionsUIManager.Instance.optionsPanel.activeSelf)
+            return;
+
         if (SpongeGameManager.Instance.IsInputBlocked()) return;
 
         if (SpongeDialogueManager.Instance.IsChoiceActive)
@@ -221,8 +333,8 @@ public class SpongeUIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab) && SpongeGameManager.Instance.CurrentState != SpongeGameState.GameState.Resolution)
             TryOpenEvidencePanel();
 
-        // 증거 패널이 열려 있을 때는 방향키/Enter를 슬롯 조작에만 사용
-        if (evidencePnl.activeSelf)
+        // 증거 패널 또는 레코드 패널이 열려 있을 때는 방향키/Enter를 슬롯 조작에만 사용
+        if (evidencePnl.activeSelf || isRecordPanelMode)
         {
             if (Input.GetKeyDown(KeyCode.RightArrow)) MoveEvidenceSelection(1);
             if (Input.GetKeyDown(KeyCode.LeftArrow))  MoveEvidenceSelection(-1);
@@ -274,8 +386,8 @@ public class SpongeUIManager : MonoBehaviour
     /// </summary>
     void HandleScreenClick()
     {
-        // 증거 패널이나 옵션 패널이 열려있으면 클릭 무시 / if문 괄호 안에 || optionsPnl.activeSelf 추가하기
-        if (evidencePnl.activeSelf) return;
+        // 증거 패널이나 레코드 패널이 열려있으면 클릭 무시
+        if (evidencePnl.activeSelf || isRecordPanelMode) return;
 
         switch (SpongeGameManager.Instance.CurrentState)
         {
@@ -299,12 +411,60 @@ public class SpongeUIManager : MonoBehaviour
         }
     }
 
+    // ── 레코드 패널 ──────────────────────────────────────────────
+    /// <summary>
+    /// 특정 대사 라인(opensRecordPanel=true) 클릭 후 DialogueManager에서 호출
+    /// </summary>
+    public void OpenRecordPanel(SpongeDialogueLine sourceLine)
+    {
+        isRecordPanelMode = true;
+        recordPanelSourceLine = sourceLine;
+        stateBeforeEvidence = SpongeGameManager.Instance.CurrentState;
+        SpongeGameManager.Instance.ChangeState(SpongeGameState.GameState.EvidenceSelect);
+        recordPnl.transform.SetAsLastSibling();
+        recordPnl.SetActive(true);
+        Time.timeScale = 0f;
+        RebuildEvidenceSlots();
+        SelectFirstFilledSlot();
+    }
+
+    void CloseRecordPanel()
+    {
+        isRecordPanelMode = false;
+        recordPanelSourceLine = null;
+        Time.timeScale = 1f;
+        recordPnl.SetActive(false);
+        SpongeEvidenceManager.Instance.ClearSelection();
+        if (SpongeGameManager.Instance.CurrentState == SpongeGameState.GameState.EvidenceSelect)
+            SpongeGameManager.Instance.ChangeState(stateBeforeEvidence);
+    }
+
+    IEnumerator RecordPanelPresentSequence(string evidenceId)
+    {
+        var sourceLine = recordPanelSourceLine;
+        CloseRecordPanel();
+        yield return StartCoroutine(PlayTakeThatAnim());
+        bool isCorrect = sourceLine.validRecordEvidenceIds != null
+                      && sourceLine.validRecordEvidenceIds.Length > 0
+                      && System.Array.Exists(sourceLine.validRecordEvidenceIds, id => id == evidenceId);
+        if (isCorrect)
+        {
+            SpongeGameManager.Instance.RegisterEvidence(evidenceId);
+            SpongeDialogueManager.Instance.ShowLine(sourceLine.nextLineId);
+        }
+        else
+            SpongeDialogueManager.Instance.ShowLine("evidence_fail_default_01");
+    }
+
     // ── 증거 패널 ────────────────────────────────────────────────
     /// <summary>
     /// 증거 패널 열기 / TAB 입력 또는 선택지에서 호출
     /// </summary>
     public void TryOpenEvidencePanel()
     {
+        // 레코드 패널 모드일 때는 TAB 무시
+        if (isRecordPanelMode) return;
+
         if (evidencePnl.activeSelf)
         {
             CloseEvidencePanel();
@@ -349,7 +509,9 @@ public class SpongeUIManager : MonoBehaviour
                 {
                     if (SpongeEvidenceManager.Instance.SelectedEvidenceId == evidenceId)
                     {
-                        if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
+                        if (isRecordPanelMode)
+                            StartCoroutine(RecordPanelPresentSequence(evidenceId));
+                        else if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
                             StartCoroutine(PresentEvidenceSequence(evidenceId));
                     }
                     else
@@ -403,9 +565,11 @@ public class SpongeUIManager : MonoBehaviour
 
     void TryPresentSelectedEvidence()
     {
-        if (stateBeforeEvidence != SpongeGameState.GameState.CrossExamination) return;
         string id = SpongeEvidenceManager.Instance.SelectedEvidenceId;
-        if (!string.IsNullOrEmpty(id))
+        if (string.IsNullOrEmpty(id)) return;
+        if (isRecordPanelMode)
+            StartCoroutine(RecordPanelPresentSequence(id));
+        else if (stateBeforeEvidence == SpongeGameState.GameState.CrossExamination)
             StartCoroutine(PresentEvidenceSequence(id));
     }
 
@@ -439,6 +603,26 @@ public class SpongeUIManager : MonoBehaviour
             SpongeDialogueManager.Instance.SkipBeforeRetestimony();
     }
 
+    // ── 아이템 획득 팝업 ─────────────────────────────────────────
+    public void TryShowEvidencePopupForLine(string lineId)
+    {
+        if (newEvidenceImg == null) return;
+        if (!evidencePopupMap.TryGetValue(lineId, out var evidenceId)) return;
+
+        foreach (var kv in iconMap)
+            if (kv.Value != null) kv.Value.SetActive(false);
+
+        if (iconMap.TryGetValue(evidenceId, out var icon) && icon != null)
+            icon.SetActive(true);
+
+        newEvidenceImg.SetActive(true);
+    }
+
+    public void HideNewEvidencePopup()
+    {
+        if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
+    }
+
     /// <summary>
     /// 증거 패널 닫기
     /// </summary>
@@ -451,22 +635,14 @@ public class SpongeUIManager : MonoBehaviour
             SpongeGameManager.Instance.ChangeState(stateBeforeEvidence);
     }
 
-    /*
     // ── 옵션 패널 ────────────────────────────────────────────────
-    /// <summary>
-    /// 옵션 패널 열기/닫기
-    /// </summary>
     public void ToggleOptionsPanel()
     {
-        optionsPnl.SetActive(!optionsPnl.activeSelf);
+        OptionsUIManager.Instance?.Toggle();
     }
-   
-    /// <summary>
-    /// 옵션 패널 닫기
-    /// </summary>
+
     public void CloseOptionsPanel()
     {
-        optionsPnl.SetActive(false);
-    } 
-    */
+        OptionsUIManager.Instance?.Close();
+    }
 }

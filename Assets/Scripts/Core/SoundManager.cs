@@ -50,6 +50,12 @@ namespace MiniTeam.Core
             sfxSource.PlayOneShot(clip, masterVolume * sfxVolume);
         }
 
+        public void PlaySFX(AudioClip clip, float volumeScale)
+        {
+            if (clip == null) return;
+            sfxSource.PlayOneShot(clip, masterVolume * sfxVolume * volumeScale);
+        }
+
         // ── 볼륨 조절 ─────────────────────────────
 
         public void SetMasterVolume(float value)

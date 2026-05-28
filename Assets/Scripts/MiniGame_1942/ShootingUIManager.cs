@@ -24,6 +24,10 @@ namespace MiniTeam.Shooting1942
 
         [Header("필살기 게이지")]
         public Slider specialGaugeSlider;
+        public Image specialGaugeFill;
+        public Sprite gaugeSpriteFulll;   // 100%
+        public Sprite gaugeSpriteMedium; // 50~99%
+        public Sprite gaugeSpriteLow;    // 0~49%
 
         [Header("일시정지 패널")]
         public GameObject pausePanel;
@@ -32,6 +36,7 @@ namespace MiniTeam.Shooting1942
         public GameObject resultPanel;
         public TextMeshProUGUI resultTitleText;
         public TextMeshProUGUI resultScoreText;
+        public TextMeshProUGUI continueHintText;
 
         private int score = 0;
 
@@ -93,8 +98,10 @@ namespace MiniTeam.Shooting1942
         public void AddSpecialGauge(float amount)
         {
             specialGauge = Mathf.Clamp(specialGauge + amount, 0f, MaxSpecialGauge);
+            float ratio = specialGauge / MaxSpecialGauge;
             if (specialGaugeSlider != null)
-                specialGaugeSlider.value = specialGauge / MaxSpecialGauge;
+                specialGaugeSlider.value = ratio;
+            UpdateGaugeFill(ratio);
         }
 
         public bool UseSpecial()
@@ -103,7 +110,16 @@ namespace MiniTeam.Shooting1942
             specialGauge = 0f;
             if (specialGaugeSlider != null)
                 specialGaugeSlider.value = 0f;
+            UpdateGaugeFill(0f);
             return true;
+        }
+
+        void UpdateGaugeFill(float ratio)
+        {
+            if (specialGaugeFill == null) return;
+            specialGaugeFill.sprite = ratio >= 1f   ? gaugeSpriteFulll
+                                    : ratio >= 0.5f ? gaugeSpriteMedium
+                                    :                 gaugeSpriteLow;
         }
 
         public static void SetBombActive(bool active) => IsBombActive = active;
@@ -142,11 +158,19 @@ namespace MiniTeam.Shooting1942
             if (resultScoreText != null)
                 resultScoreText.text = $"SCORE: {score}";
 
+            if (continueHintText != null)
+                continueHintText.gameObject.SetActive(!isCleared);
+
             CancelInvoke(nameof(HideWaveMessage));
             if (wavePanel    != null) wavePanel.SetActive(false);
             if (pausePanel   != null) pausePanel.SetActive(false);
             if (bossHpPanel  != null) bossHpPanel.SetActive(false);
             resultPanel.SetActive(true);
+        }
+
+        public void HideResult()
+        {
+            if (resultPanel != null) resultPanel.SetActive(false);
         }
     }
 }

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1193fe0015c1b6e4787d97208e7e35d6, type: 3}
+  m_Name: Test_Stage3
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  sentences:
+  - text: "\uBC30\uAC00 \uBE75\uBE75\uD558\uB2E4\uCE58!!"
+    expressionSprite: {fileID: 21300000, guid: f9fb4689fc86e7f4ab1b5d54d772c405, type: 3}
+    animationTriggerName: 
+  - text: "\uBFCC\uC9C1!!!! \uC544 \uC26C\uC6D0\uD574~~"
+    expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
+    animationTriggerName: DDong
+  - text: "\uC557. \uBC30\uAC00 \uBD88\uB7EC \uADF8\uB9CC \uC2E4\uC218\uB97C \uD588\uB2E4\uCE58...!!!"
+    expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
+    animationTriggerName: 
+  - text: "\uD639\uC2DC..."
+    expressionSprite: {fileID: 21300000, guid: f31671a02ea42a947ab7234273886b75, type: 3}
+    animationTriggerName: 
+  - text: "\uC5D0\uC787!!!"
+    expressionSprite: {fileID: 21300000, guid: c6f445e5b3978c8409c4c336545e3253, type: 3}
+    animationTriggerName: 
+  nextInteractableIndex: 0

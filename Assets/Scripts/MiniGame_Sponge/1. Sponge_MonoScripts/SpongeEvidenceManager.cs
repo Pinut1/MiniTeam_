@@ -23,8 +23,9 @@ public class SpongeEvidenceManager : MonoBehaviour
     }
 
     // 증거 상태가 바뀔 때 구독자들에게 알려주는 이벤트
-    public static event Action<string> OnEvidenceSelected; // 증거 선택됨
-    public static event Action OnEvidenceListChanged; // 목록 변경됨
+    public static event Action<string> OnEvidenceSelected;  // 증거 선택됨
+    public static event Action OnEvidenceListChanged;        // 목록 변경됨
+    public static event Action<string> OnEvidenceUnlocked;  // 증거 새로 획득됨
 
     public string SelectedEvidenceId { get; private set; }
 
@@ -46,7 +47,10 @@ public class SpongeEvidenceManager : MonoBehaviour
     public void UnlockEvidence(string id)
     {
         if (unlockedIds.Add(id))
+        {
             OnEvidenceListChanged?.Invoke();
+            OnEvidenceUnlocked?.Invoke(id);
+        }
     }
 
     // 증거 슬롯 첫 클릭 시 호출 — 하이라이트 + 상세 이미지 표시

@@ -25,6 +25,9 @@ public class SpongeDialogueLine
     public string nextLineId;        // 선택지 없을 때 다음 대사 ID
     public string grantEvidenceId;   // 이 대사 클릭 후 획득할 증거 ID (없으면 빈 문자열)
     public bool playObjectionAnim;   // true면 대사 표시 전 Objection 연출 재생
+    public bool playInnocenceAnim;   // true면 클릭 후 InnocencePnl 애니메이션 재생 후 다음 대사
+    public bool opensRecordPanel;    // true면 클릭 후 RecordPnl 열림 (증거 직접 선택)
+    public string[] validRecordEvidenceIds; // RecordPnl에서 정답 증거 ID 목록
     
     public enum CharacterType
     {

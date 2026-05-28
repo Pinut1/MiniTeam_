@@ -28,6 +28,11 @@ namespace MiniTeam.Shooting1942
         [Header("이펙트")]
         public GameObject explosionPrefab;
 
+        [Header("파워업 드롭")]
+        public GameObject powerUpPrefab;
+        [Range(0f, 1f)]
+        public float powerUpDropChance = 0.15f;
+
         private float destroyY;
         private float startX;
         private float elapsed = 0f;
@@ -142,6 +147,9 @@ namespace MiniTeam.Shooting1942
 
                 if (explosionPrefab != null)
                     Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+                if (powerUpPrefab != null && Random.value < powerUpDropChance)
+                    Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
 
                 Destroy(gameObject);
             }

@@ -84,3 +84,7 @@ Thumbs.db
 Assets/Screenshots/
 Assets/Screenshots.meta
 Packages/com.coplaydev.unity-mcp/
+
+
+# Claude Code
+Assets/.claude/

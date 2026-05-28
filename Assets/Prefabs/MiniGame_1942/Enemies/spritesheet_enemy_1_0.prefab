@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2947163850827585929}
   - component: {fileID: 4105094406748790302}
   - component: {fileID: 1405432993132984507}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: spritesheet_enemy_1_0
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1447748077
-  m_SortingLayer: 5
+  m_SortingLayer: 12
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 546111346, guid: 5eab947cd1d52b643b19785a10a6554b, type: 3}
@@ -140,6 +140,8 @@ MonoBehaviour:
   burstDelay: 0.15
   hp: 3
   explosionPrefab: {fileID: 7862446294290157411, guid: 51a47ae2a7f65fd46a835c268fc9cbed, type: 3}
+  powerUpPrefab: {fileID: 7633775831970236131, guid: cd0fbf03100e74245b5ba19bcbdac984, type: 3}
+  powerUpDropChance: 0.15
 --- !u!60 &4105094406748790302
 PolygonCollider2D:
   m_ObjectHideFlags: 0

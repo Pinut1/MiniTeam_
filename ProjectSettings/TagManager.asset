@@ -11,6 +11,7 @@ TagManager:
   - Enemy
   - EnemyBullet
   - Boss
+  - WarningBox
   layers:
   - Default
   - TransparentFX
@@ -21,6 +22,7 @@ TagManager:
   - Player
   - Enemy
   - NPC
+  - Item
   - 
   - 
   - 
@@ -30,9 +32,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Walls
   - 
   - 
   - 
@@ -49,6 +49,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BG
+    uniqueID: 37507989
+    locked: 0
+  - name: BG_Effect
+    uniqueID: 3354770137
+    locked: 0
   - name: Background
     uniqueID: 1384838389
     locked: 0
@@ -61,23 +67,17 @@ TagManager:
   - name: NPC
     uniqueID: 3373514453
     locked: 0
+  - name: Player
+    uniqueID: 1976330389
+    locked: 0
   - name: BoomEffect
     uniqueID: 2422926669
     locked: 0
   - name: Objects
     uniqueID: 972479335
     locked: 0
-  - name: Player
-    uniqueID: 1976330389
-    locked: 0
   - name: Magic
     uniqueID: 2572098445
-    locked: 0
-  - name: BG
-    uniqueID: 37507989
-    locked: 0
-  - name: BG_Effect
-    uniqueID: 3354770137
     locked: 0
   - name: UI
     uniqueID: 2043359829
@@ -126,4 +126,4 @@ TagManager:
   - 
   - 
   - 
-  -
+  - 
