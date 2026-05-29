@@ -78,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 972479335
-  m_SortingLayer: 6
+  m_SortingLayer: 9
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 320e0155e68dba74fa35db12c273e0fa, type: 3}
@@ -169,7 +169,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -457872583
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 584624433, guid: 7c5527cfa7a4b2d40b2ea921c1fc4272, type: 3}
@@ -359,7 +359,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -921452843
-  m_SortingLayer: 4
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -2056400158, guid: c5cc3503ff7243c4095617cad8dfe88e, type: 3}
@@ -411,6 +411,9 @@ MonoBehaviour:
   maxSpeed: 2.5
   minIdleTime: 1
   maxIdleTime: 5
+  isPierre: 0
+  heartPrefab: {fileID: 0}
+  pierreHeartSprite: {fileID: 0}
 --- !u!70 &5770515520825939229
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -544,7 +547,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 972479335
-  m_SortingLayer: 6
+  m_SortingLayer: 9
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1110572099, guid: 297adf0e6e8e12140819a7191bbd0044, type: 3}

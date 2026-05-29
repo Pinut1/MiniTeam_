@@ -1,30 +1,9 @@
 using UnityEngine;
 
+// ì „ì²´ í™”ë©´ í´ë¦­ì€ CutsceneNpcManager.Update()ì—ì„œ ì²˜ë¦¬í•˜ë¯€ë¡œ
+// ì´ ìŠ¤í¬ë¦½íŠ¸ì˜ OnMouseDownì€ ì‚¬ìš©í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
 public class BanillaNpcManager : MonoBehaviour
 {
-    // ¡Ú PlayerLaser¿¡¼­ Ã£°í ÀÖÀ¸´Ï Àı´ë Áö¿ì¸é ¾È µÇ´Â º¯¼ö!
     public Sprite heartSprite;
-
     public CutsceneNpcManager duelManager;
-
-    void Start()
-    {
-        if (duelManager == null)
-        {
-            duelManager = FindAnyObjectByType<CutsceneNpcManager>();
-        }
-    }
-
-    private void OnMouseDown()
-    {
-        if (duelManager != null)
-        {
-            // ¡Ú ¸Å´ÏÀú°¡ ´ë°á °¡´ÉÇÑ »óÅÂ(canStartDuelÀÌ true)ÀÏ ¶§¸¸ Å¬¸¯À» Çã¿ëÇÕ´Ï´Ù.
-            // ´ë°áÀÌ ÀÌ¹Ì ÁøÇà ÁßÀÌ°Å³ª, ¿Ï½ÂÇØ¼­ canStartDuelÀÌ false°¡ µÇ¸é Å¬¸¯ÀÌ ¾Æ¿¹ ¾ÃÈü´Ï´Ù.
-            if (duelManager.canStartDuel)
-            {
-                duelManager.StartLaserDuel();
-            }
-        }
-    }
 }

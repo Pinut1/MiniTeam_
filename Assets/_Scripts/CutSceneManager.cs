@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
@@ -77,6 +77,16 @@ public class CutsceneNpcManager : MonoBehaviour
         if (!isLaserDuelActive && banillaLaserObj != null && banillaLaserObj.activeSelf)
         {
             banillaLaserObj.SetActive(false);
+        }
+
+        // 화면 어디를 클릭해도 어택 가능 (넉백 중에는 무시)
+        if (Input.GetMouseButtonDown(0))
+        {
+            bool isKnockedBack = playerLaserScript != null && playerLaserScript.isPlayerKnockedBack;
+            if (!isKnockedBack && (canStartDuel || isLaserDuelActive))
+            {
+                StartLaserDuel();
+            }
         }
 
         if (!isLaserDuelActive) return;
@@ -633,11 +643,16 @@ public class CutsceneNpcManager : MonoBehaviour
     public void OnPlayerLoseCompetition()
     {
         SetBanillaCrying(true);
+        canStartDuel = false; // 넉백 중 클릭 차단
         ExitLaserDuel();
 
         if (playerLaserScript != null && banillaTransform != null)
         {
-            playerLaserScript.StartPlayerKnockback(banillaTransform);
+            playerLaserScript.StartPlayerKnockback(banillaTransform, onKnockbackEnd: () =>
+            {
+                // 넉백 + 기절이 완전히 끝난 뒤에만 다시 클릭 허용
+                canStartDuel = true;
+            });
             Debug.Log("쇼콜라 패배! 넉백 애니메이션 실행");
         }
     }

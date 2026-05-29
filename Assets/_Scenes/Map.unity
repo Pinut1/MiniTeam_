@@ -119,6 +119,53 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &10979134
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 10979136}
+  - component: {fileID: 10979135}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &10979135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10979134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ee529d332de9a4db000ad2128f389f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Pokemon.AudioManager
+  bgmField: {fileID: 8300000, guid: c2fcf6e1aa1869344b6eb549a2f635a2, type: 3}
+  bgmBattle: {fileID: 8300000, guid: 74cc0f1485c72ed4ba14150ac8e7d8c6, type: 3}
+  bgmVictory: {fileID: 8300000, guid: 53d87de4d42c12449ae5832804f6e61b, type: 3}
+--- !u!4 &10979136
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10979134}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.36683, y: -15.27885, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &19001141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1562,7 +1609,7 @@ GameObject:
   - component: {fileID: 283470303}
   - component: {fileID: 283470302}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Player_Portrait
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2742,7 +2789,7 @@ MonoBehaviour:
   statusPanelRight: {fileID: 379051332}
   commandPanel: {fileID: 1067517735}
   enemySlider: {fileID: 929420663}
-  pokemonSpawnPoint: {fileID: 1393415518}
+  pokemonSlider: {fileID: 1278459462}
   pokemonScale: {x: 1, y: 1, z: 1}
   trainerImage: {fileID: 929420661}
   trainerNameText: {fileID: 1934215706}
@@ -2767,6 +2814,7 @@ MonoBehaviour:
   playerBattlePanel: {fileID: 370724391}
   enemyBattlePanel: {fileID: 379051328}
   agumonPanel: {fileID: 1278459457}
+  playerPortrait: {fileID: 283470300}
 --- !u!1 &490239146
 GameObject:
   m_ObjectHideFlags: 0
@@ -107687,6 +107735,21 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7683810744662933532, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
   m_PrefabInstance: {fileID: 6689525594300505607}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1278459462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1278459457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 130dcf0e79cd9f24c95fde03705cb151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Pokemon.UIPanelSlider
+  direction: 1
+  slideDist: 500
+  duration: 0.25
 --- !u!1 &1283427313
 GameObject:
   m_ObjectHideFlags: 0
@@ -112843,6 +112906,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Agumon
       objectReference: {fileID: 0}
+    - target: {fileID: 2305864204651828021, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 1759c65bb71ccc946b61a2e30ceaf458, type: 2}
+    - target: {fileID: 3405285816537629372, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1598305952, guid: a8f2c0226a065c345a6882cfbeb9856e, type: 3}
     - target: {fileID: 7683810744662933532, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -112905,7 +112976,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683810744662933532, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -382
+      value: -406
       objectReference: {fileID: 0}
     - target: {fileID: 7683810744662933532, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -112926,7 +112997,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1221402570288019284, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1278459462}
   m_SourcePrefab: {fileID: 100100000, guid: 41c4765c9e1851249a4b710681b3167f, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -112949,3 +113023,4 @@ SceneRoots:
   - {fileID: 1539799928}
   - {fileID: 973933436}
   - {fileID: 996118137}
+  - {fileID: 10979136}

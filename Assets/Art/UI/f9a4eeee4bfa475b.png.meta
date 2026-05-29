@@ -113,9 +113,9 @@ TextureImporter:
       name: f9a4eeee4bfa475b_0
       rect:
         serializedVersion: 2
-        x: 80
+        x: 41
         y: 160
-        width: 704
+        width: 803
         height: 704
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
