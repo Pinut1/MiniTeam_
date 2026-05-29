@@ -56,37 +56,31 @@ namespace MiniTeam.Core
             playerMove = FindAnyObjectByType<HubPlayerMove>();
 
 
-            if (playerMove != null)
+            void PlayWakeUp()
             {
-                // 눈 깜빡임 연출이 진행되는 동안 플레이어가 움직이지 못하게 스크립트 OFF
-                DisablePlayerInput();
-                // 연출(WakeUp)을 실행, 다 끝나면 다음 메서드를 콜백.
                 HubUIManager.Instance.WakeUp(() =>
                 {
-                    // 눈 깜빡임 종료 후 BGM 재생 (피치 0.7)
                     if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
                     {
                         SoundManager.Instance?.SetBGMPitch(0.7f);
                         AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
                     }
-
-                    if (SpiralDiveCutscene.Instance != null)
-                        SpiralDiveCutscene.Instance.PlayIfFirstTime(() => EnablePlayerInput());
-                    else
-                        EnablePlayerInput();
+                    if (playerMove != null) EnablePlayerInput();
                 });
+            }
+
+            if (playerMove != null)
+            {
+                DisablePlayerInput();
+                // 스파이럴 → 눈깜빡 → BGM + 플레이어 입력 활성화
+                if (SpiralDiveCutscene.Instance != null)
+                    SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
+                else
+                    PlayWakeUp();
             }
             else
             {
-                HubUIManager.Instance.WakeUp(() =>
-                {
-                    // 눈 깜빡임 종료 후 BGM 재생 (피치 0.7)
-                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-                    {
-                        SoundManager.Instance?.SetBGMPitch(0.7f);
-                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-                    }
-                });
+                PlayWakeUp();
             }
            
         }
