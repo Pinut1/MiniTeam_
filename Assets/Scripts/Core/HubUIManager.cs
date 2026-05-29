@@ -54,6 +54,9 @@ public class HubUIManager : MonoBehaviour
                 if (img != null) img.enabled = false;
             }
         }
+
+        // 씬이 처음 로드되거나 복귀했을 때, 현재 스테이지에 맞춰 초기 UI를 띄워줍니다.
+        // InitializeBottomUI(MiniGameManager.Instance.currentStage);
     }
 
     #endregion
