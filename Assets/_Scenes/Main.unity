@@ -4580,9 +4580,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1112099415}
-        m_TargetAssemblyTypeName: MiniTeam.Core.OptionsUIManager, Assembly-CSharp
-        m_MethodName: Toggle
+      - m_Target: {fileID: 538911416}
+        m_TargetAssemblyTypeName: MainUIManager, Assembly-CSharp
+        m_MethodName: OpenOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
