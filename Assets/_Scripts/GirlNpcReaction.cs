@@ -15,7 +15,7 @@ public class GirlNpcReaction : MonoBehaviour
     private Coroutine reactionCoroutine;
     private Vector3 lastTargetPos;      // 남학생의 피벗(가슴) 위치를 그대로 저장!
     private bool isLaserActive = false;
-    private GameObject targetBoyNpc;
+    public GameObject targetBoyNpc;
 
     [Header("레이저 정밀 조준 설정")]
     [SerializeField] private float eyeOffset;         // 여학생의 눈 높이
@@ -31,21 +31,40 @@ public class GirlNpcReaction : MonoBehaviour
     private Vector3 flyTargetPos;
     private float flyTime = 0f;
 
-    void Start()
+    void Awake()
     {
         anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        moveScript = GetComponent<NpcRandomPatrol>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
 
-        // 자식 오브젝트들 중에서 이름에 "Surprise_Mark"가 포함된 것을 찾습니다 (계층 구조 상관없이 모두 탐색)
-        Transform[] allChildren = GetComponentsInChildren<Transform>(true);
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null) rb = GetComponentInChildren<Rigidbody2D>();
+
+        moveScript = GetComponent<NpcRandomPatrol>();
+        if (moveScript == null) moveScript = GetComponentInChildren<NpcRandomPatrol>();
+
+        // 자식 오브젝트들 중에서 이름에 "Surprise_Mark"가 포함된 것을 찾습니다
         Transform markTransform = null;
+        Transform[] allChildren = GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
             if (child.name.Contains("Surprise_Mark"))
             {
                 markTransform = child;
                 break;
+            }
+        }
+
+        // 만약 자식 중에 없다면, 부모 쪽 자식들(형제 오브젝트)도 검사합니다.
+        if (markTransform == null && transform.parent != null)
+        {
+            Transform[] parentChildren = transform.parent.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in parentChildren)
+            {
+                if (child.name.Contains("Surprise_Mark"))
+                {
+                    markTransform = child;
+                    break;
+                }
             }
         }
 
@@ -61,6 +80,10 @@ public class GirlNpcReaction : MonoBehaviour
         }
 
         Transform laserTransform = transform.Find("Laser_Yellow_0");
+        if (laserTransform == null && transform.parent != null)
+        {
+            laserTransform = transform.parent.Find("Laser_Yellow_0");
+        }
         if (laserTransform != null)
         {
             npcLaser = laserTransform.gameObject;
@@ -68,9 +91,19 @@ public class GirlNpcReaction : MonoBehaviour
         }
     }
 
-    // 애니메이터 계산이 끝난 후, 강제로 레이저를 눈에 박고 조준시킵니다.
+    // 애니메이터 계산이 끝난 후, 강제로 레이저를 눈에 박고 조준시키거나, 날아가는 중일 때 회전을 덮어씌웁니다.
     void LateUpdate()
     {
+        if (isFlyingAway)
+        {
+            // 애니메이터나 부모 스케일(-1 등)의 영향을 무시하기 위해 월드 절대 각도(eulerAngles)를 직접 올려버립니다.
+            float spinDir = (flyTargetPos.x > flyStartPos.x) ? -1f : 1f;
+            Vector3 currentAngles = transform.eulerAngles;
+            currentAngles.z += spinDir * 1080f * Time.deltaTime;
+            transform.eulerAngles = currentAngles;
+            return; // 넉백 중일 때는 레이저 로직 무시
+        }
+
         if (isLaserActive && npcLaser != null)
         {
             float facingDirection = Mathf.Sign(transform.localScale.x);
@@ -189,6 +222,8 @@ isLaserActive = true;
         if (girlAnim != null)
         {
             girlAnim.SetBool("isWalking", false);
+            girlAnim.SetBool("isAttacking", false); // 공격 상태 해제 추가!
+            girlAnim.ResetTrigger("isKnockback");
             girlAnim.SetTrigger("isKnockback");
         }
 
@@ -202,6 +237,9 @@ isLaserActive = true;
     private IEnumerator FlyAwayCoroutine()
     {
         flyTime = 0f;
+        
+        // 날아가는 방향에 따라 회전 방향 결정 (오른쪽으로 날아가면 시계방향, 왼쪽이면 반시계방향)
+        float spinDir = (flyTargetPos.x > flyStartPos.x) ? -1f : 1f;
 
         while (flyTime < flyDuration)
         {
@@ -213,6 +251,7 @@ isLaserActive = true;
             currentPos.y += height;
 
             transform.position = currentPos;
+
             yield return null;
         }
 

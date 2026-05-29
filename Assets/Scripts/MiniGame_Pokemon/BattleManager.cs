@@ -25,7 +25,6 @@ namespace MiniTeam.Pokemon
             currentTrainer = trainer;
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
             BattleUIManager.Instance?.ShowBattle(trainer);
-            AudioManager.Instance?.PlayBattleBGM();
         }
 
         public void EndBattle(bool victory = false)

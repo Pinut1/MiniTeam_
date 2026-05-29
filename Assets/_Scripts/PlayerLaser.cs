@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -55,7 +55,7 @@ public class PlayerLaser : MonoBehaviour
     public float playerKnockbackHeight = 1.5f;
     public float playerGroundStunDuration = 2.0f; // 기절 대기 시간
     public float knockbackYOffset = -0.5f;
-    private bool isPlayerKnockedBack = false;
+    public bool isPlayerKnockedBack = false;
 
     [Header("Scripts")]
     public PlayerMove playerMoveScript;
@@ -221,7 +221,7 @@ public class PlayerLaser : MonoBehaviour
     }
 
     // ★ 매니저에서 넉백을 호출할 수 있도록 public으로 열고, 공격자(바닐라)의 위치를 받을 수 있게 수정했습니다.
-    public void StartPlayerKnockback(Transform attacker = null)
+    public void StartPlayerKnockback(Transform attacker = null, System.Action onKnockbackEnd = null)
     {
         if (isPlayerKnockedBack) return;
         isPlayerKnockedBack = true;
@@ -268,10 +268,10 @@ public class PlayerLaser : MonoBehaviour
         CameraFollow cam = FindAnyObjectByType<CameraFollow>();
         if (cam != null) cam.SetKnockbackMode(true);
 
-        StartCoroutine(PlayerKnockbackCoroutine(pushDirection));
+        StartCoroutine(PlayerKnockbackCoroutine(pushDirection, onKnockbackEnd));
     }
 
-    private System.Collections.IEnumerator PlayerKnockbackCoroutine(float pushDir)
+    private System.Collections.IEnumerator PlayerKnockbackCoroutine(float pushDir, System.Action onKnockbackEnd = null)
     {
         Vector3 startPos = transform.position;
         Vector3 targetPos = startPos + new Vector3(pushDir * playerKnockbackDistance, knockbackYOffset, 0f);
@@ -324,6 +324,7 @@ public class PlayerLaser : MonoBehaviour
         }
         CameraFollow cam = FindAnyObjectByType<CameraFollow>();
         if (cam != null) cam.SetKnockbackMode(false);
+        onKnockbackEnd?.Invoke();
     }
 
     void KnockbackNearbyGirls()
@@ -338,7 +339,7 @@ public class PlayerLaser : MonoBehaviour
             GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
-            if (girl != null)
+            if (girl != null && girl.targetBoyNpc == currentBurningNpc)
             {
                 girl.StartFlyingAway(transform.position);
 
@@ -364,7 +365,7 @@ public class PlayerLaser : MonoBehaviour
             if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
 
-            if (girl != null)
+            if (girl != null && girl.targetBoyNpc == currentBurningNpc)
             {
                 if (isPierre)
                 {
@@ -758,11 +759,13 @@ public class PlayerLaser : MonoBehaviour
             }
             else
             {
-                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
+                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 2.0f);
                 foreach (Collider2D col in overlappingColliders)
                 {
-                    GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
-                    // ★ 기존의 hit.collider.gameObject 대신 찾아낸 targetNpc로 변경
+                    GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
+                    if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
+                    if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
+
                     if (girl != null && girl.gameObject != targetNpc)
                     {
                         girl.LookAtAttackedNpc(currentBurningNpc);

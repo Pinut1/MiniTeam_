@@ -23,6 +23,8 @@ public class HeartUIManager : MonoBehaviour
     public float bossHeartScale = 1.8f;
     public float magicStickScale = 2.8f;
     public float centerSpacing = 70f;
+    [Tooltip("보스 하트 2개의 Y 위치 보정값. 음수면 아래로 내려갑니다.")]
+    public float bossHeartYOffset = 0f;
 
     [Header("요술봉 확대 연출 설정")]
     public float zoomDuration = 1.5f;        // 확대+이동 시간
@@ -152,7 +154,7 @@ public class HeartUIManager : MonoBehaviour
         {
             heartSlots[0].sprite = rainbowHeartSprite;
             SetAlpha(heartSlots[0], uncollectedAlpha);
-            heartSlots[0].transform.localPosition = boardCenterPos + new Vector3(-centerSpacing, 0f, 0f);
+            heartSlots[0].transform.localPosition = boardCenterPos + new Vector3(-centerSpacing, bossHeartYOffset, 0f);
             heartSlots[0].transform.localScale = new Vector3(bossHeartScale, bossHeartScale, 1f);
         }
 
@@ -160,7 +162,7 @@ public class HeartUIManager : MonoBehaviour
         {
             heartSlots[1].sprite = vanillaWhiteHeartSprite;
             SetAlpha(heartSlots[1], uncollectedAlpha);
-            heartSlots[1].transform.localPosition = boardCenterPos + new Vector3(centerSpacing, 0f, 0f);
+            heartSlots[1].transform.localPosition = boardCenterPos + new Vector3(centerSpacing, bossHeartYOffset, 0f);
             heartSlots[1].transform.localScale = new Vector3(bossHeartScale, bossHeartScale, 1f);
         }
     }

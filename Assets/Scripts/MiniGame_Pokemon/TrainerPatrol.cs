@@ -63,13 +63,14 @@ namespace MiniTeam.Pokemon
             {
                 state = State.Chasing;
                 anim?.SetBool("isWalk", true);
+                AudioManager.Instance?.PlayBattleBGM();
                 FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
             }
         }
 
         // 부모 OnTriggerEnter2D 무력화 (직선 시야 감지로 대체)
         // 패배 후에는 플레이어 근접 여부만 추적
-        new void OnTriggerEnter2D(Collider2D other)
+        protected override void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Player")) playerNearby = true;
         }
@@ -84,7 +85,6 @@ namespace MiniTeam.Pokemon
             if (playerTf == null) return false;
             Vector2 diff = (Vector2)(playerTf.position - transform.position);
             if (diff.magnitude > detectionRange) return false;
-
             bool horizontal = Mathf.Abs(diff.y) <= sightTolerance;
             bool vertical   = Mathf.Abs(diff.x) <= sightTolerance;
             return horizontal || vertical;
