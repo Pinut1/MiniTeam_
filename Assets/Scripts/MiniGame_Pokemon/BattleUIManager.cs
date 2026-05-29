@@ -399,29 +399,6 @@ namespace MiniTeam.Pokemon
             if (blackoutPanel != null) blackoutPanel.SetActive(false);
         }
 
-        public void ShowDieState()
-        {
-            if (blackoutPanel != null) blackoutPanel.SetActive(true);
-
-            if (statusPanelLeft  != null) statusPanelLeft.gameObject.SetActive(false);
-            if (statusPanelRight != null) statusPanelRight.gameObject.SetActive(false);
-            if (commandPanel     != null) commandPanel.gameObject.SetActive(false);
-            if (enemySlider      != null) enemySlider.gameObject.SetActive(false);
-            if (itemPanel        != null) itemPanel.SetActive(false);
-
-            if (enemyPanel        != null) enemyPanel.SetActive(false);
-            if (playerBattlePanel != null) playerBattlePanel.SetActive(false);
-            if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(false);
-            if (agumonPanel       != null) agumonPanel.SetActive(false);
-
-            if (StartMenuUI.Instance?.menuPanel != null) StartMenuUI.Instance.menuPanel.SetActive(false);
-            if (StartMenuUI.Instance?.bagPanel  != null) StartMenuUI.Instance.bagPanel.SetActive(false);
-            if (MapDialogueUI.Instance?.panel   != null) MapDialogueUI.Instance.panel.SetActive(false);
-
-            isCommandActive = false;
-            isItemActive    = false;
-        }
-
         // 짧은 연출용 (블랙아웃만 단독 사용할 때)
         public IEnumerator ShowBlackout(float duration)
         {
