@@ -2,23 +2,26 @@ using MiniTeam.Core;
 using System;
 using System.Collections;
 using UnityEngine;
+using MiniTeam.Pokemon; // 추가된 네임스페이스
 
 public class JudangChiController : MonoBehaviour
 {
     public static JudangChiController Instance { get; private set; }
 
-    [Header("대사 데이터 목록")]
-    [Tooltip("인덱스 0: 게임 시작시, 1: 1스테이지 클리어 후...")]
-    public DialogueData[] stageDialogues;
-
-
-
+    // [Header("대사 데이터 키 (JSON 연동)")]
+    // [Tooltip("인덱스 0: 게임 시작시, 1: 1스테이지 클리어 후...")]
+    // public DialogueData[] stageDialogues; (SO 데이터 제거)
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
 
+    private void Start()
+    {
+        // 씬 시작 시 Hub 전용 대사 데이터 로드
+        DialogueDB.Instance.Load("Hub");
     }
 
     // 최초 허브에서 주댕치-> 주댕치 대화 씬 진입 제어
@@ -27,13 +30,14 @@ public class JudangChiController : MonoBehaviour
     {
         int currentStage = MiniGameManager.Instance.currentStage;
 
-        if (currentStage >= stageDialogues.Length) return;
+        string countStr = DialogueDB.Instance.Get($"hub_stage{currentStage}_count");
+        if (!int.TryParse(countStr, out int count) || count == 0) return;
 
-        StartCoroutine(FirstSequenceRoutine(stageDialogues[currentStage]));
+        StartCoroutine(FirstSequenceRoutine($"hub_stage{currentStage}"));
 
     }
 
-    private IEnumerator FirstSequenceRoutine(DialogueData dialogueData)
+    private IEnumerator FirstSequenceRoutine(string dialogueKeyPrefix)
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
@@ -45,7 +49,7 @@ public class JudangChiController : MonoBehaviour
 
         // 2. 대사 진행
         bool isDialogueDone = false;
-        JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
+        JudangChiDialogueManager.Instance.StartDialogue(dialogueKeyPrefix, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
 
         // 3. 시네마틱 퇴장 (큰 주댕치 내려감 + 레터박스 들어감 + 상황에 맞는 하단UI 올라옴)
@@ -64,12 +68,14 @@ public class JudangChiController : MonoBehaviour
     public void PlaySequenceForCurrentStage()
     {
         int currentStage = MiniGameManager.Instance.currentStage;
-        if (currentStage >= stageDialogues.Length) return;
+        
+        string countStr = DialogueDB.Instance.Get($"hub_stage{currentStage}_count");
+        if (!int.TryParse(countStr, out int count) || count == 0) return;
        
-        StartCoroutine(NomalSequenceRoutine(stageDialogues[currentStage]));
+        StartCoroutine(NomalSequenceRoutine($"hub_stage{currentStage}"));
     }
 
-    private IEnumerator NomalSequenceRoutine(DialogueData dialogueData)
+    private IEnumerator NomalSequenceRoutine(string dialogueKeyPrefix)
     {
         MiniGameManager.Instance.DisablePlayerInput();
 
@@ -80,7 +86,7 @@ public class JudangChiController : MonoBehaviour
 
         // 2. 대사 진행
         bool isDialogueDone = false;
-        JudangChiDialogueManager.Instance.StartDialogue(dialogueData, () => isDialogueDone = true);
+        JudangChiDialogueManager.Instance.StartDialogue(dialogueKeyPrefix, () => isDialogueDone = true);
         yield return new WaitUntil(() => isDialogueDone);
 
         bool isFinalStage = MiniGameManager.Instance.currentStage == 5;
@@ -114,12 +120,19 @@ public class JudangChiController : MonoBehaviour
     {
         int currentStage = MiniGameManager.Instance.currentStage;
 
-        if (currentStage >= stageDialogues.Length) return;
+        string countStr = DialogueDB.Instance.Get($"hub_stage{currentStage}_count");
+        if (!int.TryParse(countStr, out int count) || count == 0)
+        {
+            // 데이터가 없어도 게임 진행을 위해 필수 UI 갱신 및 조작권 반환 처리
+            HubUIManager.Instance?.InitializeBottomUI(currentStage);
+            MiniGameManager.Instance.EnablePlayerInput();
+            return;
+        }
 
-        StartCoroutine(GameClearSequenceRoutine(stageDialogues[currentStage]));
+        StartCoroutine(GameClearSequenceRoutine($"hub_stage{currentStage}"));
     }
 
-    private IEnumerator GameClearSequenceRoutine(DialogueData dialogueData)
+    private IEnumerator GameClearSequenceRoutine(string dialogueKeyPrefix)
     {
         yield return new WaitForSeconds(0.5f);
         MiniGameManager.Instance.DisablePlayerInput();

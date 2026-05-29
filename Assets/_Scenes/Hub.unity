@@ -10079,13 +10079,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad185bd08cd672459ff7fb19f84eb02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  stageDialogues:
-  - {fileID: 11400000, guid: d50e2cbb5bc8b494a8585077647b3c23, type: 2}
-  - {fileID: 11400000, guid: 1c8330dcc3ba7164fad40d1ce6e02ee6, type: 2}
-  - {fileID: 11400000, guid: d074ed72e07c89844b3c20f46d579a21, type: 2}
-  - {fileID: 11400000, guid: e67f73c820c4c0642bfb69da66e77ab4, type: 2}
-  - {fileID: 11400000, guid: c8ec625f82a21d34e8a047ae67d77aed, type: 2}
-  - {fileID: 11400000, guid: d9b7aaabe35ad094dafc6cb36b2ca729, type: 2}
 --- !u!1 &1446728234
 GameObject:
   m_ObjectHideFlags: 0
@@ -12325,6 +12318,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2009186150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2009186152}
+  - component: {fileID: 2009186151}
+  m_Layer: 0
+  m_Name: DialogueDB
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2009186151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009186150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c77ea699abc434aa0c7052a067a233, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Pokemon.DialogueDB
+--- !u!4 &2009186152
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009186150}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2018284331
 GameObject:
   m_ObjectHideFlags: 0
@@ -13273,3 +13310,4 @@ SceneRoots:
   - {fileID: 1234845120}
   - {fileID: 771010301}
   - {fileID: 1396281263}
+  - {fileID: 2009186152}

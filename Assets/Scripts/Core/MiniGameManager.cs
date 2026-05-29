@@ -140,6 +140,9 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
+            // 미니게임에서 사용하던 JSON 대사 데이터를 다시 Hub용으로 교체
+            MiniTeam.Pokemon.DialogueDB.Instance?.Load("Hub");
+
             if (isLastGameCleared)
             {
                 JudangChiController.Instance?.PlaySequenceForGameClear();
