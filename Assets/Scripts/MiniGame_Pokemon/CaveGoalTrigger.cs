@@ -13,7 +13,9 @@ namespace MiniTeam.Pokemon
 
         void OnTriggerEnter2D(Collider2D other)
         {
+            Debug.Log($"[CaveGoalTrigger] OnTriggerEnter2D: {other.name} / tag={other.tag}");
             if (!other.CompareTag("Player")) return;
+            Debug.Log($"[CaveGoalTrigger] Player 감지. PGC={PokemonGameController.Instance != null}, EventDone={PokemonGameController.Instance?.IsPokemonEventDone}");
             if (PokemonGameController.Instance == null) return;
             if (isCleared) return;
 

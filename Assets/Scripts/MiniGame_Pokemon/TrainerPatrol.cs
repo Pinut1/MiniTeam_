@@ -14,6 +14,9 @@ namespace MiniTeam.Pokemon
         public float moveSpeed       = 3f;
         public float battleDistance  = 0.8f; // 이 거리 이내면 배틀 시작
 
+        [Header("패배 후 대화 감지 거리")]
+        public float interactRange   = 1f;
+
         private enum State { Idle, Chasing, Battling }
         private State state = State.Idle;
 
@@ -37,9 +40,15 @@ namespace MiniTeam.Pokemon
         {
             if (IsDefeated)
             {
-                if (!string.IsNullOrEmpty(afterDefeatDialogueKey) && playerNearby && !dialoguePlaying
+                if (!string.IsNullOrEmpty(afterDefeatDialogueKey) && !dialoguePlaying
                     && Input.GetKeyDown(KeyCode.Z))
-                    StartCoroutine(AfterDefeatDialogueRoutine());
+                {
+                    float dist = playerTf != null
+                        ? Vector2.Distance(transform.position, playerTf.position)
+                        : float.MaxValue;
+                    if (dist <= interactRange)
+                        StartCoroutine(AfterDefeatDialogueRoutine());
+                }
                 return;
             }
             if (state == State.Battling) return;
@@ -107,6 +116,14 @@ namespace MiniTeam.Pokemon
             transform.position = startPosition;
             if (playerTf != null)
                 playerTf.position = startPosition + Vector3.down * (detectionRange + 1f);
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, detectionRange);  // 시야 감지
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, interactRange);   // 대화 감지
         }
 
         IEnumerator AfterDefeatDialogueRoutine()
