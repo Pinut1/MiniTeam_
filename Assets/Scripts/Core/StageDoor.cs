@@ -16,6 +16,12 @@ public class StageDoor : MonoBehaviour
     [Tooltip("활성화된 문이지만 주댕치와의 대화 전일 때의 경고 메시지")]
     public string cutscenePendingWarning = "주댕치의 이야기를\n 들어봐야 할 것 같다";
 
+    [Tooltip("모든 스테이지를 클리어했을 때의 경고 메시지")]
+    public string allClearWarning = "이 곳에서 볼 일은 모두 끝났다.";
+    
+    [Tooltip("이미 클리어한 스테이지 문에 접근했을 때의 경고 메시지")]
+    public string alreadyClearedWarning = "이미 가본 적 있는 문이다.";
+
     [Header("Door Animation")]
     [Tooltip("회전시킬 실제 문 트랜스폼")]
     public Transform doorTransform;
@@ -117,7 +123,7 @@ public class StageDoor : MonoBehaviour
         }
         else
         {
-            ShowWarning(inactiveDoorWarning);
+            ShowInactiveWarning();
         }
     }
 
@@ -179,5 +185,40 @@ public class StageDoor : MonoBehaviour
     private void HideWarning()
     {
         HubUIManager.Instance?.ToggleWarningUI(false);
+    }
+
+    /// <summary>
+    /// 비활성화된 문에 진입 시 진행 상황(클리어 완료 여부)에 맞춰 세분화된 경고를 띄웁니다.
+    /// </summary>
+    private void ShowInactiveWarning()
+    {
+        var manager = MiniGameManager.Instance;
+        if (manager == null || manager.stageDoors == null)
+        {
+            ShowWarning(inactiveDoorWarning);
+            return;
+        }
+
+        // 1. 모든 스테이지를 클리어한 경우 (currentStage가 5 이상인 경우)
+        if (manager.currentStage >= 5)
+        {
+            ShowWarning(allClearWarning);
+            return;
+        }
+
+        // 2. 자신이 몇 번째 스테이지 문인지 인덱스 파악
+        int myIndex = System.Array.IndexOf(manager.stageDoors, this);
+        if (myIndex != -1)
+        {
+            // 현재 활성화된 스테이지 번호보다 낮다면 이미 클리어한 스테이지의 문
+            if (myIndex < manager.currentStage)
+            {
+                ShowWarning(alreadyClearedWarning);
+                return;
+            }
+        }
+
+        // 3. 아직 도달하지 못한 미래 스테이지의 문
+        ShowWarning(inactiveDoorWarning);
     }
 }
