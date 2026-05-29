@@ -8,7 +8,13 @@ namespace MiniTeam.Shooting1942
     {
         public float speed = 5f;
 
-        private float destroyY;
+        private Vector3 direction = Vector3.down;
+        private float   destroyY;
+
+        public void SetDirection(Vector3 dir)
+        {
+            direction = dir.normalized;
+        }
 
         void Start()
         {
@@ -21,7 +27,7 @@ namespace MiniTeam.Shooting1942
 
         void Update()
         {
-            transform.Translate(Vector3.down * speed * Time.deltaTime);
+            transform.Translate(direction * speed * Time.deltaTime, Space.World);
 
             if (transform.position.y < destroyY)
                 Destroy(gameObject);

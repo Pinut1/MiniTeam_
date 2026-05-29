@@ -3,14 +3,26 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - NPC
+  - GirlNpc
+  - Banilla
+  - Bullet
+  - Enemy
+  - EnemyBullet
+  - Boss
+  - WarningBox
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Background
   - Water
   - UI
+  - Player
+  - Enemy
+  - NPC
+  - Item
   - 
   - 
   - 
@@ -20,11 +32,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Walls
   - 
   - 
   - 
@@ -41,5 +49,81 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BG
+    uniqueID: 37507989
+    locked: 0
+  - name: BG_Effect
+    uniqueID: 3354770137
+    locked: 0
+  - name: Background
+    uniqueID: 1384838389
+    locked: 0
+  - name: Students
+    uniqueID: 4069936831
+    locked: 0
+  - name: BurnEffect
+    uniqueID: 3837094713
+    locked: 0
+  - name: NPC
+    uniqueID: 3373514453
+    locked: 0
+  - name: Player
+    uniqueID: 1976330389
+    locked: 0
+  - name: BoomEffect
+    uniqueID: 2422926669
+    locked: 0
+  - name: Objects
+    uniqueID: 972479335
+    locked: 0
+  - name: Magic
+    uniqueID: 2572098445
+    locked: 0
+  - name: UI
+    uniqueID: 2043359829
+    locked: 0
+  - name: Enemy
+    uniqueID: 2847219219
+    locked: 0
+  - name: Entity
+    uniqueID: 3087796885
+    locked: 0
+  - name: Bullets
+    uniqueID: 1314381033
+    locked: 0
+  - name: Ground
+    uniqueID: 969792187
+    locked: 0
   m_RenderingLayers:
   - Default
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
