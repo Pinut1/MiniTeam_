@@ -46,6 +46,14 @@ public class HubUIManager : MonoBehaviour
         if (digiviceObj != null)
             digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
+        // 시작 시 모든 디지바이스 버튼 이미지 비활성화
+        if (digiviceBtns != null)
+        {
+            foreach (var img in digiviceBtns)
+            {
+                if (img != null) img.enabled = false;
+            }
+        }
     }
 
     #endregion
@@ -203,16 +211,14 @@ public class HubUIManager : MonoBehaviour
             if (digiviceBtns[i] == null) continue;
 
             // 0-based stage 기준 매핑:
-            // 1스테이지 클리어 시(stage = 2) -> digiviceBtns[0] 온 (alpha = 1.0f)
+            // 1스테이지 클리어 시(stage = 2) -> digiviceBtns[0] 온 (Image.enabled = true)
             // 2스테이지 클리어 시(stage = 3) -> digiviceBtns[1] 온
             // 3스테이지 클리어 시(stage = 4) -> digiviceBtns[2] 온
             // 4스테이지 클리어 시(stage = 5) -> digiviceBtns[3] 온
             int requiredStage = 2 + i;
-            float alpha = (stage >= requiredStage) ? 1.0f : 0.3f;
+            bool isUnlocked = stage >= requiredStage;
             
-            Color color = digiviceBtns[i].color;
-            color.a = alpha;
-            digiviceBtns[i].color = color;
+            digiviceBtns[i].enabled = isUnlocked;
         }
     }
     // 갱신 함수: 오직 '0단계'에서만 보이며, 0단계 컷신을 아직 안 본 상태여야 활성화
