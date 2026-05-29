@@ -14,27 +14,35 @@ namespace MiniTeam.Pokemon
         public float moveSpeed       = 3f;
         public float battleDistance  = 0.8f; // 이 거리 이내면 배틀 시작
 
-        [Header("배틀 전 대사 (비어있으면 encounterDialogueKey 사용)")]
-        public string encounterDialogue = "";
-
         private enum State { Idle, Chasing, Battling }
         private State state = State.Idle;
 
-        private Vector3    startPosition;
+        private Vector3        startPosition;
         private SpriteRenderer sr;
-        private Transform  playerTf;
+        private Animator       anim;
+        private Transform      playerTf;
+        private bool           playerNearby;
+        private bool           dialoguePlaying;
 
         protected new void Start()
         {
             startPosition = transform.position;
-            sr = GetComponent<SpriteRenderer>();
+            sr   = GetComponent<SpriteRenderer>();
+            anim = GetComponent<Animator>();
             var playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null) playerTf = playerObj.transform;
         }
 
         void Update()
         {
-            if (IsDefeated || state == State.Battling) return;
+            if (IsDefeated)
+            {
+                if (!string.IsNullOrEmpty(afterDefeatDialogueKey) && playerNearby && !dialoguePlaying
+                    && Input.GetKeyDown(KeyCode.Z))
+                    StartCoroutine(AfterDefeatDialogueRoutine());
+                return;
+            }
+            if (state == State.Battling) return;
 
             if (state == State.Chasing)
             {
@@ -45,12 +53,22 @@ namespace MiniTeam.Pokemon
             if (HasLineOfSight())
             {
                 state = State.Chasing;
+                anim?.SetBool("isWalk", true);
                 FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
             }
         }
 
         // 부모 OnTriggerEnter2D 무력화 (직선 시야 감지로 대체)
-        new void OnTriggerEnter2D(Collider2D other) { }
+        // 패배 후에는 플레이어 근접 여부만 추적
+        new void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Player")) playerNearby = true;
+        }
+
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.CompareTag("Player")) playerNearby = false;
+        }
 
         bool HasLineOfSight()
         {
@@ -76,6 +94,7 @@ namespace MiniTeam.Pokemon
             if (to.magnitude <= battleDistance)
             {
                 state = State.Battling;
+                anim?.SetBool("isWalk", false);
                 StartCoroutine(EncounterRoutine());
             }
         }
@@ -84,9 +103,23 @@ namespace MiniTeam.Pokemon
         public override void OnBattleEnd()
         {
             state = State.Idle;
+            anim?.SetBool("isWalk", false);
             transform.position = startPosition;
             if (playerTf != null)
                 playerTf.position = startPosition + Vector3.down * (detectionRange + 1f);
+        }
+
+        IEnumerator AfterDefeatDialogueRoutine()
+        {
+            dialoguePlaying = true;
+            if (MapDialogueUI.Instance != null)
+            {
+                string text = DialogueDB.Instance != null
+                    ? DialogueDB.Instance.Get(afterDefeatDialogueKey)
+                    : afterDefeatDialogueKey;
+                yield return StartCoroutine(MapDialogueUI.Instance.Show(text));
+            }
+            dialoguePlaying = false;
         }
 
         IEnumerator EncounterRoutine()
@@ -94,13 +127,9 @@ namespace MiniTeam.Pokemon
             if (sr != null && playerTf != null)
                 sr.flipX = playerTf.position.x < transform.position.x;
 
-            string dialogue;
-            if (!string.IsNullOrEmpty(encounterDialogueKey) && DialogueDB.Instance != null)
-                dialogue = DialogueDB.Instance.Get(encounterDialogueKey);
-            else if (!string.IsNullOrEmpty(encounterDialogue))
-                dialogue = encounterDialogue;
-            else
-                dialogue = $"{trainerName}이(가) 나타났다!";
+            string dialogue = !string.IsNullOrEmpty(encounterDialogueKey) && DialogueDB.Instance != null
+                ? DialogueDB.Instance.Get(encounterDialogueKey)
+                : $"{trainerName}이(가) 나타났다!";
 
             if (MapDialogueUI.Instance != null)
                 yield return StartCoroutine(MapDialogueUI.Instance.Show(dialogue));

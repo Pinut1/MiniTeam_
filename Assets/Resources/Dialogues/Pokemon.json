@@ -15,12 +15,16 @@
   "battle_pokemon": "난 교체할 포켓몬이 없는데!",
   "battle_pokemonball_1": "몬스터볼을 던졌지만...",
   "battle_pokemonball_2": "효과가 없었다!",
-  "battle_strangecandy_1": "테일이가 먹으라고 주는 거야?",
+  "battle_strangecandy_1": "태일이가 먹으라고 주는 거야?",
   "battle_strangecandy_2": "...아구몬이 다가왔다!",
   "battle_digivice_1": "디지바이스를 꺼냈다!",
   "battle_digivice_2": "아구몬이 포획됐다!",
   "battle_defeat": "눈앞이 깜깜해졌다...",
   "battle_run": "도망쳤다!",
 
-  "trainer_tail_encounter": "테일이: 아구몬! 저 녀석이야! 배틀이다!!"
+  "trainer_tail_encounter": "태일이: 아구몬! 저 녀석이야! 배틀이다!!",
+  "battle_tail_victory_1": "태일이: 아니 내 아구몬이! 돌려줘!!!",
+  "field_tail_repeat": "태일이: 아구몬!!",
+  "cave_blocked": "동굴로 들어갈 수 없다!",
+  "cave_clear": "아구몬과 함께 동굴로 들어갔다!"
 }

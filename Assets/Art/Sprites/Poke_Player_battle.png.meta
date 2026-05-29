@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bf9fd9f8ad35a834ba92c2ae63a735aa
+guid: f9f82ebe915d89c4cadfc371e014cd66
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -123,13 +123,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Old_Monster_Ball_0
+      name: Poke_Player_battle_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 32
-        width: 224
-        height: 208
+        x: 32
+        y: 0
+        width: 400
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -138,8 +138,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4a95957269327c9479912b0f4fd89dcb
-      internalID: -1150007907
+      spriteID: 0ca3eee438625d0499b7a74002099ded
+      internalID: -810741178
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: dca508c6c66075949994a7f2d7915309
     internalID: 0
     vertices: []
     indices: 
@@ -160,7 +160,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      Old_Monster_Ball_0: -1150007907
+      Poke_Player_battle_0: -810741178
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
