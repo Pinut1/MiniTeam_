@@ -1154,8 +1154,8 @@ MonoBehaviour:
   girlYSpread: 0.3
   distanceToPierre: -0.5
   playerCompetitionLaserColor: {r: 1, g: 1, b: 1, a: 1}
-  playerPushPower: 0.02
-  banillaPushSpeed: 0.27
+  playerPushPower: 0.025
+  banillaPushSpeed: 0.25
   spawnedGirls: []
   banillaBlackHeart: {fileID: -1854226887, guid: 17b2f404853f3564c86608f116c93754, type: 3}
   banillaWhiteHeart: {fileID: -507398062, guid: 17b2f404853f3564c86608f116c93754, type: 3}

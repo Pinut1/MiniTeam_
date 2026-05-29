@@ -338,7 +338,7 @@ public class PlayerLaser : MonoBehaviour
             GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
-            if (girl != null)
+            if (girl != null && girl.targetBoyNpc == currentBurningNpc)
             {
                 girl.StartFlyingAway(transform.position);
 
@@ -364,7 +364,7 @@ public class PlayerLaser : MonoBehaviour
             if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
             if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
 
-            if (girl != null)
+            if (girl != null && girl.targetBoyNpc == currentBurningNpc)
             {
                 if (isPierre)
                 {
@@ -758,11 +758,13 @@ public class PlayerLaser : MonoBehaviour
             }
             else
             {
-                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 0.5f);
+                Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(lockedTargetPos, 2.0f);
                 foreach (Collider2D col in overlappingColliders)
                 {
-                    GirlNpcReaction girl = col.GetComponentInParent<GirlNpcReaction>();
-                    // ★ 기존의 hit.collider.gameObject 대신 찾아낸 targetNpc로 변경
+                    GirlNpcReaction girl = col.GetComponent<GirlNpcReaction>();
+                    if (girl == null) girl = col.GetComponentInParent<GirlNpcReaction>();
+                    if (girl == null) girl = col.GetComponentInChildren<GirlNpcReaction>();
+
                     if (girl != null && girl.gameObject != targetNpc)
                     {
                         girl.LookAtAttackedNpc(currentBurningNpc);
