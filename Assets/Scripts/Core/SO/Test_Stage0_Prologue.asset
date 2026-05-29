@@ -26,8 +26,8 @@ MonoBehaviour:
     animationTriggerName: 
     voiceClip: {fileID: 8300000, guid: 22add3f14ddbe024d83385927e966052, type: 3}
   - text: "\uB108\uB77C\uBA74 \uB098\uB97C \uB3C4\uC640\uC904 \uC218 \uC788\uB2E4\uCE58!!\r\n\uC5EC\uAE34
-      \uB108\uC758 \uAFC8 \uC18D\uC774\uB2C8\uAE4C \uB108\uAC00 \uD558\uACE0\uC2F6\uC740\uB300\uB85C
-      \uB2E4 \uD560 \uC218 \uC788\uB2E4\uCE58"
+      \uB108\uC758 \uAFC8 \uC18D\uC774\uB2C8\uAE4C \uB108\uAC00 \uD558\uACE0\uC2F6\uC740\uB300\uB85C\n\uB2E4
+      \uD560 \uC218 \uC788\uB2E4\uCE58"
     expressionSprite: {fileID: 21300000, guid: 028b17245c0f7b242a54342df81b017d, type: 3}
     animationTriggerName: 
     voiceClip: {fileID: 8300000, guid: b882ddc55d91fb644a7b523ffc4ea692, type: 3}
