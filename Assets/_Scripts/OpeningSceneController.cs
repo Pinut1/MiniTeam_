@@ -78,8 +78,7 @@ public class OpeningSceneController : MonoBehaviour
             "scene_opening_02",
             "scene_opening_03",
             "scene_opening_04",
-            "scene_opening_05",
-            "scene_opening_06"
+            "scene_opening_05"
         };
 
         for (int i = 0; i < dialogueKeys.Length; i++)
@@ -123,7 +122,6 @@ public class OpeningSceneController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[Opening] npcManager가 없습니다. 즉시 플레이어 및 NPC 조작 복구.");
             if (playerController != null)
             {
                 playerController.enabled = true;
