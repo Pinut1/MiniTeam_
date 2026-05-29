@@ -43,6 +43,9 @@ namespace MiniTeam.Shooting1942
 
         IEnumerator CutsceneRoutine(string keyPrefix, bool mojoAnimation, Action onComplete)
         {
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player != null) player.enabled = false;
+
             int index = 1;
             while (true)
             {
@@ -74,6 +77,7 @@ namespace MiniTeam.Shooting1942
                 index++;
             }
 
+            if (player != null) player.enabled = true;
             onComplete?.Invoke();
         }
 
