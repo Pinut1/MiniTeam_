@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1193fe0015c1b6e4787d97208e7e35d6, type: 3}
+  m_Name: Test_Stage0_Prologue
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  sentences:
+  - text: "\uC548\uB155! \uD639\uC2DC \uB098 \uAE30\uC5B5\uB098\uB0D0\uCE58?\r\n\uB098\uB294
+      \uB124 \uC624\uB79C \uCE5C\uAD6C\uC778 \uC8FC\uB315\uCE58!\r\n\uC5EC\uAE30\uB294
+      \uB108\uC758 \uCD94\uC5B5\uB4E4\uB85C \uC774\uB8E8\uC5B4\uC838\uC788\uB2E4\uCE58!"
+    expressionSprite: {fileID: 21300000, guid: 028b17245c0f7b242a54342df81b017d, type: 3}
+    animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: 5a654373b33ec894c8dc202a981cd959, type: 3}
+  - text: "\uC0AC\uC2E4\uC740\u2026 \uB0B4 \uC9D1\uC774 \uBB34\uB108\uC84C\uB2E4\uCE58\u2026
+      \r\n\uB2E4\uC2DC \uACE0\uCCD0\uBCF4\uB824\uD588\uC9C0\uB9CC \uC798 \uB418\uC9C0
+      \uC54A\uC544\uC11C \uC9C0\uCCE4\uB2E4\uCE58\u2026 "
+    expressionSprite: {fileID: 21300000, guid: cd3e4518bc18dca4b8a5d568030e687b, type: 3}
+    animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: 22add3f14ddbe024d83385927e966052, type: 3}
+  - text: "\uB108\uB77C\uBA74 \uB098\uB97C \uB3C4\uC640\uC904 \uC218 \uC788\uB2E4\uCE58!!\r\n\uC5EC\uAE34
+      \uB108\uC758 \uAFC8 \uC18D\uC774\uB2C8\uAE4C \uB108\uAC00 \uD558\uACE0\uC2F6\uC740\uB300\uB85C
+      \uB2E4 \uD560 \uC218 \uC788\uB2E4\uCE58"
+    expressionSprite: {fileID: 21300000, guid: 028b17245c0f7b242a54342df81b017d, type: 3}
+    animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: b882ddc55d91fb644a7b523ffc4ea692, type: 3}
+  - text: "\uB108\uC5D0\uAC8C \uBD80\uD0C1\uC744 \uD558\uACE0\uC2F6\uB2E4\uCE58!!"
+    expressionSprite: {fileID: 21300000, guid: e625b3c334e5fd24196af4653f3c10bb, type: 3}
+    animationTriggerName: 
+    voiceClip: {fileID: 8300000, guid: 405e0498999f2934794ce1f4a6db889b, type: 3}
+  nextInteractableIndex: 0
