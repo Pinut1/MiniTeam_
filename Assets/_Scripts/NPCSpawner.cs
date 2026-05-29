@@ -91,8 +91,34 @@ public class NpcSpawner : MonoBehaviour
 
                 if (girl != null)
                 {
+                    // 화면 밖 스폰 X좌표 계산
+                    float spawnX = girl.position.x + 1.5f;
+                    if (Camera.main != null)
+                    {
+                        float camX = Camera.main.transform.position.x;
+                        // 화면 반너비 + 약간의 여유(2f)
+                        float camHalfWidth = (Camera.main.orthographicSize * Camera.main.aspect) + 2f;
+                        
+                        // 스폰 위치가 화면 안에 있다면 화면 밖으로 밀어냄
+                        if (Mathf.Abs(spawnX - camX) < camHalfWidth)
+                        {
+                            float rightOut = camX + camHalfWidth;
+                            float leftOut = camX - camHalfWidth;
+
+                            // 화면 오른쪽 밖이 맵 범위 내라면 오른쪽 스폰, 안되면 왼쪽 스폰
+                            if (rightOut <= maxX)
+                            {
+                                spawnX = rightOut;
+                            }
+                            else if (leftOut >= minX)
+                            {
+                                spawnX = leftOut;
+                            }
+                        }
+                    }
+
                     // 바닥에 소년 스폰
-                    Vector3 spawnPos = new Vector3(girl.position.x + 1.5f, floorY, transform.position.z);
+                    Vector3 spawnPos = new Vector3(spawnX, floorY, transform.position.z);
                     boy = Instantiate(boyPrefabs[Random.Range(0, boyPrefabs.Length)], spawnPos, Quaternion.identity);
                     boy.tag = "NPC";
                 }

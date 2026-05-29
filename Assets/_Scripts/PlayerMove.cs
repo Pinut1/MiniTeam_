@@ -40,6 +40,18 @@ public class PlayerMove : MonoBehaviour
         playerLaser = GetComponent<PlayerLaser>();
     }
 
+    void OnEnable()
+    {
+        // 스크립트가 켜질 때마다(컷씬 종료 후 등) 즉시 움직일 수 있도록 리셋
+        waitForMouseMovement = false;
+        isInputAttacking = false;
+        if (anim != null)
+        {
+            anim.SetBool("isAttacking", false);
+            anim.ResetTrigger("DoBackAttack");
+        }
+    }
+
     void Update()
     {
         // 클래시 모드(경쟁 중)일 때는 아예 움직이거나 마우스 공격 입력을 받지 못하도록 차단
