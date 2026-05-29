@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -1154,7 +1154,7 @@ MonoBehaviour:
   girlYSpread: 0.3
   distanceToPierre: -0.5
   playerCompetitionLaserColor: {r: 1, g: 1, b: 1, a: 1}
-  playerPushPower: 0.7
+  playerPushPower: 0.05
   banillaPushSpeed: 0.25
   spawnedGirls: []
   banillaBlackHeart: {fileID: -1854226887, guid: 17b2f404853f3564c86608f116c93754, type: 3}
@@ -3097,7 +3097,7 @@ Transform:
   m_GameObject: {fileID: 1491392489}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.31, y: 0.98, z: -10}
+  m_LocalPosition: {x: 95.5, y: 1.05, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3120,6 +3120,11 @@ MonoBehaviour:
   minX: -20.5
   maxX: 102.5
   brain: {fileID: 1491392494}
+  vcamMinX: -10
+  vcamMaxX: 30
+  useVcamBounds: 1
+  targetVcams:
+  - {fileID: 1724008627}
 --- !u!114 &1491392494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3280,6 +3285,7 @@ MonoBehaviour:
   bossHeartScale: 1.2
   magicStickScale: 2.5
   centerSpacing: 150
+  bossHeartYOffset: -9.5
   zoomDuration: 1.5
   finalZoomScale: 5
   delayBetweenSticks: 0
@@ -3661,6 +3667,7 @@ GameObject:
   - component: {fileID: 1724008628}
   - component: {fileID: 1724008627}
   - component: {fileID: 1724008629}
+  - component: {fileID: 1724008630}
   m_Layer: 0
   m_Name: Vcam_Player
   m_TagString: Untagged
@@ -3720,7 +3727,7 @@ Transform:
   m_GameObject: {fileID: 1724008626}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.1, y: 1.07, z: 0}
+  m_LocalPosition: {x: 95.5, y: 1.05, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3757,6 +3764,20 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
+--- !u!114 &1724008630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724008626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8afc631a2243f89448db271ab7fc631d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinemachineMinMaxClamp
+  minX: -12.5
+  maxX: 95.5
 --- !u!1 &1724345197
 GameObject:
   m_ObjectHideFlags: 0
@@ -4628,7 +4649,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 561350196995451319, guid: 28db68c71c0430b44b1f07004032252f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.8
+      value: -11.3
       objectReference: {fileID: 0}
     - target: {fileID: 561350196995451319, guid: 28db68c71c0430b44b1f07004032252f, type: 3}
       propertyPath: m_LocalPosition.y
