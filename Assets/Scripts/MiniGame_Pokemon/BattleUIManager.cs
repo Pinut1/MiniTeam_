@@ -37,7 +37,6 @@ namespace MiniTeam.Pokemon
         [Header("커맨드 버튼 (Grid 순서대로: 싸우다/가방/포켓몬/도망치다)")]
         public RectTransform[] commandRects; // 4개, 커서 위치 기준
         public RectTransform   commandCursor;
-        public Vector2         cursorOffset = new Vector2(-127.61f, -3.25f); // 버튼 기준 커서 오프셋
 
         [Header("아이템 선택 패널")]
         public GameObject      itemPanel;
@@ -139,10 +138,7 @@ namespace MiniTeam.Pokemon
             int idx = Mathf.Clamp(commandIndex, 0, commandRects.Length - 1);
             if (commandRects[idx] == null) return;
 
-            // Box(commandRects 부모) + 버튼 anchored + 오프셋 = 커서 위치
-            var boxRT = commandRects[idx].parent as RectTransform;
-            Vector2 boxPos = boxRT != null ? boxRT.anchoredPosition : Vector2.zero;
-            commandCursor.anchoredPosition = boxPos + commandRects[idx].anchoredPosition + cursorOffset;
+            commandCursor.position = commandRects[idx].position;
         }
 
         // ── 아이템 패널 네비게이션 (세로 목록) ──────────
@@ -203,13 +199,19 @@ namespace MiniTeam.Pokemon
             IsBattleActive = true;
             if (battlePanel != null) battlePanel.SetActive(true);
 
-            // 처음엔 트레이너(테일이) 스프라이트 표시
+            // 처음엔 트레이너(태일이) 스프라이트 표시
             if (trainerImage != null)     trainerImage.sprite   = trainer.trainerBattleSprite;
             if (trainerNameText != null)  trainerNameText.text  = trainer.pokemonName;
-            if (trainerLevelText != null) trainerLevelText.text = "Lv. ???";
-            if (playerNameText != null)   playerNameText.text   = "신태일";
-            if (playerLevelText != null)  playerLevelText.text  = "Lv. 1";
+            if (trainerLevelText != null) trainerLevelText.text = "Lv.???";
+            if (playerNameText != null)   playerNameText.text   = "개발자";
+            if (playerLevelText != null)  playerLevelText.text  = "Lv.1";
             if (messageText != null)      messageText.text      = $"{trainer.trainerName}이(가) 아구몬을 내보냈다!";
+
+            // Die 상태에서 비활성화된 패널 복구
+            if (enemyPanel        != null) enemyPanel.SetActive(true);
+            if (playerBattlePanel != null) playerBattlePanel.SetActive(true);
+            if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(true);
+            if (agumonPanel       != null) agumonPanel.SetActive(true);
 
             // Enemy 슬라이더를 visible 위치로 즉시 리셋 (이전 배틀에서 비활성화됐을 수 있음)
             if (enemySlider != null) enemySlider.SlideIn(instant: true);
@@ -244,7 +246,7 @@ namespace MiniTeam.Pokemon
             // 트레이너 배틀: 트레이너 스프라이트 슬라이드 아웃 → 포켓몬 프리팹 소환
             if (trainer != null && trainer.pokemonPrefab != null)
             {
-                // "테일이가 아구몬을 내보냈다!" 대기
+                // "태일이가 아구몬을 내보냈다!" 대기
                 yield return StartCoroutine(ShowMessageAndWait(messageText.text));
 
                 // 트레이너 스프라이트 슬라이드 아웃 (비활성화 없이 off-screen 유지)

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fe780518d62b1b445ba69a404cfd3843
+guid: d5209cdab650d7444b30fc7fb049e81a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -106,30 +106,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_0"
+      name: agumon_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 33
-        width: 22
-        height: 29
+        x: 0
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -138,20 +125,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6ebdc8acab37abf43a74e678b4cd39dd
-      internalID: 1345205936
+      spriteID: 1a58eebf345a80b40a95008ee956adcb
+      internalID: 1598305952
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_1"
+      name: agumon_1
       rect:
         serializedVersion: 2
-        x: 37
-        y: 33
-        width: 22
-        height: 30
+        x: 512
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,20 +147,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 41862c7a08eaf6e49b1ddcaced61c83b
-      internalID: -1716178185
+      spriteID: a159717dc56bde74a8fb001eb151d111
+      internalID: -835908329
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_2"
+      name: agumon_2
       rect:
         serializedVersion: 2
-        x: 69
-        y: 33
-        width: 22
-        height: 30
+        x: 1024
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -182,20 +169,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d6843bb74ed708b41b57e0415e2c8fa8
-      internalID: -53060035
+      spriteID: 5a086cce3e5db324087a5156897462b6
+      internalID: -112570550
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_3"
+      name: agumon_3
       rect:
         serializedVersion: 2
-        x: 101
-        y: 33
-        width: 22
-        height: 29
+        x: 1536
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -204,20 +191,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bb445623c9a98e64fbedb4bf18e3c301
-      internalID: 1374178905
+      spriteID: d7e34233a1761d24f91685447b9bc54e
+      internalID: -563201489
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_4"
+      name: agumon_4
       rect:
         serializedVersion: 2
-        x: 133
-        y: 33
-        width: 22
-        height: 30
+        x: 0
+        y: 512
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -226,20 +213,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e253554b9e41e6d44b78d7912fe7e3c9
-      internalID: -1148361047
+      spriteID: 945b1ae2ca672c545b32f33d0da18a41
+      internalID: 1403864288
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_5"
+      name: agumon_5
       rect:
         serializedVersion: 2
-        x: 5
-        y: 1
-        width: 22
-        height: 30
+        x: 512
+        y: 512
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -248,20 +235,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bca12c4e6dc956441839cddfbd65e3f3
-      internalID: -1773052753
+      spriteID: b126598a6b28c3144a481587ea2336bb
+      internalID: -1582412653
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_6"
+      name: agumon_6
       rect:
         serializedVersion: 2
-        x: 37
-        y: 1
-        width: 22
-        height: 29
+        x: 1024
+        y: 512
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -270,20 +257,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7fd85da2f4c4ce4449576cb8fb685590
-      internalID: -1623833121
+      spriteID: 5449dcc280a768a4a9bb716749223ba5
+      internalID: -804540489
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_7"
+      name: agumon_7
       rect:
         serializedVersion: 2
-        x: 69
-        y: 1
-        width: 22
-        height: 30
+        x: 1536
+        y: 512
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -292,20 +279,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c769a3130fc85124395af2a14bfea710
-      internalID: -1293772889
+      spriteID: 69e59e2e05edbc94a88b39729872d13e
+      internalID: -365930939
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_8"
+      name: agumon_8
       rect:
         serializedVersion: 2
-        x: 101
-        y: 1
-        width: 22
-        height: 30
+        x: 0
+        y: 0
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -314,20 +301,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 93a42e1ee48ebca4280868b045cf8835
-      internalID: 1771117981
+      spriteID: 49b924469949cb64da2858ee488f71ed
+      internalID: -1616949056
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC544\uAD6C\uBAAC_IDLE_9"
+      name: agumon_9
       rect:
         serializedVersion: 2
-        x: 133
-        y: 1
-        width: 22
-        height: 30
+        x: 512
+        y: 0
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -336,8 +323,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3c64df4663af7e841a3059550335dfd9
-      internalID: -860711364
+      spriteID: b7b832b4f3d81f94cbb012740748e929
+      internalID: -1277787524
       vertices: []
       indices: 
       edges: []
@@ -346,7 +333,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1af411ee48cf380458b0f105c9c4e260
+    spriteID: 1edb60c97d41fa54b8a24d0ba705a31b
     internalID: 0
     vertices: []
     indices: 
@@ -356,18 +343,18 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":4.0,"y":3.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      "\uC544\uAD6C\uBAAC_IDLE_0": 1345205936
-      "\uC544\uAD6C\uBAAC_IDLE_1": -1716178185
-      "\uC544\uAD6C\uBAAC_IDLE_2": -53060035
-      "\uC544\uAD6C\uBAAC_IDLE_3": 1374178905
-      "\uC544\uAD6C\uBAAC_IDLE_4": -1148361047
-      "\uC544\uAD6C\uBAAC_IDLE_5": -1773052753
-      "\uC544\uAD6C\uBAAC_IDLE_6": -1623833121
-      "\uC544\uAD6C\uBAAC_IDLE_7": -1293772889
-      "\uC544\uAD6C\uBAAC_IDLE_8": 1771117981
-      "\uC544\uAD6C\uBAAC_IDLE_9": -860711364
+      agumon_0: 1598305952
+      agumon_1: -835908329
+      agumon_2: -112570550
+      agumon_3: -563201489
+      agumon_4: 1403864288
+      agumon_5: -1582412653
+      agumon_6: -804540489
+      agumon_7: -365930939
+      agumon_8: -1616949056
+      agumon_9: -1277787524
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

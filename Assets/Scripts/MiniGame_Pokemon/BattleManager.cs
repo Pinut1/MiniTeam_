@@ -25,9 +25,10 @@ namespace MiniTeam.Pokemon
             currentTrainer = trainer;
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
             BattleUIManager.Instance?.ShowBattle(trainer);
+            AudioManager.Instance?.PlayBattleBGM();
         }
 
-        public void EndBattle()
+        public void EndBattle(bool victory = false)
         {
             // 승리가 아닌 경우(패배/도망) 트레이너 상태 리셋 → 재도전 가능
             if (currentTrainer != null && !currentTrainer.IsDefeated)
@@ -36,6 +37,7 @@ namespace MiniTeam.Pokemon
             BattleUIManager.Instance?.HideBattle();
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(true);
             currentTrainer = null;
+            if (!victory) AudioManager.Instance?.PlayFieldBGM();
         }
 
         // ── 메인 선택지 ──────────────────────────────
@@ -97,6 +99,12 @@ namespace MiniTeam.Pokemon
             yield return new WaitForSeconds(1.5f);
             BattleUIManager.Instance?.ShowDieState();
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
+            yield return new WaitUntil(() =>
+                Input.GetKeyDown(KeyCode.Z) ||
+                Input.GetKeyDown(KeyCode.Space) ||
+                Input.GetKeyDown(KeyCode.Return));
+            EndBattle();
+            PokemonGameController.Instance?.RespawnPlayer();
         }
 
         IEnumerator RunRoutine()
@@ -132,10 +140,12 @@ namespace MiniTeam.Pokemon
             BattleUIManager.Instance?.ShowMessage(L("battle_digivice_2"));
             yield return new WaitForSeconds(1.5f);
             PokemonGameController.Instance?.UseItem(MapItemType.Digivice);
+            AudioManager.Instance?.PlayVictoryBGM();
+            if (BattleUIManager.Instance != null)
+                yield return StartCoroutine(BattleUIManager.Instance.ShowMessageAndWait(L("battle_tail_victory_1")));
             PokemonGameController.Instance?.SetPokemonEventDone();
             currentTrainer?.SetDefeated();
-            EndBattle();
-            PokemonGameController.Instance?.OnGameClear();
+            EndBattle(victory: true);
         }
     }
 }
