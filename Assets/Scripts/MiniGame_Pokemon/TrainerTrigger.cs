@@ -8,7 +8,7 @@ namespace MiniTeam.Pokemon
     public class TrainerTrigger : MonoBehaviour
     {
         [Header("트레이너 정보")]
-        public string trainerName = "테일이";
+        public string trainerName = "태일이";
         public Sprite trainerBattleSprite;
 
         [Header("배틀 포켓몬")]
@@ -17,6 +17,9 @@ namespace MiniTeam.Pokemon
 
         [Header("발견 대사 (비어있으면 즉시 배틀)")]
         public string encounterDialogueKey = ""; // DialogueDB 키
+
+        [Header("패배 후 필드 대사 (비어있으면 오브젝트 비활성)")]
+        public string afterDefeatDialogueKey = "";
 
         private bool isDefeated = false;
         public bool IsDefeated => isDefeated;
@@ -48,7 +51,8 @@ namespace MiniTeam.Pokemon
         public void SetDefeated()
         {
             isDefeated = true;
-            gameObject.SetActive(false);
+            if (string.IsNullOrEmpty(afterDefeatDialogueKey))
+                gameObject.SetActive(false);
         }
 
         // 배틀이 패배/도망으로 끝났을 때 (승리 시엔 SetDefeated 호출)

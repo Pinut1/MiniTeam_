@@ -46,6 +46,12 @@ namespace MiniTeam.Pokemon
         [Header("블랙아웃")]
         public GameObject blackoutPanel;
 
+        [Header("Die 시 추가 비활성 패널")]
+        public GameObject enemyPanel;
+        public GameObject playerBattlePanel;
+        public GameObject enemyBattlePanel;
+        public GameObject agumonPanel;
+
         // 배틀 활성 상태 (StartMenuUI에서 참조)
         public bool IsBattleActive { get; private set; }
 
@@ -193,13 +199,19 @@ namespace MiniTeam.Pokemon
             IsBattleActive = true;
             if (battlePanel != null) battlePanel.SetActive(true);
 
-            // 처음엔 트레이너(테일이) 스프라이트 표시
+            // 처음엔 트레이너(태일이) 스프라이트 표시
             if (trainerImage != null)     trainerImage.sprite   = trainer.trainerBattleSprite;
             if (trainerNameText != null)  trainerNameText.text  = trainer.pokemonName;
             if (trainerLevelText != null) trainerLevelText.text = "Lv.???";
             if (playerNameText != null)   playerNameText.text   = "개발자";
             if (playerLevelText != null)  playerLevelText.text  = "Lv.1";
             if (messageText != null)      messageText.text      = $"{trainer.trainerName}이(가) 아구몬을 내보냈다!";
+
+            // Die 상태에서 비활성화된 패널 복구
+            if (enemyPanel        != null) enemyPanel.SetActive(true);
+            if (playerBattlePanel != null) playerBattlePanel.SetActive(true);
+            if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(true);
+            if (agumonPanel       != null) agumonPanel.SetActive(true);
 
             // Enemy 슬라이더를 visible 위치로 즉시 리셋 (이전 배틀에서 비활성화됐을 수 있음)
             if (enemySlider != null) enemySlider.SlideIn(instant: true);
@@ -234,7 +246,7 @@ namespace MiniTeam.Pokemon
             // 트레이너 배틀: 트레이너 스프라이트 슬라이드 아웃 → 포켓몬 프리팹 소환
             if (trainer != null && trainer.pokemonPrefab != null)
             {
-                // "테일이가 아구몬을 내보냈다!" 대기
+                // "태일이가 아구몬을 내보냈다!" 대기
                 yield return StartCoroutine(ShowMessageAndWait(messageText.text));
 
                 // 트레이너 스프라이트 슬라이드 아웃 (비활성화 없이 off-screen 유지)
@@ -385,6 +397,29 @@ namespace MiniTeam.Pokemon
         public void HideBlackout()
         {
             if (blackoutPanel != null) blackoutPanel.SetActive(false);
+        }
+
+        public void ShowDieState()
+        {
+            if (blackoutPanel != null) blackoutPanel.SetActive(true);
+
+            if (statusPanelLeft  != null) statusPanelLeft.gameObject.SetActive(false);
+            if (statusPanelRight != null) statusPanelRight.gameObject.SetActive(false);
+            if (commandPanel     != null) commandPanel.gameObject.SetActive(false);
+            if (enemySlider      != null) enemySlider.gameObject.SetActive(false);
+            if (itemPanel        != null) itemPanel.SetActive(false);
+
+            if (enemyPanel        != null) enemyPanel.SetActive(false);
+            if (playerBattlePanel != null) playerBattlePanel.SetActive(false);
+            if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(false);
+            if (agumonPanel       != null) agumonPanel.SetActive(false);
+
+            if (StartMenuUI.Instance?.menuPanel != null) StartMenuUI.Instance.menuPanel.SetActive(false);
+            if (StartMenuUI.Instance?.bagPanel  != null) StartMenuUI.Instance.bagPanel.SetActive(false);
+            if (MapDialogueUI.Instance?.panel   != null) MapDialogueUI.Instance.panel.SetActive(false);
+
+            isCommandActive = false;
+            isItemActive    = false;
         }
 
         // 짧은 연출용 (블랙아웃만 단독 사용할 때)

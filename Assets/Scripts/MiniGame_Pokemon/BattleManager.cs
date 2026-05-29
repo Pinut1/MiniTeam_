@@ -93,9 +93,13 @@ namespace MiniTeam.Pokemon
         IEnumerator DefeatRoutine()
         {
             yield return new WaitForSeconds(1.2f);
-            BattleUIManager.Instance?.ShowBlackoutNow();
-            if (MapDialogueUI.Instance != null)
-                yield return StartCoroutine(MapDialogueUI.Instance.Show(L("battle_defeat")));
+            BattleUIManager.Instance?.ShowMessage(L("battle_defeat"));
+            yield return new WaitForSeconds(1.5f);
+            BattleUIManager.Instance?.ShowDieState();
+            yield return new WaitUntil(() =>
+                Input.GetKeyDown(KeyCode.Z) ||
+                Input.GetKeyDown(KeyCode.Space) ||
+                Input.GetKeyDown(KeyCode.Return));
             EndBattle();
             PokemonGameController.Instance?.RespawnPlayer();
         }
@@ -133,10 +137,11 @@ namespace MiniTeam.Pokemon
             BattleUIManager.Instance?.ShowMessage(L("battle_digivice_2"));
             yield return new WaitForSeconds(1.5f);
             PokemonGameController.Instance?.UseItem(MapItemType.Digivice);
+            if (BattleUIManager.Instance != null)
+                yield return StartCoroutine(BattleUIManager.Instance.ShowMessageAndWait(L("battle_tail_victory_1")));
             PokemonGameController.Instance?.SetPokemonEventDone();
             currentTrainer?.SetDefeated();
             EndBattle();
-            PokemonGameController.Instance?.OnGameClear();
         }
     }
 }
