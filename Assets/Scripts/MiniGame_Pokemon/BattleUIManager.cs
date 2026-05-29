@@ -16,11 +16,11 @@ namespace MiniTeam.Pokemon
         public UIPanelSlider statusPanelLeft;
         public UIPanelSlider statusPanelRight;
         public UIPanelSlider commandPanel;
-        public UIPanelSlider enemySlider; // 트레이너 스프라이트 슬라이드 아웃용
+        public UIPanelSlider enemySlider;   // 태일이 스프라이트 슬라이드 아웃용
+        public UIPanelSlider pokemonSlider; // 아구몬 슬라이드 인용 (반대 방향 설정)
 
         [Header("포켓몬 소환")]
-        public RectTransform pokemonSpawnPoint;
-        public Vector3       pokemonScale = new Vector3(3f, 3f, 1f);
+        public Vector3 pokemonScale = new Vector3(3f, 3f, 1f);
 
         [Header("트레이너 정보")]
         public Image           trainerImage;
@@ -51,6 +51,7 @@ namespace MiniTeam.Pokemon
         public GameObject playerBattlePanel;
         public GameObject enemyBattlePanel;
         public GameObject agumonPanel;
+        public GameObject playerPortrait;
 
         // 배틀 활성 상태 (StartMenuUI에서 참조)
         public bool IsBattleActive { get; private set; }
@@ -211,10 +212,13 @@ namespace MiniTeam.Pokemon
             if (enemyPanel        != null) enemyPanel.SetActive(true);
             if (playerBattlePanel != null) playerBattlePanel.SetActive(true);
             if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(true);
-            if (agumonPanel       != null) agumonPanel.SetActive(true);
+            if (playerPortrait    != null) playerPortrait.SetActive(true);
+            // pokemonSlider 사용 중이면 동적 소환으로 처리하므로 스킵
+            if (agumonPanel != null && pokemonSlider == null) agumonPanel.SetActive(true);
 
-            // Enemy 슬라이더를 visible 위치로 즉시 리셋 (이전 배틀에서 비활성화됐을 수 있음)
-            if (enemySlider != null) enemySlider.SlideIn(instant: true);
+            // 슬라이더 위치 즉시 리셋
+            if (enemySlider   != null) enemySlider.SlideIn(instant: true);
+            if (pokemonSlider != null) pokemonSlider.SlideOut(instant: true, deactivateAfter: true);
 
             StartCoroutine(BattleOpenRoutine(trainer));
         }
@@ -249,22 +253,9 @@ namespace MiniTeam.Pokemon
                 // "태일이가 아구몬을 내보냈다!" 대기
                 yield return StartCoroutine(ShowMessageAndWait(messageText.text));
 
-                // 트레이너 스프라이트 슬라이드 아웃 (비활성화 없이 off-screen 유지)
-                if (enemySlider != null)
-                    yield return StartCoroutine(enemySlider.SlideOutRoutine(deactivateAfter: false));
-
-                // 포켓몬 UI 프리팹 소환 (Battle_Panel 자식으로)
-                if (pokemonSpawnPoint != null)
-                {
-                    spawnedPokemon = Instantiate(trainer.pokemonPrefab, battlePanel.transform);
-                    var rt = spawnedPokemon.GetComponent<RectTransform>();
-                    if (rt != null)
-                    {
-                        rt.anchoredPosition = pokemonSpawnPoint.anchoredPosition;
-                        rt.sizeDelta        = pokemonSpawnPoint.sizeDelta;
-                        rt.localScale       = pokemonScale;
-                    }
-                }
+                // 태일이 슬라이드 아웃 + 아구몬 슬라이드 인 동시 실행
+                if (enemySlider   != null) StartCoroutine(enemySlider.SlideOutRoutine(deactivateAfter: false));
+                if (pokemonSlider != null) yield return StartCoroutine(pokemonSlider.SlideInRoutine());
 
                 if (messageText != null) messageText.text = $"상대방의 {trainer.pokemonName}!";
                 yield return StartCoroutine(ShowMessageAndWait(messageText.text));
@@ -421,11 +412,13 @@ namespace MiniTeam.Pokemon
             if (commandPanel     != null) commandPanel.gameObject.SetActive(false);
             if (enemySlider      != null) enemySlider.gameObject.SetActive(false);
             if (itemPanel        != null) itemPanel.SetActive(false);
-            if (enemyPanel       != null) enemyPanel.SetActive(false);
+            if (enemyPanel        != null) enemyPanel.SetActive(false);
             if (playerBattlePanel != null) playerBattlePanel.SetActive(false);
-            if (enemyBattlePanel != null) enemyBattlePanel.SetActive(false);
-            if (agumonPanel      != null) agumonPanel.SetActive(false);
-            if (spawnedPokemon   != null) { Destroy(spawnedPokemon); spawnedPokemon = null; }
+            if (enemyBattlePanel  != null) enemyBattlePanel.SetActive(false);
+            if (agumonPanel       != null) agumonPanel.SetActive(false);
+            if (playerPortrait    != null) playerPortrait.SetActive(false);
+            if (pokemonSlider     != null) pokemonSlider.SlideOut(instant: true, deactivateAfter: true);
+            if (spawnedPokemon    != null) { Destroy(spawnedPokemon); spawnedPokemon = null; }
 
             // 다른 최상위 패널 비활성화
             if (StartMenuUI.Instance?.menuPanel != null) StartMenuUI.Instance.menuPanel.SetActive(false);

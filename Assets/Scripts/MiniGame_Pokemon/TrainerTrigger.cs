@@ -24,7 +24,7 @@ namespace MiniTeam.Pokemon
         private bool isDefeated = false;
         public bool IsDefeated => isDefeated;
 
-        void OnTriggerEnter2D(Collider2D other)
+        protected virtual void OnTriggerEnter2D(Collider2D other)
         {
             if (isDefeated) return;
             if (!other.CompareTag("Player")) return;
