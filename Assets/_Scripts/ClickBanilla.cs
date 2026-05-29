@@ -1,24 +1,7 @@
 using UnityEngine;
 
+// ì „ì²´ í™”ë©´ í´ë¦­ì€ CutsceneNpcManager.Update()ì—ì„œ ì²˜ë¦¬í•˜ë¯€ë¡œ
+// ì´ ìŠ¤í¬ë¦½íŠ¸ì˜ OnMouseDownì€ ì‚¬ìš©í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
 public class ClickableBanilla : MonoBehaviour
 {
-    private CutsceneNpcManager npcManager;
-
-    private void Start()
-    {
-        // ¾À¿¡¼­ ¸Å´ÏÀú¸¦ Ã£¾ÆµÓ´Ï´Ù.
-        npcManager = FindAnyObjectByType<CutsceneNpcManager>();
-    }
-
-    private void OnMouseDown()
-    {
-        // ÀÎÁö ·Î±×
-        Debug.Log("¿ì´Â ¹Ù´Ò¶ó Å¬¸¯! ´ë°áÀ» ½ÃÀÛÇÕ´Ï´Ù.");
-
-        if (npcManager != null)
-        {
-            // ¸Å´ÏÀú¿¡°Ô ´ë°á ½ÃÀÛ ¸í·ÉÀ» ¹«Á¶°Ç ³»¸³´Ï´Ù.
-            npcManager.StartLaserDuel();
-        }
-    }
 }
