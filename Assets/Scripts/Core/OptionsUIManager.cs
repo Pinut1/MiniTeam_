@@ -47,11 +47,19 @@ namespace MiniTeam.Core
             // R키를 누르면 강제로 미니게임 실패(Regame 효과) 처리
             if (Input.GetKeyDown(KeyCode.R))
             {
-                if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
-                {
-                    ForceClose();
-                    MiniGameManager.Instance.OnMiniGameFail();
-                }
+                TriggerGameFail();
+            }
+        }
+
+        /// <summary>
+        /// 강제로 미니게임을 실패 처리하고 허브로 복귀시킵니다. (옵션창 버튼 연동용)
+        /// </summary>
+        public void TriggerGameFail()
+        {
+            if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
+            {
+                ForceClose();
+                MiniGameManager.Instance.OnMiniGameFail();
             }
         }
 

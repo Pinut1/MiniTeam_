@@ -24,19 +24,7 @@ namespace MiniTeam.Core
 
         private const string SAVE_STAGE_KEY = "SavedCurrentStage";
 
-        public bool IsDoorActive(StageDoor door)
-        {
-            // currentStage는 1부터 시작하고 배열 인덱스는 0부터 시작하므로 수 맞춤
-            int stageIndex = currentStage ;
-
-            if (stageDoors == null || stageDoors.Length == 0) return false;
-            if (stageIndex < 0 || stageIndex >= stageDoors.Length) return false;
-
-            return stageDoors[stageIndex] == door;
-        }
-  
-
-        public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
+        #region Unity Life Cycle
 
         void Awake()
         {
@@ -48,13 +36,13 @@ namespace MiniTeam.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+
         private void Start()
         {
             // 저장된 스테이지 정보 로드
             LoadGame();
 
             playerMove = FindAnyObjectByType<HubPlayerMove>();
-
 
             void PlayWakeUp()
             {
@@ -82,8 +70,25 @@ namespace MiniTeam.Core
             {
                 PlayWakeUp();
             }
-           
         }
+
+        #endregion
+
+        #region Public Methods
+
+        public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
+
+        public bool IsDoorActive(StageDoor door)
+        {
+            // currentStage는 1부터 시작하고 배열 인덱스는 0부터 시작하므로 수 맞춤
+            int stageIndex = currentStage;
+
+            if (stageDoors == null || stageDoors.Length == 0) return false;
+            if (stageIndex < 0 || stageIndex >= stageDoors.Length) return false;
+
+            return stageDoors[stageIndex] == door;
+        }
+
         public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
@@ -120,47 +125,6 @@ namespace MiniTeam.Core
                 RestoreHub();
         }
 
-        private void RestoreHub()
-        {
-            if (hubRootObjects == null) return;
-
-            // 1. 플레이어 위치를 먼저 안전한 원점으로 이동 (CharacterController 일시 정지)
-            if (playerMove != null)
-            {
-                CharacterController cc = playerMove.GetComponent<CharacterController>();
-                if (cc != null) cc.enabled = false; // 물리 씹힘 방지
-                
-                playerMove.gameObject.transform.position = new Vector3(0, 0f, 0);
-                
-                if (cc != null) cc.enabled = true;
-            }
-
-            // 2. 그 후 허브 오브젝트 복원
-            foreach (var go in hubRootObjects)
-                if (go != null) go.SetActive(true);
-            hubRootObjects = null;
-
-            // 미니게임에서 사용하던 JSON 대사 데이터를 다시 Hub용으로 교체
-            MiniTeam.Pokemon.DialogueDB.Instance?.Load("Hub");
-
-            if (isLastGameCleared)
-            {
-                JudangChiController.Instance?.PlaySequenceForGameClear();
-            }
-            else
-            {
-                EnablePlayerInput();
-                HubUIManager.Instance?.InitializeBottomUI(currentStage);
-            }
-
-            // 미니게임에서 허브로 복귀 시 허브 BGM 다시 재생 (피치 0.7)
-            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-            {
-                SoundManager.Instance?.SetBGMPitch(0.7f);
-                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-            }
-        }
-
         public void OnMiniGameClear()
         {
             isLastGameCleared = true;
@@ -178,7 +142,6 @@ namespace MiniTeam.Core
 
         public void DisablePlayerInput()
         {
-
             if (playerMove != null)
             {
                 playerMove.UnlockCursor();
@@ -194,13 +157,6 @@ namespace MiniTeam.Core
                 playerMove.enabled = true;
             }
         }
-
-        internal void LoadEndingScene()
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
-        }
-
-        // ── 세이브/로드 시스템 ──────────────────────────────────
 
         public void SaveGame()
         {
@@ -235,6 +191,53 @@ namespace MiniTeam.Core
             HubUIManager.Instance?.UpdateExclamationMark(); // 느낌표 UI 실시간 업데이트
         }
 
+        #endregion
 
+        #region Private Methods
+
+        internal void LoadEndingScene()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
+        }
+
+        private void RestoreHub()
+        {
+            if (hubRootObjects == null) return;
+
+            // 1. 플레이어 위치를 먼저 안전한 원점으로 이동 (CharacterController 일시 정지)
+            if (playerMove != null)
+            {
+                CharacterController cc = playerMove.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false; // 물리 씹힘 방지
+
+                playerMove.gameObject.transform.position = new Vector3(0, 0f, 0);
+
+                if (cc != null) cc.enabled = true;
+            }
+
+            // 2. 그 후 허브 오브젝트 복원
+            foreach (var go in hubRootObjects)
+                if (go != null) go.SetActive(true);
+            hubRootObjects = null;
+
+            if (isLastGameCleared)
+            {
+                JudangChiController.Instance?.PlaySequenceForGameClear();
+            }
+            else
+            {
+                EnablePlayerInput();
+                HubUIManager.Instance?.InitializeBottomUI(currentStage);
+            }
+
+            // 미니게임에서 허브로 복귀 시 허브 BGM 다시 재생 (피치 0.7)
+            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+            {
+                SoundManager.Instance?.SetBGMPitch(0.7f);
+                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+            }
+        }
+
+        #endregion
     }
 }

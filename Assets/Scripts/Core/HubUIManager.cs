@@ -29,8 +29,12 @@ public class HubUIManager : MonoBehaviour
     [SerializeField] private Image objectImg;
     [SerializeField] private Sprite[] stageClearSprites;
 
-    
-    #region UNITY LIFE CYCLE
+    // Animator Event Marker 제어 프로퍼티
+    public bool isFirstCinemaEnterDone { get; private set; } = false;
+    public bool isNormalCinemaEnterDone { get; private set; } = false;
+
+    #region Unity Life Cycle
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -54,12 +58,12 @@ public class HubUIManager : MonoBehaviour
                 if (img != null) img.enabled = false;
             }
         }
-
-        // 씬이 처음 로드되거나 복귀했을 때, 현재 스테이지에 맞춰 초기 UI를 띄워줍니다.
-        // InitializeBottomUI(MiniGameManager.Instance.currentStage);
     }
 
     #endregion
+
+    #region Public Methods
+
     public void OnBottomUIClickedJudangchi()
     {
         judangchiSmallObj.GetComponent<Button>().interactable = false;
@@ -74,14 +78,12 @@ public class HubUIManager : MonoBehaviour
         JudangChiController.Instance.PlaySequenceForCurrentStage();
     }
 
-   
     public void FirstCinemaEnter()
     {
         // Event Marker에 의해 작동하는 bool trigger를 초기화
         isFirstCinemaEnterDone = false;
         // 하나의 트리거로 입장 연출(하단 퇴장 -> 레터박스 -> 큰 주댕치)을 한방에 재생!
         cinemaAnimator.SetTrigger("FirstCinemaEnter");
-      
     }
 
     public IEnumerator FirstCinemaExit(int currentStage)
@@ -129,29 +131,11 @@ public class HubUIManager : MonoBehaviour
         StartCoroutine(RestoreDigiviceButtonAfterDelay(2.5f, currentStage));
     }
 
-    private IEnumerator RestoreDigiviceButtonAfterDelay(float delay, int stage)
-    {
-        yield return new WaitForSeconds(delay);
-        if (stage >= 2)
-        {
-            if (digiviceObj != null)
-            {
-                digiviceObj.GetComponent<Button>().interactable = true;
-            }
-        }
-        else
-        {
-            if (judangchiSmallObj != null) judangchiSmallObj.GetComponent<Button>().interactable = true;
-            if (digiviceObj != null) digiviceObj.GetComponent<Button>().interactable = true;
-        }
-    }
-
     public void PlayCinemaEnter()
     {
         digiviceObj.GetComponent<Button>().interactable = false;
         isNormalCinemaEnterDone = false;
         cinemaAnimator.SetTrigger("CinemaEnter");
-       
     }
 
     public IEnumerator PlayCinemaExit(int currentStage)
@@ -205,6 +189,90 @@ public class HubUIManager : MonoBehaviour
         UpdateDigiviceButtons(stage);
     }
 
+    public void UpdateExclamationMark()
+    {
+        if (exclamationMark == null || MiniGameManager.Instance == null) return;
+        bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
+        exclamationMark.SetActive(shouldShow);
+    }
+
+    public void WakeUp(Action onComplete = null)
+    {
+        if (eyeEffect != null)
+        {
+            eyeEffect.enabled = true;
+            StartCoroutine(WakeUpRoutine(onComplete));
+        }
+        else
+        {
+            onComplete?.Invoke();
+        }
+    }
+
+    public void ChangeBigJudangchiExpression(Sprite newSprite)
+    {
+        if (newSprite != null)
+        {
+            judangchiBigImage.sprite = newSprite;
+        }
+    }
+
+    public void ToggleWarningUI(bool isOn, string message = "")
+    {
+        if (warningUI != null) warningUI.SetActive(isOn);
+
+        // 창을 켤 때 전달받은 메세지가 비어있지 않다면 텍스트를 업데이트.
+        if (isOn && !string.IsNullOrEmpty(message) && warningText != null)
+        {
+            warningText.text = message;
+        }
+    }
+
+    public void CompleteFirstCinemaEnter()
+    {
+        isFirstCinemaEnterDone = true;
+    }
+
+    public void CompleteNormalCinemaEnter()
+    {
+        isNormalCinemaEnterDone = true;
+
+        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
+        if (currentStage == 1)
+        {
+            InitializeBottomUI(1);
+        }
+    }
+
+    public void PlaySpecialAnimation(string triggerName)
+    {
+        if (cinemaAnimator != null && !string.IsNullOrEmpty(triggerName))
+        {
+            cinemaAnimator.SetTrigger(triggerName);
+        }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private IEnumerator RestoreDigiviceButtonAfterDelay(float delay, int stage)
+    {
+        yield return new WaitForSeconds(delay);
+        if (stage >= 2)
+        {
+            if (digiviceObj != null)
+            {
+                digiviceObj.GetComponent<Button>().interactable = true;
+            }
+        }
+        else
+        {
+            if (judangchiSmallObj != null) judangchiSmallObj.GetComponent<Button>().interactable = true;
+            if (digiviceObj != null) digiviceObj.GetComponent<Button>().interactable = true;
+        }
+    }
+
     private void UpdateDigiviceButtons(int stage)
     {
         if (digiviceBtns == null || digiviceBtns.Length == 0) return;
@@ -224,14 +292,7 @@ public class HubUIManager : MonoBehaviour
             digiviceBtns[i].enabled = isUnlocked;
         }
     }
-    // 갱신 함수: 오직 '0단계'에서만 보이며, 0단계 컷신을 아직 안 본 상태여야 활성화
-    public void UpdateExclamationMark()
-    {
-        if (exclamationMark == null || MiniGameManager.Instance == null) return;
-        bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
-        exclamationMark.SetActive(shouldShow);
-    }
-    // 1회성 지연 출현 코루틴
+
     private IEnumerator ShowExclamationWithDelay(float delay)
     {
         exclamationMark.SetActive(false); // 먼저 꺼둠
@@ -239,37 +300,18 @@ public class HubUIManager : MonoBehaviour
         UpdateExclamationMark();
     }
 
-    // ==========================================
-    // 눈 깜빡임 연출 
-    // ==========================================
-    #region EyeBlank
-    public void WakeUp(Action onComplete = null)
-    {
-        if (eyeEffect != null)
-        {
-            eyeEffect.enabled = true;
-            StartCoroutine(WakeUpRoutine(onComplete));
-        }
-        else
-        {
-            onComplete?.Invoke();
-        }
-    }
-
     private IEnumerator WakeUpRoutine(Action onComplete)
     {
-
-
         if (judangchiSmallObj.activeSelf)
         {
             judangchiSmallObj.SetActive(false);
         }
-
         else if (digiviceObj.activeSelf)
         {
             digiviceObj.SetActive(false);
         }
-            eyeEffect.openAmount = 0.001f;
+        
+        eyeEffect.openAmount = 0.001f;
         eyeEffect.expand = 0.0f;
         float t = 0;
 
@@ -308,58 +350,6 @@ public class HubUIManager : MonoBehaviour
         InitializeBottomUI(MiniGameManager.Instance.currentStage);
         onComplete?.Invoke();
     }
+
     #endregion
-
-    #region ETC
-    // 표정 변경 함수 (유지)
-    public void ChangeBigJudangchiExpression(Sprite newSprite)
-    {
-        if (newSprite != null)
-        {
-            judangchiBigImage.sprite = newSprite;
-        }
-    }
-
-    public void ToggleWarningUI(bool isOn, string message = "")
-    {
-        
-        if (warningUI != null) warningUI.SetActive(isOn);
-
-        // 창을 켤 때 전달받은 메세지가 비어있지 않다면 텍스트를 업데이트.
-        if (isOn && !string.IsNullOrEmpty(message) && warningText != null)
-        {
-            warningText.text = message;
-        }
-    }
-    #endregion
-
-
-    // Animator Event Marker 제어
-    public bool isFirstCinemaEnterDone { get; private set; } = false;
-    public void CompleteFirstCinemaEnter()
-    {
-        isFirstCinemaEnterDone = true;
-    }
-
-    public bool isNormalCinemaEnterDone { get; private set; } = false;
-    public void CompleteNormalCinemaEnter()
-    {
-        isNormalCinemaEnterDone = true;
-
-        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
-        if (currentStage == 1)
-        {
-            InitializeBottomUI(1);
-        }
-    }
-
-    public void PlaySpecialAnimation(string triggerName)
-    {
-        if (cinemaAnimator != null && !string.IsNullOrEmpty(triggerName))
-        {
-            cinemaAnimator.SetTrigger(triggerName);
-        }
-    }
-    
-
 }
