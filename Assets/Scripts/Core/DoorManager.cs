@@ -82,13 +82,13 @@ namespace MiniTeam.Core
 
         public void HideWarning()
         {
-            HubUIManager.Instance?.ToggleWarningUI(false);
+            WarningUIController.Instance?.ToggleWarningUI(false);
         }
 
         private void ShowWarning(string message)
         {
             Debug.Log($"[DoorManager Warning] {message}");
-            HubUIManager.Instance?.ToggleWarningUI(true, message);
+            WarningUIController.Instance?.ToggleWarningUI(true, message);
         }
 
         private void ShowInactiveWarning(StageDoor door)

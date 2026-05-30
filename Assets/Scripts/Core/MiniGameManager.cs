@@ -40,33 +40,11 @@ namespace MiniTeam.Core
 
             playerMove = FindAnyObjectByType<HubPlayerMove>();
 
-            void PlayWakeUp()
-            {
-                HubUIManager.Instance.WakeUp(() =>
-                {
-                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-                    {
-                        SoundManager.Instance?.SetBGMPitch(0.7f);
-                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-                    }
-                    ChangeState(State.Hub_Idle);
-                });
-            }
-
-            if (playerMove != null)
-            {
-                ChangeState(State.Init);
-                // 스파이럴 → 눈깜빡 → BGM + 플레이어 입력 활성화
-                if (SpiralDiveCutscene.Instance != null)
-                    SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
-                else
-                    PlayWakeUp();
-            }
+            ChangeState(State.Init);
+            if (SpiralDiveCutscene.Instance != null)
+                SpiralDiveCutscene.Instance.PlayIfFirstTime(() => HubCutsceneDirector.Instance?.PlayWakeUpSequence());
             else
-            {
-                ChangeState(State.Init);
-                PlayWakeUp();
-            }
+                HubCutsceneDirector.Instance?.PlayWakeUpSequence();
         }
 
         #endregion
@@ -191,7 +169,7 @@ namespace MiniTeam.Core
         {
             progressData.isCutscenePlayed = played;
             SaveGame(); // 컷신 상태 즉시 저장
-            HubUIManager.Instance?.UpdateExclamationMark(); // 느낌표 UI 실시간 업데이트
+            BottomUIController.Instance?.UpdateExclamationMark(); // 느낌표 UI 실시간 업데이트
         }
 
         #endregion
@@ -225,21 +203,19 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
+            if (SoundManager.Instance != null && AudioManager.Instance != null)
+            {
+                SoundManager.Instance.SetBGMPitch(0.7f);
+                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+            }
+
             if (progressData.isLastGameCleared)
             {
-                JudangChiController.Instance?.PlaySequenceForGameClear();
+                HubCutsceneDirector.Instance?.PlaySequenceForGameClear();
             }
             else
             {
-                HubUIManager.Instance?.InitializeBottomUI(progressData.currentStage);
-                ChangeState(State.Hub_Idle);
-            }
-
-            // 미니게임에서 허브로 복귀 시 허브 BGM 다시 재생 (피치 0.7)
-            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-            {
-                SoundManager.Instance?.SetBGMPitch(0.7f);
-                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                HubCutsceneDirector.Instance?.PlayWakeUpSequence();
             }
         }
 

@@ -2,17 +2,15 @@ using UnityEngine;
 
 public class CinemaEventHandler : MonoBehaviour
 {
-    //UI AnimationµéÀÇ Event Marker¸¦ Á¦¾îÇÏ´Â ½ºÅ©¸³Æ®
+    //UI Animationë“¤ì˜ Event Markerë¥¼ ì œì–´í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 
-    //
     public void OnFirstCinemaEnterFinished()
     {
-        HubUIManager.Instance.CompleteFirstCinemaEnter();
+        //HubCutsceneDirector.Instance?.CompleteFirstCinemaEnter();
     }
 
-    
     public void OnNormalCinemaEnterFinished()
     {
-        HubUIManager.Instance.CompleteNormalCinemaEnter();
+        //HubCutsceneDirector.Instance?.CompleteNormalCinemaEnter();
     }
 }

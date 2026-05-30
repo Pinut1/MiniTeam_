@@ -21,6 +21,14 @@ public class JudangChiDialogueManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        if (DialogueDB.Instance != null)
+        {
+            DialogueDB.Instance.Load("Hub");
+        }
+    }
+
     public void StartDialogue(string dialogueKeyPrefix, Action onComplete = null)
     {
         dialoguePanel.SetActive(true);
@@ -45,7 +53,7 @@ public class JudangChiDialogueManager : MonoBehaviour
                 Sprite expressionSprite = Resources.Load<Sprite>($"Sprites/Judangchi/{spriteName}");
                 if (expressionSprite != null)
                 {
-                    HubUIManager.Instance.ChangeBigJudangchiExpression(expressionSprite);
+                    DialoguePortraitController.Instance?.ChangeExpression(expressionSprite);
                 }
                 else
                 {
@@ -56,7 +64,7 @@ public class JudangChiDialogueManager : MonoBehaviour
             // 이번 문장에 설정된 디지바이스 특수 연출 트리거가 있다면 즉시 실행
             if (!string.IsNullOrEmpty(animTrigger))
             {
-                HubUIManager.Instance.PlaySpecialAnimation(animTrigger);
+                BottomUIController.Instance?.PlaySpecialAnimation(animTrigger);
                 Debug.Log($"[대화 트리거 알림] {dialogueKeyPrefix}의 {sentenceIndex}번째 대사에서 '{animTrigger}' 애니메이션 트리거 호출 시도. (트리거가 없다면 유니티 자체 경고가 발생합니다)");
             }
 

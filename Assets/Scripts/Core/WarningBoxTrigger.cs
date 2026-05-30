@@ -4,13 +4,13 @@ using UnityEngine;
 public class WarningBoxTrigger : MonoBehaviour
 {
 
-    public string customWarningMessage = "default Warning Message";
+    public string customWarningMessage = "이 너머로 가도 볼 건 없을 것 같다...";
     
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            HubUIManager.Instance?.ToggleWarningUI(true, customWarningMessage);
+            WarningUIController.Instance?.ToggleWarningUI(true, customWarningMessage);
         }
     }
 
@@ -18,7 +18,7 @@ public class WarningBoxTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            HubUIManager.Instance?.ToggleWarningUI(false);
+            WarningUIController.Instance?.ToggleWarningUI(false);
         }
     }
 }
