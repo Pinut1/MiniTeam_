@@ -20,6 +20,8 @@ public class MainUIManager : MonoBehaviour
 
     [Header("Main Menu")]
     [SerializeField] private GameObject mainMenuPanel;
+    [Tooltip("이어하기 버튼 (세이브 없으면 비활성화)")]
+    [SerializeField] private GameObject continueButton;
     [Tooltip("PressAnyButton → 메인 메뉴 전환 시간 (초)")]
     [SerializeField] private float transitionDuration = 0.5f;
 
@@ -39,6 +41,12 @@ public class MainUIManager : MonoBehaviour
         // PressAnyButton 화면 켜기, 메인 메뉴 숨기기
         if (pressAnyButtonPanel != null) pressAnyButtonPanel.SetActive(true);
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+
+        // 세이브 데이터 여부에 따라 이어하기 버튼 자체를 켜고 끄기 (레이아웃 그룹 자동 정렬됨)
+        if (continueButton != null)
+        {
+            continueButton.SetActive(PlayerPrefs.HasKey(SAVE_STAGE_KEY));
+        }
 
         StartCoroutine(BlinkRoutine());
     }

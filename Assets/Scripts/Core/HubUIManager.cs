@@ -17,7 +17,7 @@ public class HubUIManager : MonoBehaviour
     [SerializeField] private float openSpeed = 1.5f;
 
     [Header("Dialogue UI (대화 및 알림 패널)")]
-    [SerializeField] private Animator cinemaAnimator;
+    [SerializeField] public Animator cinemaAnimator;
     [SerializeField] private Image judangchiBigImage;
     [SerializeField] private GameObject warningUI;
     [SerializeField] private TMP_Text warningText;
