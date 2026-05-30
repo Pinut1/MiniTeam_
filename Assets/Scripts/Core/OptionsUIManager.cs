@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace MiniTeam.Core
 {
@@ -18,11 +19,20 @@ namespace MiniTeam.Core
         [Tooltip("닫기(TurnOff) 애니메이션이 완료될 때까지 대기할 시간 (초)")]
         public float closeDelay = 0.5f;
 
-        [Header("옵션 내부 슬라이더 (선택)")]
+        [Header("옵션 값 슬라이더 (선택)")]
         public Slider masterVolumeSlider;
         public Slider bgmVolumeSlider;
         public Slider sfxVolumeSlider;
 
+        [Header("Key Guide")]
+        public GameObject keyGuidePanel;
+        public Image keyGuideImage;
+        public TMP_Text keyGuideTitleText;
+        public Sprite hubKeyGuideSprite;
+        public Sprite[] miniGameKeyGuides;
+        public GameObject keyGuideExclamation;
+
+        public bool IsOpen => isOpen;
         private bool isOpen = false;
         private Coroutine closeCoroutine;
 
@@ -37,12 +47,24 @@ namespace MiniTeam.Core
         {
             if (optionsPanel != null) optionsPanel.SetActive(false);
             InitSliders();
+
+            if (keyGuideExclamation != null)
+            {
+                int hasViewed = PlayerPrefs.GetInt("HasViewedKeyGuide", 0);
+                var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
+                if (img != null) img.enabled = (hasViewed == 0);
+            }
         }
 
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
-                Toggle();
+            {
+                if (keyGuidePanel != null && keyGuidePanel.activeSelf)
+                    CloseKeyGuide();
+                else
+                    Toggle();
+            }
 
             // R키를 누르면 강제로 미니게임 실패(Regame 효과) 처리
             if (Input.GetKeyDown(KeyCode.R))
@@ -136,6 +158,54 @@ namespace MiniTeam.Core
                 else
                     Application.Quit();
             });
+        }
+
+        // 키 가이드 버튼 콜백
+        public void OnKeyGuideClicked()
+        {
+            if (keyGuideExclamation != null)
+            {
+                var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
+                if (img != null && img.enabled)
+                {
+                    PlayerPrefs.SetInt("HasViewedKeyGuide", 1);
+                    PlayerPrefs.Save();
+                    img.enabled = false;
+                }
+            }
+
+            if (keyGuidePanel == null || keyGuideImage == null) return;
+            
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (sceneName == "Hub" || sceneName == "Main")
+            {
+                keyGuideImage.sprite = hubKeyGuideSprite;
+                if (keyGuideTitleText != null) keyGuideTitleText.text = "Hub 조작법";
+            }
+            else
+            {
+                int stage = (MiniGameManager.Instance != null) ? MiniGameManager.Instance.currentStage : 1;
+                int index = stage - 1;
+                
+                if (miniGameKeyGuides != null && index >= 0 && index < miniGameKeyGuides.Length && miniGameKeyGuides[index] != null)
+                {
+                    keyGuideImage.sprite = miniGameKeyGuides[index];
+                }
+                else
+                {
+                    keyGuideImage.sprite = hubKeyGuideSprite; // fallback
+                }
+
+                if (keyGuideTitleText != null) keyGuideTitleText.text = $"스테이지 {stage} 조작법";
+            }
+            
+            keyGuidePanel.SetActive(true);
+        }
+
+        // 키 가이드 패널 닫기 버튼 콜백
+        public void CloseKeyGuide()
+        {
+            if (keyGuidePanel != null) keyGuidePanel.SetActive(false);
         }
 
         // ── 볼륨 슬라이더 ─────────────────────────

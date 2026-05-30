@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using MiniTeam.Pokemon; // 추가된 네임스페이스
 
 public class JudangChiDialogueManager : MonoBehaviour
 {
@@ -21,91 +20,68 @@ public class JudangChiDialogueManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void StartDialogue(string dialogueKeyPrefix, Action onComplete = null)
+    public void StartDialogue(DialogueData data, Action onComplete = null)
     {
         dialoguePanel.SetActive(true);
-        StartCoroutine(TypeSentenceRoutine(dialogueKeyPrefix, onComplete));
+        StartCoroutine(TypeSentenceRoutine(data, onComplete));
     }
 
-    private IEnumerator TypeSentenceRoutine(string dialogueKeyPrefix, Action onComplete)
+    private IEnumerator TypeSentenceRoutine(DialogueData data, Action onComplete)
     {
-        string countStr = DialogueDB.Instance.Get(dialogueKeyPrefix + "_count");
-        if (!int.TryParse(countStr, out int sentenceCount)) sentenceCount = 0;
-
-        for (int sentenceIndex = 0; sentenceIndex < sentenceCount; sentenceIndex++)
+        foreach (DialogueData.SentenceData sentenceData in data.sentences)
         {
-            string prefix = $"{dialogueKeyPrefix}_";
-            string text = DialogueDB.Instance.Get($"{prefix}text_{sentenceIndex}");
-            string spriteName = DialogueDB.Instance.Get($"{prefix}sprite_{sentenceIndex}");
-            string animTrigger = DialogueDB.Instance.Get($"{prefix}anim_{sentenceIndex}");
-            string voiceName = DialogueDB.Instance.Get($"{prefix}voice_{sentenceIndex}");
+            // 새 대사로 넘어갈 때 이전 대사에서 틀어둔 애니메이션을 즉시 취소합니다.
+            HubUIManager.Instance.StopSpecialAnimation();
 
-            if (!string.IsNullOrEmpty(spriteName))
+            if (sentenceData.expressionSprite != null)
             {
-                Sprite expressionSprite = Resources.Load<Sprite>($"Sprites/Judangchi/{spriteName}");
-                if (expressionSprite != null)
-                {
-                    HubUIManager.Instance.ChangeBigJudangchiExpression(expressionSprite);
-                }
-                else
-                {
-                    Debug.LogWarning($"[대화 에셋 오류] 표정 이미지를 찾을 수 없습니다! 파일명: {spriteName} (위치: {dialogueKeyPrefix}의 {sentenceIndex}번째 대사)");
-                }
+                HubUIManager.Instance.ChangeBigJudangchiExpression(sentenceData.expressionSprite);
             }
 
             // 이번 문장에 설정된 디지바이스 특수 연출 트리거가 있다면 즉시 실행
-            if (!string.IsNullOrEmpty(animTrigger))
+            if (!string.IsNullOrEmpty(sentenceData.animationTriggerName))
             {
-                HubUIManager.Instance.PlaySpecialAnimation(animTrigger);
-                Debug.Log($"[대화 트리거 알림] {dialogueKeyPrefix}의 {sentenceIndex}번째 대사에서 '{animTrigger}' 애니메이션 트리거 호출 시도. (트리거가 없다면 유니티 자체 경고가 발생합니다)");
+                HubUIManager.Instance.PlaySpecialAnimation(sentenceData.animationTriggerName);
             }
 
             // 해당 문장 전용 보이스/효과음이 있다면 시작 시 재생
-            if (!string.IsNullOrEmpty(voiceName))
+            if (sentenceData.voiceClip != null)
             {
-                AudioClip voiceClip = Resources.Load<AudioClip>($"Audio/Judangchi/{voiceName}");
-                if (voiceClip != null)
-                {
-                    MiniTeam.Core.AudioManager.Instance?.PlayVoice(voiceClip);
-                }
-                else
-                {
-                    Debug.LogWarning($"[대화 에셋 오류] 음성 파일을 찾을 수 없습니다! 파일명: {voiceName} (위치: {dialogueKeyPrefix}의 {sentenceIndex}번째 대사)");
-                }
+                MiniTeam.Core.AudioManager.Instance?.PlayVoice(sentenceData.voiceClip);
             }
 
             dialogueText.text = "";
             bool skipTyping = false;
 
             // 한 글자씩 타이핑 효과 출력
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < sentenceData.text.Length; i++)
             {
                 // 글자 출력 도중 클릭 시 즉시 스킵 플래그 생성
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                 {
                     skipTyping = true;
                     break;
                 }
 
                 // Rich Text 태그 처리: < 로 시작하면 > 가 닫힐 때까지 한 번에 덧붙임
-                if (text[i] == '<')
+                if (sentenceData.text[i] == '<')
                 {
-                    int closeIdx = text.IndexOf('>', i);
+                    int closeIdx = sentenceData.text.IndexOf('>', i);
                     if (closeIdx != -1)
                     {
-                        dialogueText.text += text.Substring(i, closeIdx - i + 1);
+                        dialogueText.text += sentenceData.text.Substring(i, closeIdx - i + 1);
                         i = closeIdx; // 인덱스를 닫는 괄호 위치로 건너뜀
                         continue;
                     }
                 }
 
-                dialogueText.text += text[i];
+                dialogueText.text += sentenceData.text[i];
 
                 // 타이핑 대기 시간 중에도 마우스 클릭 입력 감지지
                 float elapsed = 0f;
                 while (elapsed < typingSpeed)
                 {
-                    if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                     {
                         skipTyping = true;
                         break;
@@ -118,13 +94,13 @@ public class JudangChiDialogueManager : MonoBehaviour
             }
 
             // 텍스트를 끝까지 출력
-            dialogueText.text = text;
+            dialogueText.text = sentenceData.text;
 
             // 스킵 당시의 마우스 클릭이 다음 대사 넘어가기로 즉시 인식되지 않도록 한 프레임 대기
             yield return null;
 
             // 마우스 클릭 시 다음 대사로 진행
-            yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+            yield return new WaitUntil(() => Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space));
             yield return null;
         }
 

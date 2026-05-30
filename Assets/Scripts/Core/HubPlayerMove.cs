@@ -17,41 +17,48 @@ public class HubPlayerMove : MonoBehaviour
     private CharacterController controller;
     private float xRotation = 0f;
 
-    // Ä¿¼­°¡ º¸ÀÌ´Â »óÅÂÀÎÁö È®ÀÎÇÏ´Â º¯¼ö
+    // ì»¤ì„œê°€ ë³´ì´ëŠ” ìƒíƒœì¸ì§€ í™•ì¸í•˜ëŠ” ë³€ìˆ˜
     private bool isCursorVisible = false;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
 
-        // °ÔÀÓ ½ÃÀÛ ½Ã ¸¶¿ì½º Ä¿¼­ ¼û±â±â ¹× °íÁ¤
+        // ê²Œì„ ì‹œì‘ ì‹œ ë§ˆìš°ìŠ¤ ì»¤ì„œ ìˆ¨ê¸°ê¸° ë° ê³ ì •
         LockCursor();
     }
 
     void Update()
     {
+        // ì˜µì…˜ ì°½ì´ ì—´ë ¤ìˆìœ¼ë©´ ì‹œì  íšŒì „ ë° ì´ë™ ë“± ëª¨ë“  ì¡°ì‘ ë¬´ì‹œí•˜ê³  ì»¤ì„œ í‘œì‹œ ë³´ì¥
+        if (MiniTeam.Core.OptionsUIManager.Instance != null && MiniTeam.Core.OptionsUIManager.Instance.IsOpen)
+        {
+            if (!isCursorVisible) UnlockCursor();
+            return;
+        }
+
         HandleCursorState();
 
-        // Ä¿¼­°¡ ¼û°ÜÁ® ÀÖÀ» ¶§(Alt Å°¸¦ ¾È ´©¸¦ ¶§)¸¸ ½ÃÁ¡ È¸Àü
+        // ì»¤ì„œê°€ ìˆ¨ê²¨ì ¸ ìˆì„ ë•Œ(Alt í‚¤ë¥¼ ì•ˆ ëˆ„ë¥¼ ë•Œ)ë§Œ ì‹œì  íšŒì „
         if (!isCursorVisible)
         {
             LookAround();
         }
 
-        // ÀÌµ¿Àº Ä¿¼­ »óÅÂ¿Í ¹«°üÇÏ°Ô Ç×»ó °¡´ÉÇÏµµ·Ï À¯Áö
+        // ì´ë™ì€ ì»¤ì„œ ìƒíƒœì™€ ë¬´ê´€í•˜ê²Œ í•­ìƒ ê°€ëŠ¥í•˜ë„ë¡ ìœ ì§€
         Move();
     }
 
   
-    // ¸¶¿ì½º Ä¿¼­ »óÅÂ º¯°æ Ã³¸®
+    // ë§ˆìš°ìŠ¤ ì»¤ì„œ í‘œì‹œ ìƒíƒœ ë³€ê²½ ì²˜ë¦¬
     void HandleCursorState()
     {
-        // ¿ŞÂÊ Alt Å°¸¦ ´©¸£´Â ¼ø°£
+        // ì™¼ìª½ Alt í‚¤ë¥¼ ëˆ„ë¥´ëŠ” ìˆœê°„
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
             UnlockCursor();
         }
-        // ¿ŞÂÊ Alt Å°¸¦ ¶¼´Â ¼ø°£
+        // ì™¼ìª½ Alt í‚¤ë¥¼ ë–¼ëŠ” ìˆœê°„
         else if (Input.GetKeyUp(KeyCode.LeftAlt))
         {
             LockCursor();
@@ -91,7 +98,7 @@ public class HubPlayerMove : MonoBehaviour
         
     }
 
-    // Ä¿¼­¸¦ ¼û±â°í Áß¾Ó¿¡ °íÁ¤ÇÏ´Â ÇÔ¼ö
+    // ì»¤ì„œë¥¼ ìˆ¨ê¸°ê³  ì¤‘ì•™ì— ê³ ì •í•˜ëŠ” í•¨ìˆ˜
     public void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -99,7 +106,7 @@ public class HubPlayerMove : MonoBehaviour
         isCursorVisible = false;
     }
 
-    // Ä¿¼­¸¦ º¸ÀÌ°Ô ÇÏ°í ÀÚÀ¯·Ó°Ô ¿òÁ÷ÀÌµµ·Ï Çª´Â ÇÔ¼ö
+    // ì»¤ì„œë¥¼ ë³´ì´ê²Œ í•˜ê³  ììœ ë¡­ê²Œ ì›€ì§ì´ë„ë¡ í‘¸ëŠ” í•¨ìˆ˜
     public void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;

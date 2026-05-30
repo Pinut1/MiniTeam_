@@ -9,6 +9,9 @@ public class HubUIManager : MonoBehaviour
 {
     public static HubUIManager Instance { get; private set; }
 
+    [Header("Test_ 파리 Sound 전용 Volume Scale")]
+    public float volumeScale_Pari = 0.1f;
+
     [Header("WakeUp & Setup (오프닝 연출)")]
     public EyeOpeningEffect eyeEffect;
     [SerializeField] private float openSpeed = 1.5f;
@@ -23,7 +26,8 @@ public class HubUIManager : MonoBehaviour
     [SerializeField] private GameObject judangchiSmallObj;
     [SerializeField] private GameObject digiviceObj;
     public GameObject exclamationMark;
-    [SerializeField] private Image[] digiviceBtns;
+    private AudioSource flyAudioSource;
+    [SerializeField] private GameObject[] digiviceBtns;
 
     [Header("Stage Clear Reward (클리어 연출)")]
     [SerializeField] private Image objectImg;
@@ -46,6 +50,13 @@ public class HubUIManager : MonoBehaviour
         if (digiviceObj != null)
             digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
+        // 느낌표(exclamationMark)에 파리 소리 루프용 AudioSource 동적 생성
+        if (exclamationMark != null)
+        {
+            flyAudioSource = exclamationMark.AddComponent<AudioSource>();
+            flyAudioSource.loop = true;
+            flyAudioSource.playOnAwake = false;
+        }
     }
 
     #endregion
@@ -173,12 +184,6 @@ public class HubUIManager : MonoBehaviour
             bool wasActive = judangchiSmallObj.activeSelf;
             judangchiSmallObj.SetActive(true);
             judangchiSmallObj.GetComponent<Button>().interactable = true;
-
-            // 안 보이다가 새로 켜질 때만 효과음 재생
-            if (!wasActive && MiniTeam.Core.AudioManager.Instance != null && MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear != null)
-            {
-                MiniTeam.Core.AudioManager.Instance.PlaySFX(MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear, 0.1f); 
-            }
         }
 
         // 오직 0단계이고 아직 컷신을 안 봤을 때만 최초 지연(0.75초) 출현 연출 적용
@@ -208,11 +213,9 @@ public class HubUIManager : MonoBehaviour
             // 3스테이지 클리어 시(stage = 4) -> digiviceBtns[2] 온
             // 4스테이지 클리어 시(stage = 5) -> digiviceBtns[3] 온
             int requiredStage = 2 + i;
-            float alpha = (stage >= requiredStage) ? 1.0f : 0.3f;
+            bool isActive = stage >= requiredStage;
             
-            Color color = digiviceBtns[i].color;
-            color.a = alpha;
-            digiviceBtns[i].color = color;
+            digiviceBtns[i].SetActive(isActive);
         }
     }
     // 갱신 함수: 오직 '0단계'에서만 보이며, 0단계 컷신을 아직 안 본 상태여야 활성화
@@ -221,6 +224,23 @@ public class HubUIManager : MonoBehaviour
         if (exclamationMark == null || MiniGameManager.Instance == null) return;
         bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
         exclamationMark.SetActive(shouldShow);
+
+        // 느낌표 활성화 여부에 맞춰 파리 소리 루프 재생/정지
+        if (flyAudioSource != null && MiniTeam.Core.AudioManager.Instance != null && MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear != null)
+        {
+            if (shouldShow && !flyAudioSource.isPlaying)
+            {
+                flyAudioSource.clip = MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear;
+                float masterVol = MiniTeam.Core.SoundManager.Instance != null ? MiniTeam.Core.SoundManager.Instance.masterVolume : 1f;
+                float sfxVol = MiniTeam.Core.SoundManager.Instance != null ? MiniTeam.Core.SoundManager.Instance.sfxVolume : 1f;
+                flyAudioSource.volume = masterVol * sfxVol * volumeScale_Pari;
+                flyAudioSource.Play();
+            }
+            else if (!shouldShow && flyAudioSource.isPlaying)
+            {
+                flyAudioSource.Stop();
+            }
+        }
     }
     // 1회성 지연 출현 코루틴
     private IEnumerator ShowExclamationWithDelay(float delay)
@@ -297,6 +317,14 @@ public class HubUIManager : MonoBehaviour
 
         eyeEffect.enabled = false;
         InitializeBottomUI(MiniGameManager.Instance.currentStage);
+
+        // 키 가이드를 한 번도 본 적이 없다면 안내 처리
+        if (PlayerPrefs.GetInt("HasViewedKeyGuide", 0) == 0)
+        {
+            // TODO: 조작법 확인 안내 문구 UI 띄우기
+        }
+
+        //TODO ESC 키 보이게 하기
         onComplete?.Invoke();
     }
     #endregion
@@ -349,6 +377,15 @@ public class HubUIManager : MonoBehaviour
         if (cinemaAnimator != null && !string.IsNullOrEmpty(triggerName))
         {
             cinemaAnimator.SetTrigger(triggerName);
+        }
+    }
+    
+    public void StopSpecialAnimation()
+    {
+        if (cinemaAnimator != null)
+        {
+            // 대사 전환 시 이전 애니메이션(Digi Layer)을 즉시 취소하고 기본 상태로 강제 복귀
+            cinemaAnimator.Play("Digivice_Idle", 1);
         }
     }
     
