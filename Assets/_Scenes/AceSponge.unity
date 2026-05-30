@@ -499,7 +499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &61692981
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6241,7 +6241,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1287264978
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7473,7 +7473,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1671165487
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7652,7 +7652,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1715998413
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9679,7 +9679,7 @@ GameObject:
   - component: {fileID: 2010235536}
   - component: {fileID: 2010235535}
   m_Layer: 5
-  m_Name: BSbackImg
+  m_Name: TabbackImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9725,7 +9725,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 648091706, guid: 0f5ecaf5591b4144a9450ff86165c621, type: 3}
+  m_Sprite: {fileID: 911993460, guid: 0f5ecaf5591b4144a9450ff86165c621, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

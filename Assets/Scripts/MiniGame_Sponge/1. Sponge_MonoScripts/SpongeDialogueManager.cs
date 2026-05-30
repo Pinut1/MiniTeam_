@@ -107,6 +107,12 @@ public class SpongeDialogueManager : MonoBehaviour
         arrowLeftImg.gameObject.SetActive(false);
         arrowRightImg.gameObject.SetActive(false);
 
+        // 선택지 / 엔딩 텍스트는 시작 시 꺼야 함
+        if (choicePnl != null)     choicePnl.SetActive(false);
+        if (endingTextObj != null) endingTextObj.SetActive(false);
+        // TypeLine은 textBoxPanel을 명시적으로 켜지 않으므로 여기서 보장
+        if (textBoxPanel != null)  textBoxPanel.SetActive(true);
+
         TextAsset jsonAsset = Resources.Load<TextAsset>("SpongeData/SpongeTrialScript");
         trialScript = JsonUtility.FromJson<SpongeTrialScriptData>(jsonAsset.text);
 
