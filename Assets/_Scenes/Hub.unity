@@ -1990,6 +1990,8 @@ MonoBehaviour:
   sfxSmallJudangchiAppear: {fileID: 8300000, guid: 1a62f25f0a5fb444da25655e107b185c, type: 3}
   sfxInteract: {fileID: 0}
   sfxGetItem: {fileID: 0}
+  sfxDoorOpen: {fileID: 8300000, guid: 44b63b0db16ce624b97e45ebde0a0971, type: 3}
+  sfxDoorClose: {fileID: 8300000, guid: bc37ad25465405a428a26ff0facd9a7b, type: 3}
 --- !u!4 &610218214
 Transform:
   m_ObjectHideFlags: 0
@@ -3532,6 +3534,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004341330}
   m_CullTransparentMesh: 1
+--- !u!1 &1024987906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1024987908}
+  - component: {fileID: 1024987907}
+  m_Layer: 0
+  m_Name: DoorManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1024987907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024987906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 423d68d187407764b9b7c0ebb9a3d143, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.DoorManager
+  stageDoors:
+  - {fileID: 2165585531680062823}
+  - {fileID: 1639831150}
+  - {fileID: 1789594025}
+  - {fileID: 569002760}
+  - {fileID: 1302730630}
+  inactiveDoorWarning: "\uD604\uC7AC \uC9C0\uC815\uB41C \uACBD\uB85C\uC5D0 \uC811\uADFC\uD560
+    \uC218 \uC5C6\uC2B5\uB2C8\uB2E4. \uACC4\uC18D\uD558\uB824\uBA74 \uB2E4\uB978
+    \uBB38\uC744 \uC774\uC6A9\uD558\uC2ED\uC2DC\uC624."
+  cutscenePendingWarning: "\uC791\uC5C5\uC774 \uC911\uB2E8\uB418\uC5C8\uC2B5\uB2C8\uB2E4.
+    \uACC4\uC18D \uC2E4\uD589\uD558\uB824\uBA74 [\uC8FC\uB315\uCE58]\uC758 \uC774\uC57C\uAE30\uB97C
+    \uC785\uB825 \uD558\uC2ED\uC2DC\uC624."
+  allClearWarning: "\uB354 \uC774\uC0C1 \uC2E4\uD589\uD560 \uC791\uC5C5\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+  alreadyClearedWarning: "\uD574\uB2F9 \uAD6C\uC5ED\uC740 \uC774\uBBF8 \uD0D0\uC0C9\uC774
+    \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+--- !u!4 &1024987908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024987906}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.22575, z: 0.77603}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1038619649
 GameObject:
   m_ObjectHideFlags: 0
@@ -10259,6 +10320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad185bd08cd672459ff7fb19f84eb02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  stageDialogues: []
 --- !u!1 &1446728234
 GameObject:
   m_ObjectHideFlags: 0
@@ -11435,14 +11497,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 864e2ec7dbd159b498f278a9e45051f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniTeam.Core.MiniGameManager
-  currentStage: 0
-  isCutscenePlayed: 0
-  stageDoors:
-  - {fileID: 2165585531680062823}
-  - {fileID: 1639831150}
-  - {fileID: 1789594025}
-  - {fileID: 569002760}
-  - {fileID: 1302730630}
+  progressData:
+    currentStage: 0
+    isCutscenePlayed: 0
+    isLastGameCleared: 0
 --- !u!4 &1620732379
 Transform:
   m_ObjectHideFlags: 0
@@ -13716,3 +13774,4 @@ SceneRoots:
   - {fileID: 771010301}
   - {fileID: 1396281263}
   - {fileID: 1752006545}
+  - {fileID: 1024987908}

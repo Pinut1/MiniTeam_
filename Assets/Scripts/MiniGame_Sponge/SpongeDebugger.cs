@@ -30,7 +30,7 @@ namespace MiniTeam.Sponge
 
             GUILayout.Space(5);
             GUILayout.Label($"MiniGameManager: {(mgm != null ? "OK" : "NULL")}");
-            GUILayout.Label($"currentStage: {(mgm != null ? mgm.currentStage.ToString() : "-")}");
+            GUILayout.Label($"currentStage: {(mgm != null ? mgm.progressData.currentStage.ToString() : "-")}");
 
             GUILayout.Space(10);
 

@@ -98,7 +98,7 @@ public class HubUIManager : MonoBehaviour
 
     public void StageClear_ObjectGet()
     {
-        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
+        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.progressData.currentStage : 0;
 
         // 클리어한 스테이지에 맞춰 획득 오브젝트 스프라이트 교체 (stage 0 클리어 시 currentStage=1이 되므로 index 0 대입)
         int spriteIndex = currentStage - 1;
@@ -177,7 +177,7 @@ public class HubUIManager : MonoBehaviour
         }
 
         // 오직 0단계이고 아직 컷신을 안 봤을 때만 최초 지연(0.75초) 출현 연출 적용
-        if (stage == 0 && MiniGameManager.Instance != null && !MiniGameManager.Instance.isCutscenePlayed)
+        if (stage == 0 && MiniGameManager.Instance != null && !MiniGameManager.Instance.progressData.isCutscenePlayed)
         {
             StartCoroutine(ShowExclamationWithDelay(0.75f));
         }
@@ -192,7 +192,7 @@ public class HubUIManager : MonoBehaviour
     public void UpdateExclamationMark()
     {
         if (exclamationMark == null || MiniGameManager.Instance == null) return;
-        bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
+        bool shouldShow = (MiniGameManager.Instance.progressData.currentStage == 0) && !MiniGameManager.Instance.progressData.isCutscenePlayed;
         exclamationMark.SetActive(shouldShow);
     }
 
@@ -237,7 +237,7 @@ public class HubUIManager : MonoBehaviour
     {
         isNormalCinemaEnterDone = true;
 
-        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.currentStage : 0;
+        int currentStage = MiniGameManager.Instance != null ? MiniGameManager.Instance.progressData.currentStage : 0;
         if (currentStage == 1)
         {
             InitializeBottomUI(1);
@@ -347,7 +347,7 @@ public class HubUIManager : MonoBehaviour
         }
 
         eyeEffect.enabled = false;
-        InitializeBottomUI(MiniGameManager.Instance.currentStage);
+        InitializeBottomUI(MiniGameManager.Instance.progressData.currentStage);
         onComplete?.Invoke();
     }
 

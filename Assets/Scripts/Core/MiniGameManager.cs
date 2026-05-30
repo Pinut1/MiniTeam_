@@ -6,23 +6,19 @@ namespace MiniTeam.Core
 {
     public class MiniGameManager : MonoBehaviour
     {
+        public enum State { Init, Hub_Idle, Hub_Cutscene, MiniGame_Transition, MiniGame_Playing }
+
         public static MiniGameManager Instance { get; private set; }
+
+        public State CurrentState { get; private set; }
 
         private string currentScene;
         private GameObject[] hubRootObjects;
 
         private HubPlayerMove playerMove;
 
-        [Header("Game Progress")]
-        public int currentStage = 0;
-        public bool isCutscenePlayed = false;
-        private bool isLastGameCleared = false;
-
-        [Header("Door Management")]
-        [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
-        public StageDoor[] stageDoors;
-
-        private const string SAVE_STAGE_KEY = "SavedCurrentStage";
+        [Header("Game Progress Data")]
+        public GameProgressData progressData = new GameProgressData();
 
         #region Unity Life Cycle
 
@@ -53,13 +49,13 @@ namespace MiniTeam.Core
                         SoundManager.Instance?.SetBGMPitch(0.7f);
                         AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
                     }
-                    if (playerMove != null) EnablePlayerInput();
+                    ChangeState(State.Hub_Idle);
                 });
             }
 
             if (playerMove != null)
             {
-                DisablePlayerInput();
+                ChangeState(State.Init);
                 // 스파이럴 → 눈깜빡 → BGM + 플레이어 입력 활성화
                 if (SpiralDiveCutscene.Instance != null)
                     SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
@@ -68,7 +64,40 @@ namespace MiniTeam.Core
             }
             else
             {
+                ChangeState(State.Init);
                 PlayWakeUp();
+            }
+        }
+
+        #endregion
+
+        #region State Management
+        
+        public void ChangeState(State newState)
+        {
+            CurrentState = newState;
+            Debug.Log($"[MiniGameManager] State changed to: {newState}");
+
+            switch (newState)
+            {
+                case State.Init:
+                case State.Hub_Cutscene:
+                case State.MiniGame_Transition:
+                case State.MiniGame_Playing:
+                    if (playerMove != null)
+                    {
+                        playerMove.UnlockCursor();
+                        playerMove.enabled = false;
+                    }
+                    break;
+
+                case State.Hub_Idle:
+                    if (playerMove != null)
+                    {
+                        playerMove.LockCursor();
+                        playerMove.enabled = true;
+                    }
+                    break;
             }
         }
 
@@ -78,33 +107,25 @@ namespace MiniTeam.Core
 
         public bool IsInMiniGame => !string.IsNullOrEmpty(currentScene);
 
-        public bool IsDoorActive(StageDoor door)
-        {
-            // currentStage는 1부터 시작하고 배열 인덱스는 0부터 시작하므로 수 맞춤
-            int stageIndex = currentStage;
-
-            if (stageDoors == null || stageDoors.Length == 0) return false;
-            if (stageIndex < 0 || stageIndex >= stageDoors.Length) return false;
-
-            return stageDoors[stageIndex] == door;
-        }
-
         public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
+
+            ChangeState(State.MiniGame_Transition);
 
             // 미니게임 진입 시 기존 BGM 및 효과음 강제 종료 (안전장치)
             SoundManager.Instance?.StopBGM();
             SoundManager.Instance?.StopAllSFX();
 
             // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
-            playerMove.UnlockCursor();
             hubRootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
             foreach (var go in hubRootObjects)
                 go.SetActive(false);
 
             currentScene = sceneName;
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+
+            ChangeState(State.MiniGame_Playing);
         }
 
         public void ExitMiniGame()
@@ -127,66 +148,48 @@ namespace MiniTeam.Core
 
         public void OnMiniGameClear()
         {
-            isLastGameCleared = true;
-            currentStage++;
-            isCutscenePlayed = false; // 새로운 스테이지 진입으로 컷신 미재생 초기화
+            progressData.isLastGameCleared = true;
+            progressData.currentStage++;
+            progressData.isCutscenePlayed = false; // 새로운 스테이지 진입으로 컷신 미재생 초기화
             SaveGame(); // 스테이지 증가 및 컷신 미재생 상태 저장
             ExitMiniGame();
         }
 
         public void OnMiniGameFail()
         {
-            isLastGameCleared = false;
+            progressData.isLastGameCleared = false;
             ExitMiniGame();
         }
 
         public void DisablePlayerInput()
         {
-            if (playerMove != null)
-            {
-                playerMove.UnlockCursor();
-                playerMove.enabled = false;
-            }
+            ChangeState(State.Hub_Cutscene);
         }
 
         public void EnablePlayerInput()
         {
-            if (playerMove != null)
-            {
-                playerMove.LockCursor();
-                playerMove.enabled = true;
-            }
+            ChangeState(State.Hub_Idle);
         }
 
         public void SaveGame()
         {
-            PlayerPrefs.SetInt(SAVE_STAGE_KEY, currentStage);
-            PlayerPrefs.SetInt("SavedCutscenePlayed", isCutscenePlayed ? 1 : 0);
-            PlayerPrefs.Save();
-            Debug.Log($"[SaveSystem] Game Saved. Current Stage: {currentStage}, Cutscene Played: {isCutscenePlayed}");
+            SaveSystem.Save(progressData);
         }
 
         public void LoadGame()
         {
-            // 기본 스테이지는 0으로 설정
-            currentStage = PlayerPrefs.GetInt(SAVE_STAGE_KEY, 0);
-            isCutscenePlayed = PlayerPrefs.GetInt("SavedCutscenePlayed", 0) == 1;
-            Debug.Log($"[SaveSystem] Game Loaded. Current Stage: {currentStage}, Cutscene Played: {isCutscenePlayed}");
+            progressData = SaveSystem.Load();
         }
 
         public void ResetSaveData()
         {
-            PlayerPrefs.DeleteKey(SAVE_STAGE_KEY);
-            PlayerPrefs.DeleteKey("SavedCutscenePlayed");
-            PlayerPrefs.Save();
-            currentStage = 0;
-            isCutscenePlayed = false;
-            Debug.Log("[SaveSystem] Save Data Reset.");
+            SaveSystem.ResetSaveData();
+            progressData.Reset();
         }
 
         public void SetCutscenePlayed(bool played)
         {
-            isCutscenePlayed = played;
+            progressData.isCutscenePlayed = played;
             SaveGame(); // 컷신 상태 즉시 저장
             HubUIManager.Instance?.UpdateExclamationMark(); // 느낌표 UI 실시간 업데이트
         }
@@ -202,6 +205,8 @@ namespace MiniTeam.Core
 
         private void RestoreHub()
         {
+            ChangeState(State.MiniGame_Transition);
+
             if (hubRootObjects == null) return;
 
             // 1. 플레이어 위치를 먼저 안전한 원점으로 이동 (CharacterController 일시 정지)
@@ -220,14 +225,14 @@ namespace MiniTeam.Core
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
 
-            if (isLastGameCleared)
+            if (progressData.isLastGameCleared)
             {
                 JudangChiController.Instance?.PlaySequenceForGameClear();
             }
             else
             {
-                EnablePlayerInput();
-                HubUIManager.Instance?.InitializeBottomUI(currentStage);
+                HubUIManager.Instance?.InitializeBottomUI(progressData.currentStage);
+                ChangeState(State.Hub_Idle);
             }
 
             // 미니게임에서 허브로 복귀 시 허브 BGM 다시 재생 (피치 0.7)

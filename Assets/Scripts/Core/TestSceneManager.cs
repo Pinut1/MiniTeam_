@@ -17,15 +17,15 @@ public class TestSceneManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Text∞° ¿ŒΩ∫∆Â≈Õø° ø¨∞·µ«¡ˆ æ æ“Ω¿¥œ¥Ÿ.");
+            Debug.LogError("TextÍ∞Ä Ïù∏Ïä§ÌéôÌÑ∞Ïóê Ïó∞Í≤∞ÎêòÏßÄ ÏïäÏïòÏäµÎãàÎã§.");
         }
         if (CurrentSceneText != null)
         {
-            CurrentSceneText.text = "Current Stage\r\n" + MiniGameManager.Instance.currentStage;
+            CurrentSceneText.text = "Current Stage\r\n" + MiniGameManager.Instance.progressData.currentStage;
         }
         else
         {
-            Debug.LogError("Text∞° ¿ŒΩ∫∆Â≈Õø° ø¨∞·µ«¡ˆ æ æ“Ω¿¥œ¥Ÿ.");
+            Debug.LogError("TextÍ∞Ä Ïù∏Ïä§ÌéôÌÑ∞Ïóê Ïó∞Í≤∞ÎêòÏßÄ ÏïäÏïòÏäµÎãàÎã§.");
         }
     }
 
@@ -34,7 +34,7 @@ public class TestSceneManager : MonoBehaviour
         int count = 2;
         while (count >0)
         {
-            countdownText.text = count.ToString() + " √ ";
+            countdownText.text = count.ToString() + " Ï¥à";
             yield return new WaitForSeconds(1f);
             count--;
         }

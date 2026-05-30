@@ -29,7 +29,7 @@ public class HubDebugger : MonoBehaviour
         GUILayout.BeginArea(new Rect(Screen.width - 220, 10, 210, 300), GUI.skin.box);
 
         GUILayout.Label("=== Hub Debugger (F2 토글) ===");
-        GUILayout.Label($"currentStage: {(mgm != null ? mgm.currentStage.ToString() : "NULL")}");
+        GUILayout.Label($"currentStage: {(mgm != null ? mgm.progressData.currentStage.ToString() : "NULL")}");
         GUILayout.Label($"IsInMiniGame: {(mgm != null ? mgm.IsInMiniGame.ToString() : "NULL")}");
 
         GUILayout.Space(5);
