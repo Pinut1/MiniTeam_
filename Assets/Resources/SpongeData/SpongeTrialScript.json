@@ -817,7 +817,7 @@
     {
       "lineId": "press_00_03",
       "speaker": "집게사장",
-      "txt": "딘체 20명이나 왔었습니다.\n그날 매출을보며 미소를 지었죠.",
+      "txt": "단체 20명이나 왔었습니다.\n그날 매출을보며 미소를 지었죠.",
       "animationTrig": "G_talk",
       "backgroundSpr": "Sponge_BG/BG_Witness",
       "deskSpr": "Sponge_Table/JipgeSajang",
