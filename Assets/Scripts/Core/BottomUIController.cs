@@ -50,9 +50,12 @@ public class BottomUIController : MonoBehaviour
     public void Show(int stage)
     {
         InitializeLogic(stage);
-        if (judangchiAnimator != null) judangchiAnimator.SetTrigger("Show");
-        if(digiviceAnimator != null) digiviceAnimator.SetTrigger("Show");
-       
+        
+        if (stage == 0)
+        {
+            if (judangchiAnimator != null) judangchiAnimator.SetTrigger("Show");
+          
+        }
     }
 
     public void PlayClickAnimation(int stage)
