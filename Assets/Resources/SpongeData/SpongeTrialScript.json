@@ -1752,7 +1752,7 @@
     {
       "lineId": "re_press_choice_01_02",
       "speaker": "징징이",
-      "txt": "가게를 보아을 때 무엇을 보았나?",
+      "txt": "가게를 봤을 때 무엇을 보았나?",
       "animationTrig": "J_talk",
       "backgroundSpr": "Sponge_BG/BG_Defense",
       "deskSpr": "Sponge_Table/JingJingi",
