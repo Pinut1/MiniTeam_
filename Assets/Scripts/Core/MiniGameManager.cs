@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -48,43 +48,59 @@ namespace MiniTeam.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        private void Start()
+                private void Start()
         {
-            // 저장된 스테이지 정보 로드
             LoadGame();
-
-            playerMove = FindAnyObjectByType<HubPlayerMove>();
-
-
-            void PlayWakeUp()
-            {
-                HubUIManager.Instance.WakeUp(() =>
-                {
-                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-                    {
-                        SoundManager.Instance?.SetBGMPitch(0.7f);
-                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-                    }
-                    if (playerMove != null) EnablePlayerInput();
-                });
-            }
-
-            if (playerMove != null)
-            {
-                DisablePlayerInput();
-                // 스파이럴 → 눈깜빡 → BGM + 플레이어 입력 활성화
-                if (SpiralDiveCutscene.Instance != null)
-                    SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
-                else
-                    PlayWakeUp();
-            }
-            else
-            {
-                PlayWakeUp();
-            }
-           
         }
-                public void EnterMiniGame(string sceneName)
+
+        private void OnEnable()
+        {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+        {
+            if (scene.name == "Hub")
+            {
+                playerMove = FindAnyObjectByType<HubPlayerMove>();
+
+                void PlayWakeUp()
+                {
+                    if (HubUIManager.Instance != null)
+                    {
+                        HubUIManager.Instance.WakeUp(() =>
+                        {
+                            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                            {
+                                SoundManager.Instance?.SetBGMPitch(0.7f);
+                                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                            }
+                            if (playerMove != null) EnablePlayerInput();
+                        });
+                    }
+                }
+
+                if (playerMove != null)
+                {
+                    DisablePlayerInput();
+                    if (SpiralDiveCutscene.Instance != null)
+                        SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
+                    else
+                        PlayWakeUp();
+                }
+                else
+                {
+                    PlayWakeUp();
+                }
+            }
+        }
+        
+        public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
 
@@ -256,6 +272,8 @@ namespace MiniTeam.Core
             PlayerPrefs.Save();
             currentStage = 0;
             isCutscenePlayed = false;
+            isLastGameCleared = false;
+            currentScene = "";
             Debug.Log("[SaveSystem] Save Data Reset.");
         }
 

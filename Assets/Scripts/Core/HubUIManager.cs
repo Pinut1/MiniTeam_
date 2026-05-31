@@ -22,7 +22,20 @@ public class HubUIManager : MonoBehaviour
     [SerializeField] private GameObject warningUI;
     [SerializeField] private TMP_Text warningText;
 
-    [Header("Interaction Objects (하단 상호작용)")]
+        [Header("Interaction Objects (하단 상호작용)")]
+    
+    public bool IsWarningUIActive => warningUI != null && warningUI.activeSelf;
+    private System.Action warningOnComplete;
+
+    void Update()
+    {
+        if (IsWarningUIActive && Input.GetKeyDown(KeyCode.Escape))
+        {
+            warningUI.SetActive(false);
+            warningOnComplete?.Invoke();
+            warningOnComplete = null;
+        }
+    }
     [SerializeField] private GameObject judangchiSmallObj;
     [SerializeField] private GameObject digiviceObj;
     public GameObject exclamationMark;
@@ -254,7 +267,7 @@ public class HubUIManager : MonoBehaviour
     // 눈 깜빡임 연출 
     // ==========================================
     #region EyeBlank
-        public void WakeUp(System.Action onComplete = null)
+            public void WakeUp(System.Action onComplete = null)
     {
         if (judangchiSmallObj.activeSelf) judangchiSmallObj.SetActive(false);
         if (digiviceObj.activeSelf) digiviceObj.SetActive(false);
@@ -263,12 +276,35 @@ public class HubUIManager : MonoBehaviour
         {
             EyeOpeningEffect.Instance.PlayWakeUpComplex(openSpeed, () => {
                 InitializeBottomUI(MiniGameManager.Instance.currentStage);
-                onComplete?.Invoke();
+                CheckAndShowKeyGuideWarning(onComplete);
             });
         }
         else
         {
             InitializeBottomUI(MiniGameManager.Instance.currentStage);
+            CheckAndShowKeyGuideWarning(onComplete);
+        }
+    }
+    
+    private void CheckAndShowKeyGuideWarning(System.Action onComplete)
+    {
+        if (PlayerPrefs.GetInt("HasViewedKeyGuideAlert", 0) == 0)
+        {
+            if (warningUI != null && warningText != null)
+            {
+                warningText.text = "상황별로 조작법이 다르니 시작 전 주의하십시오. \n 변경된 조작법은 즉시 [Esc] 옵션창 이미지로 확인 요망합니다.";
+                warningUI.SetActive(true);
+                warningOnComplete = onComplete;
+                PlayerPrefs.SetInt("HasViewedKeyGuideAlert", 1);
+                PlayerPrefs.Save();
+            }
+            else
+            {
+                onComplete?.Invoke();
+            }
+        }
+        else
+        {
             onComplete?.Invoke();
         }
     }

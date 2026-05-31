@@ -34,7 +34,9 @@ namespace MiniTeam.Core
 
         public bool IsOpen => isOpen;
         private bool isOpen = false;
-        private Coroutine closeCoroutine;
+            private Coroutine closeCoroutine;
+    private float lastToggleTime = 0f;
+    private const float TOGGLE_COOLDOWN = 1.45f; // 애니메이션 시간(1.3초)보다 살짝 여유있게 방어
 
         void Awake()
         {
@@ -54,12 +56,20 @@ namespace MiniTeam.Core
                 var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
                 if (img != null) img.enabled = (hasViewed == 0);
             }
-        }
-
-        void Update()
+        }        void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                // 광클 방지 (쿨다운)
+                if (Time.unscaledTime - lastToggleTime < TOGGLE_COOLDOWN) return;
+                lastToggleTime = Time.unscaledTime;
+
+                // HubUIManager에 경고창이 떠 있다면 옵션창을 열지 않음
+                if (HubUIManager.Instance != null && HubUIManager.Instance.IsWarningUIActive)
+                {
+                    return;
+                }
+
                 if (keyGuidePanel != null && keyGuidePanel.activeSelf)
                     CloseKeyGuide();
                 else

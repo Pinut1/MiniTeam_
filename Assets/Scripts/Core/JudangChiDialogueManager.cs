@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class JudangChiDialogueManager : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class JudangChiDialogueManager : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private Text dialogueText;
+    [SerializeField] private TMP_Text dialogueText;
 
     [Header("Settings")]
     [SerializeField] private float typingSpeed = 0.05f;
@@ -43,7 +44,7 @@ public class JudangChiDialogueManager : MonoBehaviour
             if (spriteName.StartsWith("[")) spriteName = "";
             if (voiceName.StartsWith("[")) voiceName = "";
 
-            // »õ ´ë»ç·Î ³Ñ¾î°¥ ¶§ ÀÌÀü ´ë»ç¿¡¼­ Æ²¾îµĞ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Áï½Ã Ãë¼ÒÇÕ´Ï´Ù.
+            // ìƒˆ ëŒ€ì‚¬ë¡œ ë„˜ì–´ê°ˆ ë•Œ ì´ì „ ëŒ€ì‚¬ì—ì„œ í‹€ì–´ë‘” ì• ë‹ˆë©”ì´ì…˜ì„ ì¦‰ì‹œ ì·¨ì†Œí•©ë‹ˆë‹¤.
             HubUIManager.Instance.StopSpecialAnimation();
 
             if (!string.IsNullOrEmpty(spriteName))
@@ -57,7 +58,7 @@ public class JudangChiDialogueManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(animText))
             {
-                // ºÒ °ªÀ» ÆÄ½ÌÇÏ¿© Á¦¾îÇÏ´Â ±â´É Ãß°¡
+                // ë¶ˆ ê°’ì„ íŒŒì‹±í•˜ì—¬ ì œì–´í•˜ëŠ” ê¸°ëŠ¥ ì¶”ê°€
                 if (animText.EndsWith("_true"))
                 {
                     string boolName = animText.Replace("_true", "");
@@ -74,7 +75,7 @@ public class JudangChiDialogueManager : MonoBehaviour
                 }
             }
 
-            // ÇØ´ç ¹®Àå Àü¿ë º¸ÀÌ½º/È¿°úÀ½ÀÌ ÀÖ´Ù¸é ½ÃÀÛ ½Ã Àç»ı
+            // í•´ë‹¹ ë¬¸ì¥ ì „ìš© ë³´ì´ìŠ¤/íš¨ê³¼ìŒì´ ìˆë‹¤ë©´ ì‹œì‘ ì‹œ ì¬ìƒ
             if (!string.IsNullOrEmpty(voiceName))
             {
                 AudioClip clip = Resources.Load<AudioClip>($"Audio/Judangchi/{voiceName}");
@@ -87,31 +88,31 @@ public class JudangChiDialogueManager : MonoBehaviour
             dialogueText.text = "";
             bool skipTyping = false;
 
-            // ÇÑ ±ÛÀÚ¾¿ Å¸ÀÌÇÎ È¿°ú Ãâ·Â
+            // í•œ ê¸€ìì”© íƒ€ì´í•‘ íš¨ê³¼ ì¶œë ¥
             for (int i = 0; i < text.Length; i++)
             {
-                // ±ÛÀÚ Ãâ·Â µµÁß Å¬¸¯ ½Ã Áï½Ã ½ºÅµ ÇÃ·¡±× »ı¼º
+                // ê¸€ì ì¶œë ¥ ë„ì¤‘ í´ë¦­ ì‹œ ì¦‰ì‹œ ìŠ¤í‚µ í”Œë˜ê·¸ ìƒì„±
                 if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                 {
                     skipTyping = true;
                     break;
                 }
 
-                // Rich Text ÅÂ±× Ã³¸®: < ·Î ½ÃÀÛÇÏ¸é > °¡ ´İÈú ¶§±îÁö ÇÑ ¹ø¿¡ µ¡ºÙÀÓ
+                // Rich Text íƒœê·¸ ì²˜ë¦¬: < ë¡œ ì‹œì‘í•˜ë©´ > ê°€ ë‹«í ë•Œê¹Œì§€ í•œ ë²ˆì— ë§ë¶™ì„
                 if (text[i] == '<')
                 {
                     int closeIdx = text.IndexOf('>', i);
                     if (closeIdx != -1)
                     {
                         dialogueText.text += text.Substring(i, closeIdx - i + 1);
-                        i = closeIdx; // ÀÎµ¦½º¸¦ ´İ´Â °ıÈ£ À§Ä¡·Î °Ç³Ê¶Ü
+                        i = closeIdx; // ì¸ë±ìŠ¤ë¥¼ ë‹«ëŠ” ê´„í˜¸ ìœ„ì¹˜ë¡œ ê±´ë„ˆëœ€
                         continue;
                     }
                 }
 
                 dialogueText.text += text[i];
 
-                // Å¸ÀÌÇÎ ´ë±â ½Ã°£ Áß¿¡µµ ¸¶¿ì½º Å¬¸¯ ÀÔ·Â °¨Áö
+                // íƒ€ì´í•‘ ëŒ€ê¸° ì‹œê°„ ì¤‘ì—ë„ ë§ˆìš°ìŠ¤ í´ë¦­ ì…ë ¥ ê°ì§€
                 float elapsed = 0f;
                 while (elapsed < typingSpeed)
                 {
@@ -127,19 +128,19 @@ public class JudangChiDialogueManager : MonoBehaviour
                 if (skipTyping) break;
             }
 
-            // ÅØ½ºÆ®¸¦ ³¡±îÁö Ãâ·Â
+            // í…ìŠ¤íŠ¸ë¥¼ ëê¹Œì§€ ì¶œë ¥
             dialogueText.text = text;
 
-            // ½ºÅµ ´ç½ÃÀÇ ¸¶¿ì½º Å¬¸¯ÀÌ ´ÙÀ½ ´ë»ç ³Ñ¾î°¡±â·Î Áï½Ã ÀÎ½ÄµÇÁö ¾Êµµ·Ï ÇÑ ÇÁ·¹ÀÓ ´ë±â
+            // ìŠ¤í‚µ ë‹¹ì‹œì˜ ë§ˆìš°ìŠ¤ í´ë¦­ì´ ë‹¤ìŒ ëŒ€ì‚¬ ë„˜ì–´ê°€ê¸°ë¡œ ì¦‰ì‹œ ì¸ì‹ë˜ì§€ ì•Šë„ë¡ í•œ í”„ë ˆì„ ëŒ€ê¸°
             yield return null;
 
-            // ¸¶¿ì½º Å¬¸¯ ½Ã ´ÙÀ½ ´ë»ç·Î ÁøÇà
+            // ë§ˆìš°ìŠ¤ í´ë¦­ ì‹œ ë‹¤ìŒ ëŒ€ì‚¬ë¡œ ì§„í–‰
             yield return new WaitUntil(() => Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space));
             yield return null;
         }
 
-        // ¸ğµç ´ë»ç ¹è¿­À» ´Ù ¼øÈ¸Çß´Ù¸é Ã¢À» ²ô°í Äİ¹é ½ÇÇà
+        // ëª¨ë“  ëŒ€ì‚¬ ë°°ì—´ì„ ë‹¤ ìˆœíšŒí–ˆë‹¤ë©´ ì°½ì„ ë„ê³  ì½œë°± ì‹¤í–‰
         dialoguePanel.SetActive(false);
-        onComplete?.Invoke(); // ¾ÈÁ¤¼ºÀ» À§ÇØ ? ¿¬»êÀÚ Ãß°¡
+        onComplete?.Invoke(); // ì•ˆì •ì„±ì„ ìœ„í•´ ? ì—°ì‚°ì ì¶”ê°€
     }
 }

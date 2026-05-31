@@ -152,18 +152,35 @@ public class MainUIManager : MonoBehaviour
     }
 
     // 경고창에서 '예(Yes)'를 눌렀을 때 호출
-    public void ConfirmStartNewGame()
+        public void ConfirmStartNewGame()
     {
         if (isTranstioning) return;
         isTranstioning = true;
         
-        // 새로 시작할 때 기존 세이브 데이터 초기화
-        PlayerPrefs.DeleteKey(SAVE_STAGE_KEY);
-        PlayerPrefs.DeleteKey("SavedCutscenePlayed");
+        // 1. 설정 데이터 백업
+        float masterVolume = PlayerPrefs.GetFloat("SavedMasterVolume", 1f);
+        float bgmVolume = PlayerPrefs.GetFloat("SavedBGMVolume", 0.6f);
+        float sfxVolume = PlayerPrefs.GetFloat("SavedSFXVolume", 1f);
+        int hasViewedKeyGuide = PlayerPrefs.GetInt("HasViewedKeyGuide", 0);
+
+        // 2. 모든 데이터 완벽 초기화
+        PlayerPrefs.DeleteAll();
+
+        // 3. 설정 데이터 복원
+        PlayerPrefs.SetFloat("SavedMasterVolume", masterVolume);
+        PlayerPrefs.SetFloat("SavedBGMVolume", bgmVolume);
+        PlayerPrefs.SetFloat("SavedSFXVolume", sfxVolume);
+        PlayerPrefs.SetInt("HasViewedKeyGuide", hasViewedKeyGuide);
         PlayerPrefs.Save();
 
-        // 페이드아웃 후 Hub 씬으로 전환
-        PlayFadeOut(() => SceneManager.LoadScene("Hub"));
+        // 4. 메모리에 살아있는 매니저 강제 리셋
+        if (MiniGameManager.Instance != null)
+        {
+            MiniGameManager.Instance.ResetSaveData();
+        }
+
+        // 이동
+        PlayFadeOut(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Hub"));
     }
 
     // 경고창에서 '아니오(No)'를 눌렀을 때 호출
