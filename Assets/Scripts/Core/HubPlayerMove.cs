@@ -24,6 +24,12 @@ public class HubPlayerMove : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
 
+        // 카메라 참조가 빠져있을 경우 방어 코드: 메인 카메라를 자동으로 찾아옵니다.
+        if (playerCamera == null && Camera.main != null)
+        {
+            playerCamera = Camera.main.transform;
+        }
+
         // 게임 시작 시 마우스 커서 숨기기 및 고정
         LockCursor();
     }

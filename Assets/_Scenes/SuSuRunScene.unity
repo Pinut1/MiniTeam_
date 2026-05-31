@@ -179,7 +179,7 @@ MonoBehaviour:
   m_text: "\uC548\uB155!!! \uB098\uB294 \uC1FC\uCF5C\uB77C\uC57C!\n\uB9CC\uB098\uC11C
     \uBC18\uAC00\uC6CC!"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b10a4f0491d2f8d469a913298cdd76fb, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6b661e6d10633a41b9c0be01b1ac508, type: 2}
   m_sharedMaterial: {fileID: -7863872309707425824, guid: b10a4f0491d2f8d469a913298cdd76fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -246,7 +246,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &81977804

@@ -254,78 +254,23 @@ public class HubUIManager : MonoBehaviour
     // 눈 깜빡임 연출 
     // ==========================================
     #region EyeBlank
-    public void WakeUp(Action onComplete = null)
+        public void WakeUp(System.Action onComplete = null)
     {
-        if (eyeEffect != null)
+        if (judangchiSmallObj.activeSelf) judangchiSmallObj.SetActive(false);
+        if (digiviceObj.activeSelf) digiviceObj.SetActive(false);
+
+        if (EyeOpeningEffect.Instance != null)
         {
-            eyeEffect.enabled = true;
-            StartCoroutine(WakeUpRoutine(onComplete));
+            EyeOpeningEffect.Instance.PlayWakeUpComplex(openSpeed, () => {
+                InitializeBottomUI(MiniGameManager.Instance.currentStage);
+                onComplete?.Invoke();
+            });
         }
         else
         {
+            InitializeBottomUI(MiniGameManager.Instance.currentStage);
             onComplete?.Invoke();
         }
-    }
-
-    private IEnumerator WakeUpRoutine(Action onComplete)
-    {
-
-
-        if (judangchiSmallObj.activeSelf)
-        {
-            judangchiSmallObj.SetActive(false);
-        }
-
-        else if (digiviceObj.activeSelf)
-        {
-            digiviceObj.SetActive(false);
-        }
-            eyeEffect.openAmount = 0.001f;
-        eyeEffect.expand = 0.0f;
-        float t = 0;
-
-        while (t < 0.8f)
-        {
-            t += Time.deltaTime * openSpeed;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        while (t > 0.001f)
-        {
-            t -= Time.deltaTime * openSpeed;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime * openSpeed * 2;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(0.1f);
-
-        t = 0;
-        while (t < 1.0f)
-        {
-            t += Time.deltaTime * (openSpeed * 1.5f);
-            eyeEffect.expand = Mathf.Lerp(0.0f, 1.5f, t);
-            yield return null;
-        }
-
-        eyeEffect.enabled = false;
-        InitializeBottomUI(MiniGameManager.Instance.currentStage);
-
-        // 키 가이드를 한 번도 본 적이 없다면 안내 처리
-        if (PlayerPrefs.GetInt("HasViewedKeyGuide", 0) == 0)
-        {
-            // TODO: 조작법 확인 안내 문구 UI 띄우기
-        }
-
-        //TODO ESC 키 보이게 하기
-        onComplete?.Invoke();
     }
     #endregion
 

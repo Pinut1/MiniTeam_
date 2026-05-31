@@ -1,54 +1,156 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using System;
 
-[ExecuteInEditMode]
+[ExecuteAlways]
+[RequireComponent(typeof(Image))]
 public class EyeOpeningEffect : MonoBehaviour
 {
+    public static EyeOpeningEffect Instance { get; private set; }
+
     [Range(0.001f, 1.0f)] public float openAmount = 0.001f;
     [Range(0.0f, 2.0f)] public float expand = 0.0f;
     public float smoothness = 0.1f;
 
-    public Shader shader;
+    private Image targetImage;
     private Material effectMaterial;
 
-    // 1. ¸ÓÆ¼¸®¾óÀ» ¾ÈÀüÇÏ°Ô °¡Á®¿À´Â ÇÁ·ÎÆÛÆ¼ (Lazy Initialization)
-    private Material Material
+    private void Awake()
     {
-        get
+        if (Application.isPlaying)
         {
-            if (effectMaterial == null && shader != null)
-            {
-                effectMaterial = new Material(shader);
-                // ¿¡µğÅÍ¿¡¼­ ¸ÓÆ¼¸®¾óÀÌ ¿¡¼ÂÀ¸·Î ÀúÀåµÇ´Â °ÍÀ» ¹æÁö
-                effectMaterial.hideFlags = HideFlags.HideAndDontSave;
-            }
-            return effectMaterial;
+            if (Instance == null) Instance = this;
+        }
+
+        targetImage = GetComponent<Image>();
+        if (targetImage != null && targetImage.material != null)
+        {
+            effectMaterial = new Material(targetImage.material);
+            targetImage.material = effectMaterial;
         }
     }
 
-    private void OnDisable()
+    private void Update()
     {
-        // 2. ÄÄÆ÷³ÍÆ®°¡ ²¨Áö°Å³ª »èÁ¦µÉ ¶§ ¸Ş¸ğ¸® ´©¼ö ¹æÁö¸¦ À§ÇØ ¸ÓÆ¼¸®¾ó ÆÄ±«
+        if (effectMaterial != null)
+        {
+            effectMaterial.SetFloat("_OpenAmount", openAmount);
+            effectMaterial.SetFloat("_Expand", expand);
+            effectMaterial.SetFloat("_Smoothness", smoothness);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Application.isPlaying && Instance == this) Instance = null;
+
         if (effectMaterial != null)
         {
             if (Application.isPlaying) Destroy(effectMaterial);
             else DestroyImmediate(effectMaterial);
-            effectMaterial = null;
         }
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    // --- ì• ë‹ˆë©”ì´ì…˜ ì—°ì¶œ ë©”ì„œë“œ ---
+
+    public void PlayWakeUpComplex(float openSpeed, Action onComplete = null)
     {
-        // 3. ¼ÎÀÌ´õ°¡ ¿¬°áµÇÁö ¾Ê¾Ò°Å³ª ¸ÓÆ¼¸®¾ó »ı¼º¿¡ ½ÇÆĞÇÏ¸é ¿øº» Ãâ·Â
-        if (shader == null || Material == null)
+        gameObject.SetActive(true);
+        enabled = true;
+        StartCoroutine(WakeUpComplexRoutine(openSpeed, onComplete));
+    }
+
+    private IEnumerator WakeUpComplexRoutine(float openSpeed, Action onComplete)
+    {
+        openAmount = 0.001f;
+        expand = 0.0f;
+        float t = 0;
+
+        while (t < 0.8f)
         {
-            Graphics.Blit(source, destination);
-            return;
+            t += Time.deltaTime * openSpeed;
+            openAmount = Mathf.Lerp(0.001f, 1.0f, t);
+            yield return null;
         }
 
-        Material.SetFloat("_OpenAmount", openAmount);
-        Material.SetFloat("_Expand", expand);
-        Material.SetFloat("_Smoothness", smoothness);
+        while (t > 0.001f)
+        {
+            t -= Time.deltaTime * openSpeed;
+            openAmount = Mathf.Lerp(0.001f, 1.0f, t);
+            yield return null;
+        }
 
-        Graphics.Blit(source, destination, Material);
+        while (t < 1f)
+        {
+            t += Time.deltaTime * openSpeed * 2;
+            openAmount = Mathf.Lerp(0.001f, 1.0f, t);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.1f);
+
+        t = 0;
+        while (t < 1.0f)
+        {
+            t += Time.deltaTime * (openSpeed * 1.5f);
+            expand = Mathf.Lerp(0.0f, 1.5f, t);
+            yield return null;
+        }
+
+        gameObject.SetActive(false);
+        enabled = false;
+        onComplete?.Invoke();
+    }
+
+    public void PlayGoToSleep(float closeSpeed, Action onComplete = null)
+    {
+        gameObject.SetActive(true);
+        enabled = true;
+        StartCoroutine(GoToSleepRoutine(closeSpeed, onComplete));
+    }
+
+    private IEnumerator GoToSleepRoutine(float closeSpeed, Action onComplete)
+    {
+        openAmount = 1.0f;
+        expand = 0.3f;
+        float t = 1.0f;
+
+        while (t > 0.001f)
+        {
+            t -= Time.deltaTime * closeSpeed;
+            openAmount = t;
+            yield return null;
+        }
+
+        openAmount = 0.001f;
+        onComplete?.Invoke();
+    }
+
+    public void PlayWakeUpSimple(float openSpeed, Action onComplete = null)
+    {
+        gameObject.SetActive(true);
+        enabled = true;
+        StartCoroutine(WakeUpSimpleRoutine(openSpeed, onComplete));
+    }
+
+    private IEnumerator WakeUpSimpleRoutine(float openSpeed, Action onComplete)
+    {
+        openAmount = 0.001f;
+        expand = 0.3f;
+        float t = 0.0f;
+
+        while (t < 1.0f)
+        {
+            t += Time.deltaTime * openSpeed;
+            openAmount = t;
+            yield return null;
+        }
+
+        openAmount = 1.0f;
+        
+        gameObject.SetActive(false);
+        enabled = false;
+        onComplete?.Invoke();
     }
 }

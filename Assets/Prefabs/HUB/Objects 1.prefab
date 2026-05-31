@@ -291,8 +291,24 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 23033622508798858, guid: 145951c76cacc4f4393085a293255411, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 908b08b29ffee1b4baae655eedbd2638, type: 2}
+    - target: {fileID: 23331682565263918, guid: 145951c76cacc4f4393085a293255411, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 23559002803690836, guid: 145951c76cacc4f4393085a293255411, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 908b08b29ffee1b4baae655eedbd2638, type: 2}
     - target: {fileID: 65558903531210868, guid: 145951c76cacc4f4393085a293255411, type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 65558903531210868, guid: 145951c76cacc4f4393085a293255411, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

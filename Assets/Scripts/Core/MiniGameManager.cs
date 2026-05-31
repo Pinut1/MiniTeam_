@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -84,22 +84,53 @@ namespace MiniTeam.Core
             }
            
         }
-        public void EnterMiniGame(string sceneName)
+                public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
 
-            // 미니게임 진입 시 기존 BGM 및 효과음 강제 종료 (안전장치)
+            if (EyeOpeningEffect.Instance != null)
+            {
+                EyeOpeningEffect.Instance.PlayGoToSleep(1.5f, () => {
+                    LoadMiniGameActual(sceneName);
+                });
+            }
+            else
+            {
+                LoadMiniGameActual(sceneName);
+            }
+        }
+
+        private void LoadMiniGameActual(string sceneName)
+        {
+            StartCoroutine(LoadMiniGameAsync(sceneName));
+        }
+
+        private System.Collections.IEnumerator LoadMiniGameAsync(string sceneName)
+        {
             SoundManager.Instance?.StopBGM();
             SoundManager.Instance?.StopAllSFX();
 
-            // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
             playerMove.UnlockCursor();
-            hubRootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            hubRootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            
             foreach (var go in hubRootObjects)
+            {
+                // EyeOpeningEffect가 있는 캔버스 루트는 끄지 않음 (완전히 독립된 오브젝트)
+                if (go.GetComponentInChildren<EyeOpeningEffect>() != null) continue;
+                
                 go.SetActive(false);
+            }
 
             currentScene = sceneName;
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            var asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+            
+            yield return asyncLoad;
+
+            // 미니게임 로드가 완료되면 새로운 심플 눈뜨기 연출 실행
+            if (EyeOpeningEffect.Instance != null)
+            {
+                EyeOpeningEffect.Instance.PlayWakeUpSimple(1.5f);
+            }
         }
 
         public void ExitMiniGame()
@@ -238,3 +269,4 @@ namespace MiniTeam.Core
 
     }
 }
+
