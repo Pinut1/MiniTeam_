@@ -61,7 +61,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -81,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1207170411
-  m_SortingLayer: 6
+  m_SortingLayer: 13
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -4423739779879752017, guid: bf4b6fda11b2c7d45b7753402a5f5651, type: 3}
@@ -110,11 +110,15 @@ MonoBehaviour:
   moveSpeed: 3
   sineAmount: 1.5
   sineSpeed: 2
-  canShoot: 0
+  shootType: 0
   enemyBulletPrefab: {fileID: 0}
   shootInterval: 2
+  spreadAngle: 20
+  burstDelay: 0.15
   hp: 1
   explosionPrefab: {fileID: 0}
+  powerUpPrefab: {fileID: 0}
+  powerUpDropChance: 0.15
 --- !u!60 &-2986922424605400990
 PolygonCollider2D:
   m_ObjectHideFlags: 0

@@ -1505,6 +1505,7 @@ MonoBehaviour:
   transitionDuration: 0.5
   fadePanel: {fileID: 1955667537}
   fadeDuration: 2
+  menuCamera: {fileID: 0}
 --- !u!4 &538911417
 Transform:
   m_ObjectHideFlags: 0
@@ -5315,7 +5316,7 @@ GameObject:
   - component: {fileID: 1777106258}
   - component: {fileID: 1777106257}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: MainCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

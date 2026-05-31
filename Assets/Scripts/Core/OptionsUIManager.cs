@@ -64,8 +64,14 @@ namespace MiniTeam.Core
                 if (Time.unscaledTime - lastToggleTime < TOGGLE_COOLDOWN) return;
                 lastToggleTime = Time.unscaledTime;
 
-                // HubUIManager에 경고창이 떠 있다면 옵션창을 열지 않음
+                // HubUIManager에 튜토리얼 경고창이 떠 있거나, MainUIManager의 새 게임 경고창이 켜져있다면 옵션창을 열지 않음
                 if (HubUIManager.Instance != null && HubUIManager.Instance.IsWarningUIActive)
+                {
+                    return;
+                }
+            
+                MainUIManager mainUI = FindAnyObjectByType<MainUIManager>();
+                if (mainUI != null && mainUI.isWarningActive)
                 {
                     return;
                 }
@@ -158,21 +164,27 @@ namespace MiniTeam.Core
         // "게임으로 돌아가기" 버튼
         public void OnResumeClicked() => Close();
 
-        // "나가기" 버튼 — 미니게임 중이면 허브로, 허브면 앱 종료
+        // "나가기" 버튼 (미니게임이면 허브로, 허브면 앱 종료)
         public void OnExitClicked()
         {
             Close(() =>
             {
                 if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
+                {
                     MiniGameManager.Instance.ExitMiniGame();
+                }
                 else
+                {
                     Application.Quit();
+                }
             });
         }
 
         // 키 가이드 버튼 콜백
         public void OnKeyGuideClicked()
         {
+            Debug.Log("[OptionsUIManager] OnKeyGuideClicked 호출됨!");
+
             if (keyGuideExclamation != null)
             {
                 var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
@@ -184,11 +196,18 @@ namespace MiniTeam.Core
                 }
             }
 
-            if (keyGuidePanel == null || keyGuideImage == null) return;
-            
-            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            if (sceneName == "Hub" || sceneName == "Main")
+            if (keyGuidePanel == null || keyGuideImage == null) 
             {
+                Debug.LogError($"[OptionsUIManager] keyGuidePanel({keyGuidePanel != null}) 또는 keyGuideImage({keyGuideImage != null})가 할당되지 않았습니다!");
+                return;
+            }
+            
+            bool isMiniGame = (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame);
+            Debug.Log($"[OptionsUIManager] MiniGameManager 존재여부: {MiniGameManager.Instance != null}, IsInMiniGame: {isMiniGame}");
+            
+            if (!isMiniGame)
+            {
+                Debug.Log("[OptionsUIManager] 현재 허브 씬으로 판별됨. 허브 가이드 이미지 적용.");
                 keyGuideImage.sprite = hubKeyGuideSprite;
                 if (keyGuideTitleText != null) keyGuideTitleText.text = "Hub 조작법";
             }
@@ -197,12 +216,17 @@ namespace MiniTeam.Core
                 int stage = (MiniGameManager.Instance != null) ? MiniGameManager.Instance.currentStage : 1;
                 int index = stage - 1;
                 
+                Debug.Log($"[OptionsUIManager] 미니게임 판별됨. 현재 스테이지: {stage}, Index: {index}");
+                Debug.Log($"[OptionsUIManager] miniGameKeyGuides 배열 크기: {(miniGameKeyGuides != null ? miniGameKeyGuides.Length : "NULL")}");
+
                 if (miniGameKeyGuides != null && index >= 0 && index < miniGameKeyGuides.Length && miniGameKeyGuides[index] != null)
                 {
+                    Debug.Log($"[OptionsUIManager] 배열에서 {index}번째 이미지를 성공적으로 찾아서 적용!");
                     keyGuideImage.sprite = miniGameKeyGuides[index];
                 }
                 else
                 {
+                    Debug.LogWarning($"[OptionsUIManager] 경고: 배열에서 {index}번째 이미지를 찾을 수 없어 Fallback(허브 이미지) 적용!");
                     keyGuideImage.sprite = hubKeyGuideSprite; // fallback
                 }
 

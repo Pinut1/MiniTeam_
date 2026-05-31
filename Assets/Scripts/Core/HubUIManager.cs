@@ -27,7 +27,7 @@ public class HubUIManager : MonoBehaviour
     public bool IsWarningUIActive => warningUI != null && warningUI.activeSelf;
     private System.Action warningOnComplete;
 
-    void Update()
+    void LateUpdate()
     {
         if (IsWarningUIActive && Input.GetKeyDown(KeyCode.Escape))
         {
@@ -54,9 +54,30 @@ public class HubUIManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void OnEnable()
+    {
+        // 1. 다이얼로그 시스템에서 저장된 애니메이터 Bool 상태 자동 복원 (ex: OnDDong)
+        // 미니게임에 들어갔다 나오면 SetActive(true)가 호출되므로 OnEnable에서 복원해야 합니다.
+        if (cinemaAnimator != null)
+        {
+            cinemaAnimator.keepAnimatorStateOnDisable = true; // 꺼질 때 상태 리셋 방지 (최신 API 이름)
+            foreach (var param in cinemaAnimator.parameters)
+            {
+                if (param.type == AnimatorControllerParameterType.Bool)
+                {
+                    string key = "AnimBool_" + param.name;
+                    if (PlayerPrefs.HasKey(key))
+                    {
+                        cinemaAnimator.SetBool(param.name, PlayerPrefs.GetInt(key) == 1);
+                    }
+                }
+            }
+        }
+    }
+
     private void Start()
     {
-        // 버튼 이벤트 연결 (GameObject에서 Button 컴포넌트 추출)
+        // 2. 하단 UI 버튼 이벤트 연결
         if (judangchiSmallObj != null)
             judangchiSmallObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedJudangchi);
 

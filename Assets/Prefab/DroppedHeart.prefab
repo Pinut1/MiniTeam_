@@ -61,7 +61,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -81,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 972479335
-  m_SortingLayer: 6
+  m_SortingLayer: 9
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 292935899, guid: 17b2f404853f3564c86608f116c93754, type: 3}
@@ -108,6 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroppedHeart
   pickupRadius: 0.5
   isPierreHeart: 0
+  isBanillaWhiteHeart: 0
   pierreEffectPrefab: {fileID: 7172107419783844229, guid: 9b9bd1f807a7cfc4a9223feef4642dab, type: 3}
 --- !u!58 &2680478329212666069
 CircleCollider2D:

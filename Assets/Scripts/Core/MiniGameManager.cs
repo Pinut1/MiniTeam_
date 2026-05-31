@@ -17,6 +17,9 @@ namespace MiniTeam.Core
         public int currentStage = 0;
         public bool isCutscenePlayed = false;
         private bool isLastGameCleared = false;
+        
+        [Header("Menu & State")]
+        public bool isMainMenuActive = false; // 허브 씬 통합 시 메인 메뉴가 떠 있는지 여부
 
         [Header("Door Management")]
         [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
@@ -69,35 +72,55 @@ namespace MiniTeam.Core
             {
                 playerMove = FindAnyObjectByType<HubPlayerMove>();
 
-                void PlayWakeUp()
+                // 메인 메뉴가 켜져있는 상태라면 로직 대기
+                if (isMainMenuActive)
                 {
-                    if (HubUIManager.Instance != null)
-                    {
-                        HubUIManager.Instance.WakeUp(() =>
-                        {
-                            if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
-                            {
-                                SoundManager.Instance?.SetBGMPitch(0.7f);
-                                AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-                            }
-                            if (playerMove != null) EnablePlayerInput();
-                        });
-                    }
+                    if (playerMove != null) DisablePlayerInput();
+                    return; 
                 }
 
-                if (playerMove != null)
+                InitializeHubPlayLogic();
+            }
+        }
+
+        // 실제 허브 게임플레이 시작 시 호출되는 초기화 로직 (BGM, WakeUp 등)
+        private void InitializeHubPlayLogic()
+        {
+            void PlayWakeUp()
+            {
+                if (HubUIManager.Instance != null)
                 {
-                    DisablePlayerInput();
-                    if (SpiralDiveCutscene.Instance != null)
-                        SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
-                    else
-                        PlayWakeUp();
-                }
-                else
-                {
-                    PlayWakeUp();
+                    HubUIManager.Instance.WakeUp(() =>
+                    {
+                        if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                        {
+                            SoundManager.Instance?.SetBGMPitch(0.7f);
+                            AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                        }
+                        if (playerMove != null) EnablePlayerInput();
+                    });
                 }
             }
+
+            if (playerMove != null)
+            {
+                DisablePlayerInput();
+                if (SpiralDiveCutscene.Instance != null)
+                    SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
+                else
+                    PlayWakeUp();
+            }
+            else
+            {
+                PlayWakeUp();
+            }
+        }
+
+        // 메인 메뉴(MainUIManager)에서 '새 게임' 또는 '이어하기'를 눌렀을 때 호출됨
+        public void StartGameFromMenu()
+        {
+            isMainMenuActive = false;
+            InitializeHubPlayLogic();
         }
         
         public void EnterMiniGame(string sceneName)
@@ -244,7 +267,17 @@ namespace MiniTeam.Core
 
         internal void LoadEndingScene()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
+            if (EyeOpeningEffect.Instance != null)
+            {
+                // 1. 눈 감기 연출 재생 후 씬 로드
+                EyeOpeningEffect.Instance.PlayGoToSleep(1.5f, () => {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut");
+                });
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut");
+            }
         }
 
         // ── 세이브/로드 시스템 ──────────────────────────────────

@@ -27,7 +27,7 @@ EditorBuildSettings:
     path: Assets/_Scenes/SuSuRunScene.unity
     guid: ef6aa98380cb5af44b2cb26b4b853ab2
   - enabled: 1
-    path: Assets/_Scenes/EndingCut_Test.unity
+    path: Assets/_Scenes/EndingCut.unity
     guid: de794ff4a7c7e634480a52f321d8a575
   - enabled: 1
     path: Assets/_Scenes/TestMiniScene.unity
@@ -35,5 +35,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/Map.unity
     guid: 04583b9feef463040ab04d769a86545a
+  - enabled: 1
+    path: Assets/_Scenes/Battle.unity
+    guid: d8ccc460b10e4124eb2c3436bf60d453
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

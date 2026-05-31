@@ -63,11 +63,15 @@ public class JudangChiDialogueManager : MonoBehaviour
                 {
                     string boolName = animText.Replace("_true", "");
                     HubUIManager.Instance.cinemaAnimator.SetBool(boolName, true);
+                    PlayerPrefs.SetInt("AnimBool_" + boolName, 1);
+                    PlayerPrefs.Save();
                 }
                 else if (animText.EndsWith("_false"))
                 {
                     string boolName = animText.Replace("_false", "");
                     HubUIManager.Instance.cinemaAnimator.SetBool(boolName, false);
+                    PlayerPrefs.SetInt("AnimBool_" + boolName, 0);
+                    PlayerPrefs.Save();
                 }
                 else
                 {
