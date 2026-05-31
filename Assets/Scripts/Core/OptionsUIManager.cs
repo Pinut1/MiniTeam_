@@ -213,10 +213,9 @@ namespace MiniTeam.Core
             }
             else
             {
-                int stage = (MiniGameManager.Instance != null) ? MiniGameManager.Instance.currentStage : 1;
-                int index = stage - 1;
+                int index = (MiniGameManager.Instance != null) ? MiniGameManager.Instance.currentStage : 0;
                 
-                Debug.Log($"[OptionsUIManager] 미니게임 판별됨. 현재 스테이지: {stage}, Index: {index}");
+                Debug.Log($"[OptionsUIManager] 미니게임 판별됨. 현재 currentStage: {index}, 적용될 Index: {index}");
                 Debug.Log($"[OptionsUIManager] miniGameKeyGuides 배열 크기: {(miniGameKeyGuides != null ? miniGameKeyGuides.Length : "NULL")}");
 
                 if (miniGameKeyGuides != null && index >= 0 && index < miniGameKeyGuides.Length && miniGameKeyGuides[index] != null)
@@ -230,7 +229,7 @@ namespace MiniTeam.Core
                     keyGuideImage.sprite = hubKeyGuideSprite; // fallback
                 }
 
-                if (keyGuideTitleText != null) keyGuideTitleText.text = $"스테이지 {stage} 조작법";
+                if (keyGuideTitleText != null) keyGuideTitleText.text = $"스테이지 {index + 1} 조작법";
             }
             
             keyGuidePanel.SetActive(true);

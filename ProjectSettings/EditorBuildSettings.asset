@@ -5,12 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/Main.unity
     guid: 62aff00c97be9014b9bcf464dbf3bcaf
   - enabled: 1
     path: Assets/_Scenes/Hub.unity
-    guid: 1797e7a7da8cbf143bf6325f6ff9b603
+    guid: 4b8ec94cd8835e0448fafd4ecfb7254b
   - enabled: 1
     path: Assets/_Scenes/Pokemon.unity
     guid: 30c9fdbf2f258e04ba3a54f58b324f63
