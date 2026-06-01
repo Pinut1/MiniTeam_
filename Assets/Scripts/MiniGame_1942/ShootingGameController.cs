@@ -127,7 +127,13 @@ namespace MiniTeam.Shooting1942
             Time.timeScale = 1f;
 
             var player = FindAnyObjectByType<PlayerController>();
-            if (player != null) player.enabled = false;
+            if (player != null)
+            {
+                player.enabled = false;
+                var rb = player.GetComponent<Rigidbody2D>();
+                if (rb != null) rb.linearVelocity = Vector2.zero;
+                player.transform.position = new Vector3(3.35f, -1.75f, 0f);
+            }
         }
 
         // ── 디버그 패널 (Development Build 전용) ──

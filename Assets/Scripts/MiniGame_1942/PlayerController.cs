@@ -48,7 +48,7 @@ namespace MiniTeam.Shooting1942
                 nextFireTime = Time.time + currentFireRate;
             }
 
-            if (Input.GetKeyDown(KeyCode.Z) && ShootingUIManager.Instance != null && ShootingUIManager.Instance.IsSpecialReady)
+            if (Input.GetKeyDown(KeyCode.F) && ShootingUIManager.Instance != null && ShootingUIManager.Instance.IsSpecialReady)
             {
                 if (ShootingUIManager.Instance.UseSpecial())
                     FireBomb();

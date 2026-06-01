@@ -227,6 +227,16 @@ namespace MiniTeam.Shooting1942
             StopAllPatterns();
             if (moveCoroutine != null) StopCoroutine(moveCoroutine);
 
+            // 대화 전에 플레이어 조작 즉시 차단
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player != null)
+            {
+                player.enabled = false;
+                var rb = player.GetComponent<Rigidbody2D>();
+                if (rb != null) rb.linearVelocity = Vector2.zero;
+                player.transform.position = new Vector3(3.35f, -1.75f, 0f);
+            }
+
             // 대화 먼저 재생
             var clearCutscene = FindAnyObjectByType<ClearCutsceneManager>(FindObjectsInactive.Include);
             if (clearCutscene != null)
