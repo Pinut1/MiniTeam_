@@ -147,29 +147,46 @@ public class MainUIManager : MonoBehaviour
     {
         if (isTranstioning || isWarningActive) return;
 
-        // 세이브 데이터가 있는지 확인
-        if (PlayerPrefs.HasKey(SAVE_STAGE_KEY))
-        {
-            Debug.Log($"[MainUIManager] 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
+        //// 세이브 데이터가 있는지 확인
+        //if (PlayerPrefs.HasKey(SAVE_STAGE_KEY))
+        //{
+        //    Debug.Log($"[MainUIManager] 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
             
-            // 경고창 애니메이션 재생
-            if (uiAnimator != null)
-            {
-                isWarningActive = true;
-                Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 호출");
-                uiAnimator.SetTrigger("NewGameWarning");
-            }
-            else
-            {
-                Debug.LogError("[MainUIManager] uiAnimator가 할당되어 있지 않습니다! 인스펙터를 확인하세요.");
-            }
+        //    // 경고창 애니메이션 재생
+        //    if (uiAnimator != null)
+        //    {
+        //        isWarningActive = true;
+        //        Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 호출");
+        //        uiAnimator.SetTrigger("NewGameWarning");
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError("[MainUIManager] uiAnimator가 할당되어 있지 않습니다! 인스펙터를 확인하세요.");
+        //    }
+        //}
+        //else
+        //{
+        //    Debug.Log("[MainUIManager] 세이브 데이터 없음. 바로 새 게임 시작.");
+        //    // 바로 시작
+        //    ConfirmStartNewGame();
+        //}
+
+        // 세이브 데이터가 있는지 확인
+       
+        Debug.Log($"[MainUIManager] 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
+            
+        // 경고창 애니메이션 재생
+        if (uiAnimator != null)
+        {
+            isWarningActive = true;
+            Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 호출");
+            uiAnimator.SetTrigger("NewGameWarning");
         }
         else
         {
-            Debug.Log("[MainUIManager] 세이브 데이터 없음. 바로 새 게임 시작.");
-            // 바로 시작
-            ConfirmStartNewGame();
+            Debug.LogError("[MainUIManager] uiAnimator가 할당되어 있지 않습니다! 인스펙터를 확인하세요.");
         }
+       
     }
 
     // 경고창에서 '예(Yes)'를 눌렀을 때 호출
