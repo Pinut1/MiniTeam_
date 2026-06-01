@@ -137,7 +137,11 @@ public class SpongeUIManager : MonoBehaviour
 
     private void Start()
     {
-        // 증거 패널
+        // 증거 패널 — 먼저 활성화해 Canvas 레이아웃 계산 후 비활성화
+        // (SetActive(false)로 시작하면 자식 이미지 위치가 처음 열릴 때 틀어지는 문제 방지)
+        evidencePnl.SetActive(true);
+        if (recordPnl != null) recordPnl.SetActive(true);
+        Canvas.ForceUpdateCanvases();
         evidencePnl.SetActive(false);
         if (recordPnl != null)      recordPnl.SetActive(false);
         if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
