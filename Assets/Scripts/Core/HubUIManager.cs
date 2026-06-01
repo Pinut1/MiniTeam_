@@ -60,7 +60,6 @@ public class HubUIManager : MonoBehaviour
         // 미니게임에 들어갔다 나오면 SetActive(true)가 호출되므로 OnEnable에서 복원해야 합니다.
         if (cinemaAnimator != null)
         {
-            cinemaAnimator.keepAnimatorStateOnDisable = true; // 꺼질 때 상태 리셋 방지 (최신 API 이름)
             foreach (var param in cinemaAnimator.parameters)
             {
                 if (param.type == AnimatorControllerParameterType.Bool)
