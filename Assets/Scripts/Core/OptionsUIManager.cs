@@ -175,9 +175,14 @@ namespace MiniTeam.Core
                 }
                 else
                 {
-                    Application.Quit();
+    #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+        Application.Quit();
+    #endif
                 }
             });
+
         }
 
         // 키 가이드 버튼 콜백
