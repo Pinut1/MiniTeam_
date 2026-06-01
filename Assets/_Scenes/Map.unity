@@ -151,6 +151,7 @@ MonoBehaviour:
   bgmField: {fileID: 8300000, guid: c2fcf6e1aa1869344b6eb549a2f635a2, type: 3}
   bgmBattle: {fileID: 8300000, guid: 74cc0f1485c72ed4ba14150ac8e7d8c6, type: 3}
   bgmVictory: {fileID: 8300000, guid: 53d87de4d42c12449ae5832804f6e61b, type: 3}
+  sfxHeal: {fileID: 8300000, guid: c9413619de96b954ab3f6ea6103060c9, type: 3}
 --- !u!4 &10979136
 Transform:
   m_ObjectHideFlags: 0
@@ -2796,6 +2797,7 @@ MonoBehaviour:
   trainerLevelText: {fileID: 125514655}
   playerNameText: {fileID: 61195660}
   playerLevelText: {fileID: 2024649271}
+  messagePanel: {fileID: 471537462}
   messageText: {fileID: 1052119683}
   commandRects:
   - {fileID: 1092320642}

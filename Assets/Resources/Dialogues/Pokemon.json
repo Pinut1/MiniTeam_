@@ -22,9 +22,9 @@
   "battle_defeat": "눈앞이 깜깜해졌다...",
   "battle_run": "도망쳤다!",
 
-  "trainer_tail_encounter": "태일이: 아구몬! 저 녀석이야! 배틀이다!!",
-  "battle_tail_victory_1": "태일이: 아니 내 아구몬이! 돌려줘!!!",
-  "field_tail_repeat": "태일이: 아구몬!!",
+  "trainer_tail_encounter": "아구몬! 저 녀석이야! 배틀이다!!",
+  "battle_tail_victory_1": "아니 내 아구몬이! 돌려줘!!!",
+  "field_tail_repeat": "아구몬!!",
   "cave_blocked": "동굴로 들어갈 수 없다!",
   "cave_clear": "아구몬과 함께 동굴로 들어갔다!"
 }
