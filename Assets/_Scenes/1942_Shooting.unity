@@ -614,11 +614,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7157280283343770905, guid: 0addd7a3d669aee4292bb214a37b9c61, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.39
+      value: 3.35
       objectReference: {fileID: 0}
     - target: {fileID: 7157280283343770905, guid: 0addd7a3d669aee4292bb214a37b9c61, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.86
+      value: -1.76
       objectReference: {fileID: 0}
     - target: {fileID: 7157280283343770905, guid: 0addd7a3d669aee4292bb214a37b9c61, type: 3}
       propertyPath: m_LocalPosition.z
@@ -917,7 +917,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -4, y: -10}
+  m_AnchoredPosition: {x: -4, y: -18}
   m_SizeDelta: {x: 450, y: 131.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &181662813
@@ -940,7 +940,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB3C4\uC640\uC918\uC11C \uACE0\uB9C8\uC6CC! \n"
+  m_text: "\uD750\uD750\uD750! \uD30C\uC6CC\uD37C\uD504 \uAC78\uC988!\n\uC774\uBC88\uC5D4
+    \uBB34\uC801\uC758 \uBE44\uD589\uC120\uB4E4\uB3C4 \uB9CC\uB4E4\uC5C8\uC9C0!\n\uB098\uB97C
+    \uB9C9\uC744\uC218\uB294 \uC5C6\uC744\uAC70\uB2E4!!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f1f622efff350d74baf94e1b2e9c9ea0, type: 2}
   m_sharedMaterial: {fileID: 5416576176089975846, guid: f1f622efff350d74baf94e1b2e9c9ea0, type: 2}
@@ -3498,7 +3500,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00048828, y: -3}
+  m_AnchoredPosition: {x: 0.00048828, y: -26.7}
   m_SizeDelta: {x: 444.368, y: 114.2193}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1651378410
@@ -3521,7 +3523,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD30C\uC6CC\uD37C\uD504\uAC78"
+  m_text: "\uD750\uD750\uD750! \uD30C\uC6CC\uD37C\uD504 \uAC78\uC988!\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a28c40062f102d14f8610141569d35ea, type: 2}
   m_sharedMaterial: {fileID: 8603691921200370404, guid: a28c40062f102d14f8610141569d35ea, type: 2}
@@ -4164,7 +4166,7 @@ Transform:
   m_GameObject: {fileID: 1859394211}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.6, y: 23, z: 0}
+  m_LocalPosition: {x: 3.7, y: 23, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -4197,7 +4199,7 @@ Transform:
   m_GameObject: {fileID: 1974870063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.6, y: 0, z: 0}
+  m_LocalPosition: {x: 3.7, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -4744,7 +4746,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2144512968
 RectTransform:
   m_ObjectHideFlags: 0

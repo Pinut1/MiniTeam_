@@ -57,7 +57,7 @@ namespace MiniTeam.Pokemon
 
             if (!isOpen)
             {
-                if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.X))
                     OpenMenu();
                 return;
             }
@@ -71,7 +71,7 @@ namespace MiniTeam.Pokemon
                     MoveBagCursor(1);
                 else if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Return))
                     SelectBagItem();
-                else if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
+                else if (Input.GetKeyDown(KeyCode.X))
                     CloseBag();
                 return;
             }
@@ -83,7 +83,7 @@ namespace MiniTeam.Pokemon
                 Navigate(1);
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
                 SelectCurrent();
-            else if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
+            else if (Input.GetKeyDown(KeyCode.X))
                 CloseAll();
         }
 
