@@ -16,3 +16,5 @@
 # Unity meta 파일 — GUID 보호 (자동 머지 금지)
 *.meta merge=ours
 *.anim filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
