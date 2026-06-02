@@ -42,7 +42,7 @@ MonoBehaviour:
     m_Start: 0
     m_ClipIn: 0
     m_Asset: {fileID: -424608914949736374}
-    m_Duration: 67.63333333333334
+    m_Duration: 70.27400000000033
     m_TimeScale: 1
     m_ParentTrack: {fileID: -8486791423080569310}
     m_EaseInDuration: 0
@@ -152,7 +152,7 @@ MonoBehaviour:
     m_Start: 22.05
     m_ClipIn: 0
     m_Asset: {fileID: -7078111698683520699}
-    m_Duration: 28.833333333333332
+    m_Duration: 21.366666666666664
     m_TimeScale: 1
     m_ParentTrack: {fileID: -7656423574352945571}
     m_EaseInDuration: 0
@@ -606,10 +606,10 @@ MonoBehaviour:
   m_Children: []
   m_Clips:
   - m_Version: 1
-    m_Start: 52.49066666666667
+    m_Start: 43.416666666666664
     m_ClipIn: 0
     m_Asset: {fileID: 6342762264789308345}
-    m_Duration: 9.049999999999663
+    m_Duration: 18.516666666666666
     m_TimeScale: 1
     m_ParentTrack: {fileID: -2065766207992934883}
     m_EaseInDuration: 0
@@ -689,7 +689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
   m_Name: Signal Emitter
   m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 67.63333333333334
+  m_Time: 65.5
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: d647e89595fb73c418fe7dabde4da890, type: 2}

@@ -310,8 +310,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 14
+  m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -383,13 +383,13 @@ MonoBehaviour:
   - YOUNGWK
   - YEJI
   - JUNGMIN
-  - GIUT STREET
+  - 
   delayBetweenWords: 1
   randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*
   revealSpeed: 0.3
   randomChangesPerLetter: 20
   useMonospace: 1
-  monospaceWidth: 1
+  monospaceWidth: 1.2
   randomRevealOrder: 0
 --- !u!4 &128388181 stripped
 Transform:
@@ -3789,7 +3789,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!95 &1498330721
 Animator:
   serializedVersion: 7
