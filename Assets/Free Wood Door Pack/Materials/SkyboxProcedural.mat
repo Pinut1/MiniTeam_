@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: SkyboxProcedural
   m_Shader: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _SUNDISK_HIGH_QUALITY
   m_InvalidKeywords:
@@ -20,6 +22,7 @@ Material:
   m_CustomRenderQueue: 1000
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -62,7 +65,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaTestRef: 0.5
-    - _AtmosphereThickness: 1
+    - _AtmosphereThickness: 0.69
     - _BumpScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -95,3 +98,4 @@ Material:
     - _SpecularColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _SunTint: {r: 0.99607843, g: 0.99607843, b: 0.99607843, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

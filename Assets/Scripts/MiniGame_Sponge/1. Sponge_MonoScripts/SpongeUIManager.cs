@@ -137,10 +137,42 @@ public class SpongeUIManager : MonoBehaviour
 
     private void Start()
     {
+        // 증거 패널 — 먼저 활성화해 Canvas 레이아웃 계산 후 비활성화
+        // (SetActive(false)로 시작하면 자식 이미지 위치가 처음 열릴 때 틀어지는 문제 방지)
+        evidencePnl.SetActive(true);
+        if (recordPnl != null) recordPnl.SetActive(true);
+        Canvas.ForceUpdateCanvases();
         evidencePnl.SetActive(false);
-        if (recordPnl != null) recordPnl.SetActive(false);
+        if (recordPnl != null)      recordPnl.SetActive(false);
         if (newEvidenceImg != null) newEvidenceImg.SetActive(false);
-        if (holderSponge != null) holderSponge.SetActive(false);
+        if (holderSponge != null)   holderSponge.SetActive(false);
+
+        // 추궁 힌트 / 심문 중 표시
+        if (pressStartPnlLeft != null)  pressStartPnlLeft.SetActive(false);
+        if (pressStartPnlRight != null) pressStartPnlRight.SetActive(false);
+        if (pressingImgObj != null)     pressingImgObj.SetActive(false);
+
+        // 연출 패널 (코루틴에서 켰다 끄므로 시작엔 꺼야 함)
+        whitePnl.SetActive(false);
+        holditObj.SetActive(false);
+        objectionObj.SetActive(false);
+        takeThatObj.SetActive(false);
+
+        // 심문 시작 패널
+        if (questionPnlLeft != null)  questionPnlLeft.SetActive(false);
+        if (questionPnlRight != null) questionPnlRight.SetActive(false);
+
+        // 무죄 판결 / 판사 망치 연출
+        if (innocencePnl != null)    innocencePnl.SetActive(false);
+        if (judgeGavelBGImg != null) judgeGavelBGImg.SetActive(false);
+        if (judgeGavelImg != null)   judgeGavelImg.SetActive(false);
+        if (judgeEffetImg != null)   judgeEffetImg.SetActive(false);
+        if (judgeGavelImg1 != null)  judgeGavelImg1.SetActive(false);
+
+        // 메뉴 — GameManager.Start()가 ChangeState() 없이 직접 Dialogue로 세팅하므로
+        // HandleStateChanged가 발동하지 않아 여기서 명시적으로 초기화
+        if (menuDefault != null)   menuDefault.SetActive(true);
+        if (menuCrossExam != null) menuCrossExam.SetActive(false);
     }
 
     // ── 이벤트 구독 ──────────────────────────────────────────────

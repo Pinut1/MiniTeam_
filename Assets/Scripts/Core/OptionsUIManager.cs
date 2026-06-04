@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace MiniTeam.Core
 {
@@ -18,13 +19,24 @@ namespace MiniTeam.Core
         [Tooltip("닫기(TurnOff) 애니메이션이 완료될 때까지 대기할 시간 (초)")]
         public float closeDelay = 0.5f;
 
-        [Header("옵션 내부 슬라이더 (선택)")]
+        [Header("옵션 값 슬라이더 (선택)")]
         public Slider masterVolumeSlider;
         public Slider bgmVolumeSlider;
         public Slider sfxVolumeSlider;
 
+        [Header("Key Guide")]
+        public GameObject keyGuidePanel;
+        public Image keyGuideImage;
+        public TMP_Text keyGuideTitleText;
+        public Sprite hubKeyGuideSprite;
+        public Sprite[] miniGameKeyGuides;
+        public GameObject keyGuideExclamation;
+
+        public bool IsOpen => isOpen;
         private bool isOpen = false;
-        private Coroutine closeCoroutine;
+            private Coroutine closeCoroutine;
+    private float lastToggleTime = 0f;
+    private const float TOGGLE_COOLDOWN = 1.45f; // 애니메이션 시간(1.3초)보다 살짝 여유있게 방어
 
         void Awake()
         {
@@ -37,12 +49,38 @@ namespace MiniTeam.Core
         {
             if (optionsPanel != null) optionsPanel.SetActive(false);
             InitSliders();
-        }
 
-        void Update()
+            if (keyGuideExclamation != null)
+            {
+                int hasViewed = PlayerPrefs.GetInt("HasViewedKeyGuide", 0);
+                var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
+                if (img != null) img.enabled = (hasViewed == 0);
+            }
+        }        void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
-                Toggle();
+            {
+                // 광클 방지 (쿨다운)
+                if (Time.unscaledTime - lastToggleTime < TOGGLE_COOLDOWN) return;
+                lastToggleTime = Time.unscaledTime;
+
+                // HubUIManager에 튜토리얼 경고창이 떠 있거나, MainUIManager의 새 게임 경고창이 켜져있다면 옵션창을 열지 않음
+                if (HubUIManager.Instance != null && HubUIManager.Instance.IsWarningUIActive)
+                {
+                    return;
+                }
+            
+                MainUIManager mainUI = FindAnyObjectByType<MainUIManager>();
+                if (mainUI != null && mainUI.isWarningActive)
+                {
+                    return;
+                }
+
+                if (keyGuidePanel != null && keyGuidePanel.activeSelf)
+                    CloseKeyGuide();
+                else
+                    Toggle();
+            }
 
             // R키를 누르면 강제로 미니게임 실패(Regame 효과) 처리
             if (Input.GetKeyDown(KeyCode.R))
@@ -126,16 +164,86 @@ namespace MiniTeam.Core
         // "게임으로 돌아가기" 버튼
         public void OnResumeClicked() => Close();
 
-        // "나가기" 버튼 — 미니게임 중이면 허브로, 허브면 앱 종료
+        // "나가기" 버튼 (미니게임이면 허브로, 허브면 앱 종료)
         public void OnExitClicked()
         {
             Close(() =>
             {
                 if (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame)
+                {
                     MiniGameManager.Instance.ExitMiniGame();
+                }
                 else
-                    Application.Quit();
+                {
+    #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+        Application.Quit();
+    #endif
+                }
             });
+
+        }
+
+        // 키 가이드 버튼 콜백
+        public void OnKeyGuideClicked()
+        {
+            Debug.Log("[OptionsUIManager] OnKeyGuideClicked 호출됨!");
+
+            if (keyGuideExclamation != null)
+            {
+                var img = keyGuideExclamation.GetComponent<UnityEngine.UI.Image>();
+                if (img != null && img.enabled)
+                {
+                    PlayerPrefs.SetInt("HasViewedKeyGuide", 1);
+                    PlayerPrefs.Save();
+                    img.enabled = false;
+                }
+            }
+
+            if (keyGuidePanel == null || keyGuideImage == null) 
+            {
+                Debug.LogError($"[OptionsUIManager] keyGuidePanel({keyGuidePanel != null}) 또는 keyGuideImage({keyGuideImage != null})가 할당되지 않았습니다!");
+                return;
+            }
+            
+            bool isMiniGame = (MiniGameManager.Instance != null && MiniGameManager.Instance.IsInMiniGame);
+            Debug.Log($"[OptionsUIManager] MiniGameManager 존재여부: {MiniGameManager.Instance != null}, IsInMiniGame: {isMiniGame}");
+            
+            if (!isMiniGame)
+            {
+                Debug.Log("[OptionsUIManager] 현재 허브 씬으로 판별됨. 허브 가이드 이미지 적용.");
+                keyGuideImage.sprite = hubKeyGuideSprite;
+                if (keyGuideTitleText != null) keyGuideTitleText.text = "Hub 조작법";
+            }
+            else
+            {
+                int index = (MiniGameManager.Instance != null) ? MiniGameManager.Instance.currentStage : 0;
+                
+                Debug.Log($"[OptionsUIManager] 미니게임 판별됨. 현재 currentStage: {index}, 적용될 Index: {index}");
+                Debug.Log($"[OptionsUIManager] miniGameKeyGuides 배열 크기: {(miniGameKeyGuides != null ? miniGameKeyGuides.Length : "NULL")}");
+
+                if (miniGameKeyGuides != null && index >= 0 && index < miniGameKeyGuides.Length && miniGameKeyGuides[index] != null)
+                {
+                    Debug.Log($"[OptionsUIManager] 배열에서 {index}번째 이미지를 성공적으로 찾아서 적용!");
+                    keyGuideImage.sprite = miniGameKeyGuides[index];
+                }
+                else
+                {
+                    Debug.LogWarning($"[OptionsUIManager] 경고: 배열에서 {index}번째 이미지를 찾을 수 없어 Fallback(허브 이미지) 적용!");
+                    keyGuideImage.sprite = hubKeyGuideSprite; // fallback
+                }
+
+                if (keyGuideTitleText != null) keyGuideTitleText.text = $"스테이지 {index + 1} 조작법";
+            }
+            
+            keyGuidePanel.SetActive(true);
+        }
+
+        // 키 가이드 패널 닫기 버튼 콜백
+        public void CloseKeyGuide()
+        {
+            if (keyGuidePanel != null) keyGuidePanel.SetActive(false);
         }
 
         // ── 볼륨 슬라이더 ─────────────────────────

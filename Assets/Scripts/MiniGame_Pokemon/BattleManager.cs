@@ -98,10 +98,11 @@ namespace MiniTeam.Pokemon
             yield return new WaitForSeconds(1.5f);
             BattleUIManager.Instance?.ShowDieState();
             FindAnyObjectByType<PlayerMapController>()?.SetControllable(false);
-            yield return new WaitUntil(() =>
-                Input.GetKeyDown(KeyCode.Z) ||
-                Input.GetKeyDown(KeyCode.Space) ||
-                Input.GetKeyDown(KeyCode.Return));
+            var healClip = AudioManager.Instance?.sfxHeal;
+            AudioManager.Instance?.StopBGM();
+            AudioManager.Instance?.PlaySFX(healClip);
+            float holdTime = (healClip != null ? healClip.length : 0f) + 1f;
+            yield return new WaitForSeconds(holdTime);
             EndBattle();
             PokemonGameController.Instance?.RespawnPlayer();
         }

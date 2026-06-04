@@ -28,6 +28,10 @@ public class SpiralDiveCutscene : MonoBehaviour
     [Header("Easing")]
     [SerializeField] private AnimationCurve easing = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
+    [Header("Audio")]
+    [Tooltip("컷씬 전용 BGM (없으면 재생 안 함)")]
+    [SerializeField] private AudioClip cutsceneBGM;
+
     private MotionBlur motionBlur;
     private const string OPENING_PLAYED_KEY = "OpeningCutscenePlayed";
 
@@ -64,6 +68,11 @@ public class SpiralDiveCutscene : MonoBehaviour
     {
         Camera cam = targetCamera != null ? targetCamera : Camera.main;
         if (cam == null) { onComplete?.Invoke(); yield break; }
+
+        if (cutsceneBGM != null && MiniTeam.Core.AudioManager.Instance != null)
+        {
+            MiniTeam.Core.AudioManager.Instance.PlayBGM(cutsceneBGM);
+        }
 
         if (postProcessVolume != null)
             postProcessVolume.profile.TryGetSettings(out motionBlur);

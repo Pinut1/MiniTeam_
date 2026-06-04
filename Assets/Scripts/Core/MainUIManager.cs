@@ -20,6 +20,8 @@ public class MainUIManager : MonoBehaviour
 
     [Header("Main Menu")]
     [SerializeField] private GameObject mainMenuPanel;
+    [Tooltip("이어하기 버튼 (세이브 없으면 비활성화)")]
+    [SerializeField] private GameObject continueButton;
     [Tooltip("PressAnyButton → 메인 메뉴 전환 시간 (초)")]
     [SerializeField] private float transitionDuration = 0.5f;
 
@@ -28,23 +30,49 @@ public class MainUIManager : MonoBehaviour
     [SerializeField] private Image fadePanel;
     [Tooltip("페이드아웃에 걸리는 시간 (초)")]
     [SerializeField] private float fadeDuration = 2.0f;
+    
+    [Header("Hub Integration Settings")]
+    [Tooltip("메인 메뉴 전용 카메라 (게임 시작 시 꺼짐)")]
+    public GameObject menuCamera;
 
-    // 중복 클릭 방지 플래그
+    // 상태 플래그
     private bool isTranstioning = false;
     private bool isPressAnyButtonActive = true;
+    public bool isWarningActive = false;
     private const string SAVE_STAGE_KEY = "SavedCurrentStage";
 
     private void Start()
     {
+        // 통합 씬(Hub)에서 이미 게임이 진행 중인데 씬이 다시 로드된 경우 (예: 미니게임 끝나고 복귀)
+        if (MiniGameManager.Instance != null && !MiniGameManager.Instance.isMainMenuActive)
+        {
+            if (menuCamera != null) Destroy(menuCamera);
+            Destroy(gameObject);
+            return;
+        }
+
         // PressAnyButton 화면 켜기, 메인 메뉴 숨기기
         if (pressAnyButtonPanel != null) pressAnyButtonPanel.SetActive(true);
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
 
+        // 세이브 데이터 여부에 따라 이어하기 버튼 자체를 켜고 끄기 (레이아웃 그룹 자동 정렬됨)
+        if (continueButton != null)
+        {
+            continueButton.SetActive(PlayerPrefs.HasKey(SAVE_STAGE_KEY));
+        }
+
         StartCoroutine(BlinkRoutine());
     }
 
-    private void Update()
+    private void LateUpdate()
     {
+        // 새 게임 경고창이 켜져있을 때 ESC를 누르면 취소(No) 처리
+        if (isWarningActive && Input.GetKeyDown(KeyCode.Escape))
+        {
+            CancelStartNewGame();
+            return;
+        }
+
         if (!isPressAnyButtonActive || isTranstioning) return;
 
         // 아무 키 / 마우스 클릭 / 게임패드 버튼 감지
@@ -117,30 +145,48 @@ public class MainUIManager : MonoBehaviour
 
     public void GameStart()
     {
-        if (isTranstioning) return;
+        if (isTranstioning || isWarningActive) return;
 
-        // 기존 저장 데이터가 있는지 확인
-        if (PlayerPrefs.HasKey(SAVE_STAGE_KEY))
-        {
-            Debug.Log($"[MainUIManager] 기존 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
+        //// 세이브 데이터가 있는지 확인
+        //if (PlayerPrefs.HasKey(SAVE_STAGE_KEY))
+        //{
+        //    Debug.Log($"[MainUIManager] 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
             
-            // 경고창 애니메이션 실행
-            if (uiAnimator != null)
-            {
-                Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 실행");
-                uiAnimator.SetTrigger("NewGameWarning");
-            }
-            else
-            {
-                Debug.LogError("[MainUIManager] uiAnimator가 연결되어 있지 않습니다! 인스펙터를 확인하세요.");
-            }
+        //    // 경고창 애니메이션 재생
+        //    if (uiAnimator != null)
+        //    {
+        //        isWarningActive = true;
+        //        Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 호출");
+        //        uiAnimator.SetTrigger("NewGameWarning");
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError("[MainUIManager] uiAnimator가 할당되어 있지 않습니다! 인스펙터를 확인하세요.");
+        //    }
+        //}
+        //else
+        //{
+        //    Debug.Log("[MainUIManager] 세이브 데이터 없음. 바로 새 게임 시작.");
+        //    // 바로 시작
+        //    ConfirmStartNewGame();
+        //}
+
+        // 세이브 데이터가 있는지 확인
+       
+        Debug.Log($"[MainUIManager] 세이브 데이터 발견 (Key: {SAVE_STAGE_KEY}). 경고 애니메이션 호출 시도.");
+            
+        // 경고창 애니메이션 재생
+        if (uiAnimator != null)
+        {
+            isWarningActive = true;
+            Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameWarning\") 호출");
+            uiAnimator.SetTrigger("NewGameWarning");
         }
         else
         {
-            Debug.Log("[MainUIManager] 기존 세이브 데이터 없음. 바로 게임 시작.");
-            // 바로 시작
-            ConfirmStartNewGame();
+            Debug.LogError("[MainUIManager] uiAnimator가 할당되어 있지 않습니다! 인스펙터를 확인하세요.");
         }
+       
     }
 
     // 경고창에서 '예(Yes)'를 눌렀을 때 호출
@@ -148,20 +194,41 @@ public class MainUIManager : MonoBehaviour
     {
         if (isTranstioning) return;
         isTranstioning = true;
+        isWarningActive = false;
         
-        // 새로 시작할 때 기존 세이브 데이터 초기화
-        PlayerPrefs.DeleteKey(SAVE_STAGE_KEY);
-        PlayerPrefs.DeleteKey("SavedCutscenePlayed");
+        // 1. 설정 데이터 백업
+        float masterVolume = PlayerPrefs.GetFloat("SavedMasterVolume", 1f);
+        float bgmVolume = PlayerPrefs.GetFloat("SavedBGMVolume", 0.6f);
+        float sfxVolume = PlayerPrefs.GetFloat("SavedSFXVolume", 1f);
+        int hasViewedKeyGuide = PlayerPrefs.GetInt("HasViewedKeyGuide", 0);
+
+        // 2. 모든 데이터 완벽 초기화
+        PlayerPrefs.DeleteAll();
+
+        // 3. 설정 데이터 복원
+        PlayerPrefs.SetFloat("SavedMasterVolume", masterVolume);
+        PlayerPrefs.SetFloat("SavedBGMVolume", bgmVolume);
+        PlayerPrefs.SetFloat("SavedSFXVolume", sfxVolume);
+        PlayerPrefs.SetInt("HasViewedKeyGuide", hasViewedKeyGuide);
         PlayerPrefs.Save();
 
-        // 페이드아웃 후 Hub 씬으로 전환
-        PlayFadeOut(() => SceneManager.LoadScene("Hub"));
+        // 4. 메모리에 살아있는 매니저 초기화
+        if (MiniGameManager.Instance != null)
+        {
+            MiniGameManager.Instance.ResetSaveData();
+        }
+
+        // 이동 대신 Hub 게임플레이 즉시 시작
+        PlayFadeOut(() => {
+            StartHubGameplay();
+        });
     }
 
     // 경고창에서 '아니오(No)'를 눌렀을 때 호출
     public void CancelStartNewGame()
     {
-        Debug.Log("[MainUIManager] CancelStartNewGame() 호출됨. 복귀 애니메이션 실행 시도.");
+        isWarningActive = false;
+        Debug.Log("[MainUIManager] CancelStartNewGame() 호출. 경고 애니메이션 닫기 시도.");
         if (uiAnimator != null)
         {
             Debug.Log("[MainUIManager] uiAnimator.SetTrigger(\"NewGameReturn\") 실행");
@@ -179,8 +246,23 @@ public class MainUIManager : MonoBehaviour
         if (isTranstioning) return;
         isTranstioning = true;
 
-        // 저장된 스테이지 정보가 있는 채로 Hub 씬 로드
-        PlayFadeOut(() => SceneManager.LoadScene("Hub"));
+        // 씬 이동 대신 Hub 게임플레이 즉시 시작
+        PlayFadeOut(() => {
+            StartHubGameplay();
+        });
+    }
+
+    // 통합 씬에서 게임을 실제로 시작하는 로직
+    private void StartHubGameplay()
+    {
+        if (MiniGameManager.Instance != null)
+        {
+            MiniGameManager.Instance.StartGameFromMenu();
+        }
+        
+        // 어차피 일회용이므로 메인 카메라와 자기 자신(UI)을 완전히 파괴(Destroy)합니다.
+        if (menuCamera != null) Destroy(menuCamera);
+        Destroy(gameObject);
     }
 
     // 게임을 종료하는 함수

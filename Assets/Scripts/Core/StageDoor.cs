@@ -1,4 +1,4 @@
-using MiniTeam.Core;
+﻿using MiniTeam.Core;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
@@ -7,29 +7,16 @@ public class StageDoor : MonoBehaviour
     public enum OpenType { Automatic, Manual }
 
     [Header("Flow Control")]
-    [Tooltip("문의 개폐 방식 설정 (자동 / 수동)")]
     public OpenType openType = OpenType.Manual;
-    
-    [Tooltip("아직 비활성화된 스테이지 문에 접근했을 때의 경고 메시지")]
-    public string inactiveDoorWarning = "아직 들어갈 수 없는 곳이다. 다른 문에 가 보자.";
-    
-    [Tooltip("활성화된 문이지만 주댕치와의 대화 전일 때의 경고 메시지")]
-    public string cutscenePendingWarning = "주댕치의 이야기를\n 들어봐야 할 것 같다";
-
-    [Tooltip("모든 스테이지를 클리어했을 때의 경고 메시지")]
-    public string allClearWarning = "이 곳에서 볼 일은 모두 끝났다.";
-    
-    [Tooltip("이미 클리어한 스테이지 문에 접근했을 때의 경고 메시지")]
-    public string alreadyClearedWarning = "이미 가본 적 있는 문이다.";
+    public string inactiveDoorWarning = "현재 지정된 경로에 접근할 수 없습니다. 계속하려면 다른 문을 이용하십시오.";
+    public string cutscenePendingWarning = "작업이 중단되었습니다. 계속 실행하려면 [주댕치]의 이야기를 입력 하십시오.";
+    public string allClearWarning = "더 이상 실행할 작업이 없습니다.";
+    public string alreadyClearedWarning = "해당 구역은 이미 탐색이 완료되었습니다.";
 
     [Header("Door Animation")]
-    [Tooltip("회전시킬 실제 문 트랜스폼")]
     public Transform doorTransform;
-    [Tooltip("문이 열리는 속도 조절 배율")]
     public float smooth = 1.0f;
-    [Tooltip("문이 열렸을 때의 목표 로컬 Y 각도")]
     public float doorOpenAngle = -90.0f;
-    [Tooltip("문이 닫혔을 때의 목표 로컬 Y 각도")]
     public float doorCloseAngle = 0.0f;
 
     [Header("Audio")]
@@ -38,7 +25,7 @@ public class StageDoor : MonoBehaviour
 
     private float currentYAngle = 0f;
     private bool isOpen = false;
-    private bool isPlayerInRange = false;
+    private bool isPlayerInRange = false; // ���� �ü��� ��� �ִ��� ����
 
     private void Awake()
     {
@@ -47,6 +34,8 @@ public class StageDoor : MonoBehaviour
             doorTransform = transform.GetChild(0);
         }
     }
+
+
 
     private void OnEnable()
     {
@@ -60,9 +49,6 @@ public class StageDoor : MonoBehaviour
         HandleManualInput();
     }
 
-    /// <summary>
-    /// 목표 각도로 부드럽게 문 회전을 업데이트합니다.
-    /// </summary>
     private void HandleDoorRotation()
     {
         if (doorTransform == null) return;
@@ -74,9 +60,6 @@ public class StageDoor : MonoBehaviour
         doorTransform.localRotation = Quaternion.Euler(0, currentYAngle, 0);
     }
 
-    /// <summary>
-    /// 수동 모드일 때 플레이어의 F키 개폐 입력을 처리합니다.
-    /// </summary>
     private void HandleManualInput()
     {
         if (!isPlayerInRange || openType != OpenType.Manual) return;
@@ -144,23 +127,15 @@ public class StageDoor : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 자동문 개폐 조치 가능 여부를 검사합니다.
-    /// </summary>
     private bool managerIsActiveAndAutomatic()
     {
         var manager = MiniGameManager.Instance;
         return manager != null && manager.IsDoorActive(this) && openType == OpenType.Automatic;
     }
 
-    /// <summary>
-    /// 문의 개폐 상태를 토글하고 그에 따른 효과음을 출력합니다.
-    /// </summary>
     private void ToggleDoor()
     {
         isOpen = !isOpen;
-
-        // 문이 개폐되면 기존에 켜져 있던 경고창은 시야 확보를 위해 꺼줍니다.
         HideWarning();
 
         AudioClip clipToPlay = isOpen ? openDoorSound : closeDoorSound;
@@ -170,26 +145,16 @@ public class StageDoor : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 경고 UI를 메시지와 함께 활성화합니다.
-    /// </summary>
     private void ShowWarning(string message)
     {
-        Debug.Log($"[StageDoor Warning] {message}");
         HubUIManager.Instance?.ToggleWarningUI(true, message);
     }
 
-    /// <summary>
-    /// 경고 UI를 비활성화합니다.
-    /// </summary>
     private void HideWarning()
     {
         HubUIManager.Instance?.ToggleWarningUI(false);
     }
 
-    /// <summary>
-    /// 비활성화된 문에 진입 시 진행 상황(클리어 완료 여부)에 맞춰 세분화된 경고를 띄웁니다.
-    /// </summary>
     private void ShowInactiveWarning()
     {
         var manager = MiniGameManager.Instance;
@@ -199,26 +164,19 @@ public class StageDoor : MonoBehaviour
             return;
         }
 
-        // 1. 모든 스테이지를 클리어한 경우 (currentStage가 5 이상인 경우)
         if (manager.currentStage >= 5)
         {
             ShowWarning(allClearWarning);
             return;
         }
 
-        // 2. 자신이 몇 번째 스테이지 문인지 인덱스 파악
         int myIndex = System.Array.IndexOf(manager.stageDoors, this);
-        if (myIndex != -1)
+        if (myIndex != -1 && myIndex < manager.currentStage)
         {
-            // 현재 활성화된 스테이지 번호보다 낮다면 이미 클리어한 스테이지의 문
-            if (myIndex < manager.currentStage)
-            {
-                ShowWarning(alreadyClearedWarning);
-                return;
-            }
+            ShowWarning(alreadyClearedWarning);
+            return;
         }
 
-        // 3. 아직 도달하지 못한 미래 스테이지의 문
         ShowWarning(inactiveDoorWarning);
     }
 }

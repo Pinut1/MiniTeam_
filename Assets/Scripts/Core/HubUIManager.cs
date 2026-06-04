@@ -9,21 +9,38 @@ public class HubUIManager : MonoBehaviour
 {
     public static HubUIManager Instance { get; private set; }
 
+    [Header("Test_ 파리 Sound 전용 Volume Scale")]
+    public float volumeScale_Pari = 0.1f;
+
     [Header("WakeUp & Setup (오프닝 연출)")]
     public EyeOpeningEffect eyeEffect;
     [SerializeField] private float openSpeed = 1.5f;
 
     [Header("Dialogue UI (대화 및 알림 패널)")]
-    [SerializeField] private Animator cinemaAnimator;
+    [SerializeField] public Animator cinemaAnimator;
     [SerializeField] private Image judangchiBigImage;
     [SerializeField] private GameObject warningUI;
     [SerializeField] private TMP_Text warningText;
 
-    [Header("Interaction Objects (하단 상호작용)")]
+        [Header("Interaction Objects (하단 상호작용)")]
+    
+    public bool IsWarningUIActive => warningUI != null && warningUI.activeSelf;
+    private System.Action warningOnComplete;
+
+    void LateUpdate()
+    {
+        if (IsWarningUIActive && Input.GetKeyDown(KeyCode.Escape))
+        {
+            warningUI.SetActive(false);
+            warningOnComplete?.Invoke();
+            warningOnComplete = null;
+        }
+    }
     [SerializeField] private GameObject judangchiSmallObj;
     [SerializeField] private GameObject digiviceObj;
     public GameObject exclamationMark;
-    [SerializeField] private Image[] digiviceBtns;
+    private AudioSource flyAudioSource;
+    [SerializeField] private GameObject[] digiviceBtns;
 
     [Header("Stage Clear Reward (클리어 연출)")]
     [SerializeField] private Image objectImg;
@@ -37,15 +54,42 @@ public class HubUIManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void OnEnable()
+    {
+        // 1. 다이얼로그 시스템에서 저장된 애니메이터 Bool 상태 자동 복원 (ex: OnDDong)
+        // 미니게임에 들어갔다 나오면 SetActive(true)가 호출되므로 OnEnable에서 복원해야 합니다.
+        if (cinemaAnimator != null)
+        {
+            foreach (var param in cinemaAnimator.parameters)
+            {
+                if (param.type == AnimatorControllerParameterType.Bool)
+                {
+                    string key = "AnimBool_" + param.name;
+                    if (PlayerPrefs.HasKey(key))
+                    {
+                        cinemaAnimator.SetBool(param.name, PlayerPrefs.GetInt(key) == 1);
+                    }
+                }
+            }
+        }
+    }
+
     private void Start()
     {
-        // 버튼 이벤트 연결 (GameObject에서 Button 컴포넌트 추출)
+        // 2. 하단 UI 버튼 이벤트 연결
         if (judangchiSmallObj != null)
             judangchiSmallObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedJudangchi);
 
         if (digiviceObj != null)
             digiviceObj.GetComponent<Button>().onClick.AddListener(OnBottomUIClickedDigivice);
 
+        // 느낌표(exclamationMark)에 파리 소리 루프용 AudioSource 동적 생성
+        if (exclamationMark != null)
+        {
+            flyAudioSource = exclamationMark.AddComponent<AudioSource>();
+            flyAudioSource.loop = true;
+            flyAudioSource.playOnAwake = false;
+        }
     }
 
     #endregion
@@ -173,12 +217,6 @@ public class HubUIManager : MonoBehaviour
             bool wasActive = judangchiSmallObj.activeSelf;
             judangchiSmallObj.SetActive(true);
             judangchiSmallObj.GetComponent<Button>().interactable = true;
-
-            // 안 보이다가 새로 켜질 때만 효과음 재생
-            if (!wasActive && MiniTeam.Core.AudioManager.Instance != null && MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear != null)
-            {
-                MiniTeam.Core.AudioManager.Instance.PlaySFX(MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear, 0.1f); 
-            }
         }
 
         // 오직 0단계이고 아직 컷신을 안 봤을 때만 최초 지연(0.75초) 출현 연출 적용
@@ -208,11 +246,9 @@ public class HubUIManager : MonoBehaviour
             // 3스테이지 클리어 시(stage = 4) -> digiviceBtns[2] 온
             // 4스테이지 클리어 시(stage = 5) -> digiviceBtns[3] 온
             int requiredStage = 2 + i;
-            float alpha = (stage >= requiredStage) ? 1.0f : 0.3f;
+            bool isActive = stage >= requiredStage;
             
-            Color color = digiviceBtns[i].color;
-            color.a = alpha;
-            digiviceBtns[i].color = color;
+            digiviceBtns[i].SetActive(isActive);
         }
     }
     // 갱신 함수: 오직 '0단계'에서만 보이며, 0단계 컷신을 아직 안 본 상태여야 활성화
@@ -221,6 +257,23 @@ public class HubUIManager : MonoBehaviour
         if (exclamationMark == null || MiniGameManager.Instance == null) return;
         bool shouldShow = (MiniGameManager.Instance.currentStage == 0) && !MiniGameManager.Instance.isCutscenePlayed;
         exclamationMark.SetActive(shouldShow);
+
+        // 느낌표 활성화 여부에 맞춰 파리 소리 루프 재생/정지
+        if (flyAudioSource != null && MiniTeam.Core.AudioManager.Instance != null && MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear != null)
+        {
+            if (shouldShow && !flyAudioSource.isPlaying)
+            {
+                flyAudioSource.clip = MiniTeam.Core.AudioManager.Instance.sfxSmallJudangchiAppear;
+                float masterVol = MiniTeam.Core.SoundManager.Instance != null ? MiniTeam.Core.SoundManager.Instance.masterVolume : 1f;
+                float sfxVol = MiniTeam.Core.SoundManager.Instance != null ? MiniTeam.Core.SoundManager.Instance.sfxVolume : 1f;
+                flyAudioSource.volume = masterVol * sfxVol * volumeScale_Pari;
+                flyAudioSource.Play();
+            }
+            else if (!shouldShow && flyAudioSource.isPlaying)
+            {
+                flyAudioSource.Stop();
+            }
+        }
     }
     // 1회성 지연 출현 코루틴
     private IEnumerator ShowExclamationWithDelay(float delay)
@@ -234,70 +287,46 @@ public class HubUIManager : MonoBehaviour
     // 눈 깜빡임 연출 
     // ==========================================
     #region EyeBlank
-    public void WakeUp(Action onComplete = null)
+            public void WakeUp(System.Action onComplete = null)
     {
-        if (eyeEffect != null)
+        if (judangchiSmallObj.activeSelf) judangchiSmallObj.SetActive(false);
+        if (digiviceObj.activeSelf) digiviceObj.SetActive(false);
+
+        if (EyeOpeningEffect.Instance != null)
         {
-            eyeEffect.enabled = true;
-            StartCoroutine(WakeUpRoutine(onComplete));
+            EyeOpeningEffect.Instance.PlayWakeUpComplex(openSpeed, () => {
+                InitializeBottomUI(MiniGameManager.Instance.currentStage);
+                CheckAndShowKeyGuideWarning(onComplete);
+            });
+        }
+        else
+        {
+            InitializeBottomUI(MiniGameManager.Instance.currentStage);
+            CheckAndShowKeyGuideWarning(onComplete);
+        }
+    }
+    
+    private void CheckAndShowKeyGuideWarning(System.Action onComplete)
+    {
+        if (PlayerPrefs.GetInt("HasViewedKeyGuideAlert", 0) == 0)
+        {
+            if (warningUI != null && warningText != null)
+            {
+                warningText.text = "상황별로 조작법이 다르니 시작 전 주의하십시오. \n 변경된 조작법은 즉시 [Esc] 옵션창 이미지로 확인 요망합니다.";
+                warningUI.SetActive(true);
+                warningOnComplete = onComplete;
+                PlayerPrefs.SetInt("HasViewedKeyGuideAlert", 1);
+                PlayerPrefs.Save();
+            }
+            else
+            {
+                onComplete?.Invoke();
+            }
         }
         else
         {
             onComplete?.Invoke();
         }
-    }
-
-    private IEnumerator WakeUpRoutine(Action onComplete)
-    {
-
-
-        if (judangchiSmallObj.activeSelf)
-        {
-            judangchiSmallObj.SetActive(false);
-        }
-
-        else if (digiviceObj.activeSelf)
-        {
-            digiviceObj.SetActive(false);
-        }
-            eyeEffect.openAmount = 0.001f;
-        eyeEffect.expand = 0.0f;
-        float t = 0;
-
-        while (t < 0.8f)
-        {
-            t += Time.deltaTime * openSpeed;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        while (t > 0.001f)
-        {
-            t -= Time.deltaTime * openSpeed;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime * openSpeed * 2;
-            eyeEffect.openAmount = Mathf.Lerp(0.001f, 1.0f, t);
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(0.1f);
-
-        t = 0;
-        while (t < 1.0f)
-        {
-            t += Time.deltaTime * (openSpeed * 1.5f);
-            eyeEffect.expand = Mathf.Lerp(0.0f, 1.5f, t);
-            yield return null;
-        }
-
-        eyeEffect.enabled = false;
-        InitializeBottomUI(MiniGameManager.Instance.currentStage);
-        onComplete?.Invoke();
     }
     #endregion
 
@@ -349,6 +378,15 @@ public class HubUIManager : MonoBehaviour
         if (cinemaAnimator != null && !string.IsNullOrEmpty(triggerName))
         {
             cinemaAnimator.SetTrigger(triggerName);
+        }
+    }
+    
+    public void StopSpecialAnimation()
+    {
+        if (cinemaAnimator != null)
+        {
+            // 대사 전환 시 이전 애니메이션(Digi Layer)을 즉시 취소하고 기본 상태로 강제 복귀
+            cinemaAnimator.Play("Digivice_Idle", 1);
         }
     }
     

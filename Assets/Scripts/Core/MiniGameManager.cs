@@ -17,6 +17,9 @@ namespace MiniTeam.Core
         public int currentStage = 0;
         public bool isCutscenePlayed = false;
         private bool isLastGameCleared = false;
+        
+        [Header("Menu & State")]
+        public bool isMainMenuActive = false; // 허브 씬 통합 시 메인 메뉴가 떠 있는지 여부
 
         [Header("Door Management")]
         [Tooltip("스테이지 순서대로 문(Stage Door)을 할당. (Stage 1 = Index 0)")]
@@ -48,31 +51,60 @@ namespace MiniTeam.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        private void Start()
+                private void Start()
         {
-            // 저장된 스테이지 정보 로드
             LoadGame();
+        }
 
-            playerMove = FindAnyObjectByType<HubPlayerMove>();
+        private void OnEnable()
+        {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+        }
 
+        private void OnDisable()
+        {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
 
+        private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+        {
+            if (scene.name == "Hub")
+            {
+                playerMove = FindAnyObjectByType<HubPlayerMove>();
+
+                // 메인 메뉴가 켜져있는 상태라면 로직 대기
+                if (isMainMenuActive)
+                {
+                    if (playerMove != null) DisablePlayerInput();
+                    return; 
+                }
+
+                InitializeHubPlayLogic();
+            }
+        }
+
+        // 실제 허브 게임플레이 시작 시 호출되는 초기화 로직 (BGM, WakeUp 등)
+        private void InitializeHubPlayLogic()
+        {
             void PlayWakeUp()
             {
-                HubUIManager.Instance.WakeUp(() =>
+                if (HubUIManager.Instance != null)
                 {
-                    if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                    HubUIManager.Instance.WakeUp(() =>
                     {
-                        SoundManager.Instance?.SetBGMPitch(0.7f);
-                        AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
-                    }
-                    if (playerMove != null) EnablePlayerInput();
-                });
+                        if (AudioManager.Instance != null && AudioManager.Instance.bgmHub != null)
+                        {
+                            SoundManager.Instance?.SetBGMPitch(0.7f);
+                            AudioManager.Instance.PlayBGM(AudioManager.Instance.bgmHub);
+                        }
+                        if (playerMove != null) EnablePlayerInput();
+                    });
+                }
             }
 
             if (playerMove != null)
             {
                 DisablePlayerInput();
-                // 스파이럴 → 눈깜빡 → BGM + 플레이어 입력 활성화
                 if (SpiralDiveCutscene.Instance != null)
                     SpiralDiveCutscene.Instance.PlayIfFirstTime(() => PlayWakeUp());
                 else
@@ -82,24 +114,62 @@ namespace MiniTeam.Core
             {
                 PlayWakeUp();
             }
-           
         }
+
+        // 메인 메뉴(MainUIManager)에서 '새 게임' 또는 '이어하기'를 눌렀을 때 호출됨
+        public void StartGameFromMenu()
+        {
+            isMainMenuActive = false;
+            InitializeHubPlayLogic();
+        }
+        
         public void EnterMiniGame(string sceneName)
         {
             if (IsInMiniGame) return;
 
-            // 미니게임 진입 시 기존 BGM 및 효과음 강제 종료 (안전장치)
+            if (EyeOpeningEffect.Instance != null)
+            {
+                EyeOpeningEffect.Instance.PlayGoToSleep(1.5f, () => {
+                    LoadMiniGameActual(sceneName);
+                });
+            }
+            else
+            {
+                LoadMiniGameActual(sceneName);
+            }
+        }
+
+        private void LoadMiniGameActual(string sceneName)
+        {
+            StartCoroutine(LoadMiniGameAsync(sceneName));
+        }
+
+        private System.Collections.IEnumerator LoadMiniGameAsync(string sceneName)
+        {
             SoundManager.Instance?.StopBGM();
             SoundManager.Instance?.StopAllSFX();
 
-            // Hub 씬 오브젝트 숨기기 (DontDestroyOnLoad 오브젝트는 이미 별도 씬으로 이동했으므로 포함 안 됨)
             playerMove.UnlockCursor();
-            hubRootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            hubRootObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            
             foreach (var go in hubRootObjects)
+            {
+                // EyeOpeningEffect가 있는 캔버스 루트는 끄지 않음 (완전히 독립된 오브젝트)
+                if (go.GetComponentInChildren<EyeOpeningEffect>() != null) continue;
+                
                 go.SetActive(false);
+            }
 
             currentScene = sceneName;
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            var asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+            
+            yield return asyncLoad;
+
+            // 미니게임 로드가 완료되면 새로운 심플 눈뜨기 연출 실행
+            if (EyeOpeningEffect.Instance != null)
+            {
+                EyeOpeningEffect.Instance.PlayWakeUpSimple(1.5f);
+            }
         }
 
         public void ExitMiniGame()
@@ -139,6 +209,9 @@ namespace MiniTeam.Core
             foreach (var go in hubRootObjects)
                 if (go != null) go.SetActive(true);
             hubRootObjects = null;
+
+            // 미니게임에서 사용하던 JSON 대사 데이터를 다시 Hub용으로 교체
+            MiniTeam.Pokemon.DialogueDB.Instance?.Load("Hub");
 
             if (isLastGameCleared)
             {
@@ -194,7 +267,17 @@ namespace MiniTeam.Core
 
         internal void LoadEndingScene()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut_Test");
+            if (EyeOpeningEffect.Instance != null)
+            {
+                // 1. 눈 감기 연출 재생 후 씬 로드
+                EyeOpeningEffect.Instance.PlayGoToSleep(1.5f, () => {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut");
+                });
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("EndingCut");
+            }
         }
 
         // ── 세이브/로드 시스템 ──────────────────────────────────
@@ -222,6 +305,8 @@ namespace MiniTeam.Core
             PlayerPrefs.Save();
             currentStage = 0;
             isCutscenePlayed = false;
+            isLastGameCleared = false;
+            currentScene = "";
             Debug.Log("[SaveSystem] Save Data Reset.");
         }
 
@@ -235,3 +320,4 @@ namespace MiniTeam.Core
 
     }
 }
+

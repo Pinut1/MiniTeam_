@@ -32,6 +32,7 @@ namespace MiniTeam.Pokemon
         public TextMeshProUGUI playerLevelText;
 
         [Header("메시지")]
+        public GameObject      messagePanel;
         public TextMeshProUGUI messageText;
 
         [Header("커맨드 버튼 (Grid 순서대로: 싸우다/가방/포켓몬/도망치다)")]
@@ -150,7 +151,7 @@ namespace MiniTeam.Pokemon
             else if (Input.GetKeyDown(KeyCode.DownArrow)) MoveItem(1);
             else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Z))
                 SelectItem();
-            else if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Escape))
+            else if (Input.GetKeyDown(KeyCode.X))
                 HideItemPanel();
         }
 
@@ -198,7 +199,8 @@ namespace MiniTeam.Pokemon
         public void ShowBattle(TrainerTrigger trainer)
         {
             IsBattleActive = true;
-            if (battlePanel != null) battlePanel.SetActive(true);
+            if (battlePanel   != null) battlePanel.SetActive(true);
+            if (messagePanel  != null) messagePanel.SetActive(true);
 
             // 처음엔 트레이너(태일이) 스프라이트 표시
             if (trainerImage != null)     trainerImage.sprite   = trainer.trainerBattleSprite;
@@ -424,6 +426,8 @@ namespace MiniTeam.Pokemon
             if (StartMenuUI.Instance?.menuPanel != null) StartMenuUI.Instance.menuPanel.SetActive(false);
             if (StartMenuUI.Instance?.bagPanel  != null) StartMenuUI.Instance.bagPanel.SetActive(false);
             if (MapDialogueUI.Instance?.panel   != null) MapDialogueUI.Instance.panel.SetActive(false);
+
+            if (messagePanel != null) messagePanel.SetActive(false);
 
             // blackoutPanel = Die_Panel 활성화
             if (blackoutPanel != null) blackoutPanel.SetActive(true);

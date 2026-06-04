@@ -12,6 +12,9 @@ namespace MiniTeam.Pokemon
         public AudioClip bgmBattle;
         public AudioClip bgmVictory;
 
+        [Header("SFX")]
+        public AudioClip sfxHeal;
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

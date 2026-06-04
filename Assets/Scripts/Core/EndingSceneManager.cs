@@ -5,9 +5,9 @@ namespace MiniTeam.Core
 {
     public class EndingSceneManager : MonoBehaviour
     {
-        [Header("이동할 씬 이름")]
-        [Tooltip("엔딩이 끝나고 돌아갈 씬의 이름을 적어주세요. (기본값: Main)")]
-        public string mainSceneName = "Main";
+        [Header("이동 할 씬 이름")]
+        [Tooltip("메인 메뉴 역할을 하는 씬 주소. (기본값: Hub)")]
+        public string mainSceneName = "Hub";
 
         /// <summary>
         /// 메인 씬으로 돌아가는 메서드. 
@@ -15,10 +15,16 @@ namespace MiniTeam.Core
         /// </summary>
         public void GoToMainScene()
         {
-            Debug.Log($"[EndingSceneManager] {mainSceneName} 씬으로 이동합니다.");
+            Debug.Log($"[EndingSceneManager] {mainSceneName} 로 이동합니다.");
             
-            // 만약 컷씬 도중 게임이 일시정지(Time.timeScale = 0) 되어 있었다면 정상 속도로 복구
+            // 일시정지 상태(Time.timeScale = 0) 였다면 속도 복구
             Time.timeScale = 1f;
+            
+            // 통합된 씬 구조: Hub 씬으로 가되, 메인 메뉴 상태로 활성화되도록 지시
+            if (MiniGameManager.Instance != null)
+            {
+                MiniGameManager.Instance.isMainMenuActive = true;
+            }
             
             SceneManager.LoadScene(mainSceneName);
         }
