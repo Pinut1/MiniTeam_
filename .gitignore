@@ -89,6 +89,9 @@ Packages/com.coplaydev.unity-mcp/
 # Claude Code
 Assets/.claude/
 
+# Unity scene recovery files
+/Assets/_Recovery/
+
 # AI Handoff Document
 /AI_HANDOFF.md
 
